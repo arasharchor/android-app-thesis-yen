@@ -1,8 +1,12 @@
 package com.yen.androidappthesisyen;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,9 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements ActionBar.TabListener {
 
     private static final String LOG_TAG = "MainActivity";
+
+    // FOR REFRESH ICON
+    private final Handler handler = new Handler();
 
 
 
@@ -34,9 +41,21 @@ public class MainActivity extends Activity {
 
         }
 
+        final ActionBar theActionBar = getActionBar();
 
         // is FALSE bij ROOT ACTIVITY he.
-        getActionBar().setDisplayHomeAsUpEnabled(false);
+        theActionBar.setDisplayHomeAsUpEnabled(false);
+
+        // set up tabs nav
+        for (int i = 1; i < 4; i++) {
+            // Only recently gotten deprecated: since Android 5.0
+            theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
+        }
+
+        // Only recently gotten deprecated: since Android 5.0
+        theActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        // TODO perhaps work with LIST instead of TABS if you want to.
+
     }
 
 
@@ -46,6 +65,24 @@ public class MainActivity extends Activity {
 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
+
+        // FOR REFRESH ICON
+        final MenuItem refreshMenuItem = (MenuItem) menu.findItem(R.id.action_button_refresh);
+        refreshMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            // on selecting show progress spinner for 1s
+            public boolean onMenuItemClick(MenuItem item) {
+                // is by default DISABLED and we leave it that way since it's not needed
+//                item.setActionView(R.layout.progress_action);
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        refreshMenuItem.setActionView(null);
+                    }
+                }, 1000);
+                return false;
+            }
+        });
+
+
 //        return true;
         return super.onCreateOptionsMenu(menu);
     }
@@ -72,9 +109,62 @@ public class MainActivity extends Activity {
                 // TODO zoekfunctie
                 return true;*/
 
-            case R.id.actionbar_settings:
+            case android.R.id.home:
+                // TODO handle clicking the app icon/logo
+                return false; // TODO why here 'false'?
+
+            case R.id.action_button_refresh:
+                // switch to a progress animation
+                item.setActionView(R.layout.indeterminate_progress_action);
+                return true;
+
+
+            case R.id.action_button_1:
+                // TODO doe iets
+                /*useLogo = !useLogo; VANBOVEN STOND ER: private boolean useLogo = false;
+                item.setChecked(useLogo);
+                getActionBar().setDisplayUseLogoEnabled(useLogo);*/
+                return true;
+
+            case R.id.action_button_2:
+                // TODO doe iets
+                /*showHomeUp = !showHomeUp;
+                item.setChecked(showHomeUp);
+                getActionBar().setDisplayHomeAsUpEnabled(showHomeUp);*/
+                return true;
+
+            case R.id.action_set_1_opt_1:
+                item.setChecked(true);
                 // TODO doe iets
                 return true;
+
+            case R.id.action_set_1_opt_3:
+                item.setChecked(true);
+                // TODO doe iets
+                return true;
+
+            case R.id.action_set_1_opt_2:
+                item.setChecked(true);
+                // TODO doe iets
+                return true;
+
+            case R.id.action_set_2_opt_1:
+                item.setChecked(true);
+                // TODO doe iets
+//                getActionBar().setBackgroundDrawable(null);
+                return true;
+
+            case R.id.action_set_2_opt_2:
+                item.setChecked(true);
+                // TODO doe iets
+//                getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ad_action_bar_gradient_bak));
+                return true;
+
+
+            case R.id.action_settings:
+                // TODO doe iets
+                return true;
+
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -82,9 +172,9 @@ public class MainActivity extends Activity {
 
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
+
+
+
     public static class PlaceholderFragment extends Fragment {
 
         public PlaceholderFragment() {
@@ -127,4 +217,33 @@ Note: When your activity is paused, the Activity instance is kept resident in me
 
 
     }
+
+
+
+    public void toMasterDetailActivity(View view) {
+        Intent intent = new Intent(this, MasterDetailItemListActivity.class);
+        // nu geen extra info met de Intent verstuurd.
+        startActivity(intent);
+    }
+
+
+
+    // Following 3 methods are due to "implements ActionBar.TabListener"
+    // TODO tabs are probably meant to CHANGE THE LAYOUT (change activity or fragment) while the BUTTONS on the left of the OVERFLOW BUTTON are probably for ACTIONS on the current layout
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+        // TODO doe iets
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        // TODO doe iets
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        // TODO doe iets
+    }
+
+
 }

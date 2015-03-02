@@ -5,6 +5,19 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <!-- Customize your theme here. -->
+
+        <item name="android:actionBarTabStyle">@style/MyActionBarTabStyle</item>
+
+
     </style>
+
+    <!-- style for the tabs -->
+    <style name="MyActionBarTabStyle" parent="android:style/Widget.Holo.Light.ActionBar.TabView">
+        <!--Useful!-->
+        <item name="android:paddingLeft">32dp</item>
+        <item name="android:paddingRight">32dp</item>
+    </style>
+
+
 
 </resources>

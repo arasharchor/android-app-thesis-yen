@@ -4,10 +4,68 @@
     tools:context=".MainActivity">
 
     <!-- Settings, should always be in the overflow -->
-    <!-- Hier geen icon ingesteld -->
-    <item android:id="@+id/actionbar_settings"
+    <!-- Here no icon defined -->
+    <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
+
+    <!-- icon -->
+    <item android:id="@+id/action_button_refresh"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_label_refresh"
+        android:icon="@drawable/ic_menu_refresh_holo_light" />
+
+    <item android:id="@+id/action_button_1"
+        android:showAsAction="ifRoom"
+        android:checkable="true"
+        android:checked="false"
+        android:title="@string/action_label_button_1" />
+
+
+    <item android:id="@+id/action_button_2"
+        android:showAsAction="ifRoom"
+        android:checkable="true"
+        android:checked="false"
+        android:title="@string/action_label_button_2" />
+
+    <!-- Navigation submenu -->
+    <item android:id="@+id/action_menu_setting_1"
+        android:title="@string/action_label_setting_1">
+        <menu>
+            <group android:id="@+id/action_group_setting_1"
+                android:checkableBehavior="single">
+
+                <item android:id="@+id/action_set_1_opt_1"
+                    android:title="@string/action_label_set_1_opt_1"
+                    android:checked="true" />
+
+                <item android:id="@+id/action_set_1_opt_2"
+                    android:title="@string/action_label_set_1_opt_2" />
+
+                <item android:id="@+id/action_set_1_opt_3"
+                    android:title="@string/action_label_set_1_opt_3" />
+
+            </group>
+        </menu>
+    </item>
+
+    <!-- action bar background submenu -->
+    <item android:id="@+id/action_menu_setting_2"
+        android:title="@string/action_label_setting_2">
+        <menu>
+            <group android:id="@+id/action_group_setting_2"
+                android:checkableBehavior="single">
+
+                <item android:id="@+id/action_set_2_opt_1"
+                    android:title="@string/action_label_set_2_opt_1"
+                    android:checked="true" />
+
+                <item android:id="@+id/action_set_2_opt_2"
+                    android:title="@string/action_label_set_2_opt_2" />
+
+            </group>
+        </menu>
+    </item>
 
 </menu>
