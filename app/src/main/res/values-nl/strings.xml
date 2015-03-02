@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android App Thesis Yen</string>
+    <string name="action_settings">Instellingen</string>
+    <string name="hello_world">Hallo wereld!</string>
+    <string name="foobar">foobar</string>
+    <string name="button_master_detail_activity">Naar master &amp; detail activiteit</string>
+    <string name="pebble_not_found">Pebble niet gevonden</string>
+    <string name="acceldata_stream">Accel Data Stream</string>
+    <string name="generic_not_found">... generiek ... niet gevonden</string>
+    <string name="generic_toggle">generieke toggle</string>
+</resources>

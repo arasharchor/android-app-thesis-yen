@@ -1,0 +1,10 @@
+<resources>
+
+    <!-- DIT STOND ER EERST: parent="Theme.AppCompat.Light.DarkActionBar -->
+    <!-- Als je LIGHT theme pakt: zorg dat je de icons aanpast! -->
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
+        <!-- Customize your theme here. -->
+    </style>
+
+</resources>

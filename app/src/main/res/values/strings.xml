@@ -1,0 +1,16 @@
+<resources>
+
+    <string name="app_name">Android App Thesis Yen</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="foobar">foobar</string>
+    <string name="button_master_detail_activity">To master &amp; detail activity</string>
+    <string name="pebble_not_found">Pebble not found</string>
+    <string name="acceldata_stream">Accel Data Stream</string>
+    <string name="generic_not_found">... generic ... not found</string>
+    <string name="generic_toggle">generic toggle</string>
+    <string name="label_acceldata_stream">Accelerometer Data Stream</string>
+    <string name="label_acceldata_datalogging">Accelerometer Data Logging</string>
+    <string name="label_generic_sensor_streaming">... generic ... sensor streaming</string>
+
+</resources>
