@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ToggleButton;
 
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
@@ -55,6 +56,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // Only recently gotten deprecated: since Android 5.0
         theActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         // TODO perhaps work with LIST instead of TABS if you want to.
+
+
 
     }
 
@@ -184,6 +187,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+            // If you do it in onCreate it seems to crash! (Even though the view has been inflated using setContentView(...) beforehand.
+            ToggleButton testToggle = (ToggleButton) findViewById(R.id.toggleButton_pebble_acceldata_stream);
+            testToggle.setEnabled(false);
+
+
+
             return rootView;
         }
     }
@@ -192,6 +202,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     @Override
     protected void onResume() {
         super.onResume();
+
+
 
 
     }

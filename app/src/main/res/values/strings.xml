@@ -30,4 +30,7 @@
     <string name="action_label_set_2_opt_1">Set 2 Opt 1</string>
     <string name="action_label_set_2_opt_2">Set 2 Opt 2</string>
 
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
