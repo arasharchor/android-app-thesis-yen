@@ -7,12 +7,9 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ToggleButton;
 
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
@@ -22,7 +19,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     // FOR REFRESH ICON
     private final Handler handler = new Handler();
 
-
+    // Probably NOT recommended to make the variable FINAL and immediately initialize a fragment here.
+    // Because in onCreate you see there is a check on the savedInstanceState so it's possible a new MainFragment has to be made, but not always!
+    private MainFragment usedFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +35,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // in "R.layout.activity_main" !
         if (savedInstanceState == null) {
 //            Fragment aPlaceholderFragment = new PlaceholderFragment();
-            Fragment aPlaceholderFragment = new NewPlaceholderFragment();
+            usedFragment = new MainFragment();
+//            Fragment aPlaceholderFragment = new MainFragment();
             getFragmentManager().beginTransaction()
-                    .add(R.id.framelayout_container_main_activity, aPlaceholderFragment)
+                    .add(R.id.framelayout_container_main_activity, usedFragment)
                     .commit();
 
         }
@@ -75,8 +75,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         refreshMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             // on selecting show progress spinner for 1s
             public boolean onMenuItemClick(MenuItem item) {
-                // is by default DISABLED and we leave it that way since it's not needed
-//                item.setActionView(R.layout.progress_action);
+                // Probably best to NOT do something here, but do it in the right section in onOptionsItemSelected.
                 handler.postDelayed(new Runnable() {
                     public void run() {
                         refreshMenuItem.setActionView(null);
@@ -119,7 +118,14 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
             case R.id.action_button_refresh:
                 // switch to a progress animation
+                // THIS CODE TRIGGERS THE ANIMATION. AND THE CODE ABOVE (with handler.postDelayed) STOPS the animation after 1 sec.
                 item.setActionView(R.layout.indeterminate_progress_action);
+
+                // TODO here should arrive code to for example do a Bluetooth sweep of the environment, and show and enable the toggles for the discovered devices.
+                usedFragment.setLabelStates(usedFragment.getView(), true);
+                usedFragment.setToggleStates(usedFragment.getView(), true);
+
+
                 return true;
 
 
@@ -178,8 +184,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
 
 
-
-    public static class PlaceholderFragment extends Fragment {
+    // OLD CODE: fragment is now standalone instead of line.
+    /*public static class PlaceholderFragment extends Fragment {
 
         public PlaceholderFragment() {
         }
@@ -190,14 +196,14 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             // If you do it in onCreate it seems to crash! (Even though the view has been inflated using setContentView(...) beforehand.
-            ToggleButton testToggle = (ToggleButton) rootView.findViewById(R.id.toggleButton_pebble_acceldata_stream);
+            ToggleButton testToggle = (ToggleButton) rootView.findViewById(R.id.toggle_pebble_acceldata_stream);
             testToggle.setEnabled(false);
 
 
 
             return rootView;
         }
-    }
+    }*/
 
 
     @Override

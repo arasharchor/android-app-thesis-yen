@@ -6,11 +6,14 @@
 
     <string name="foobar">foobar</string>
 
-    <string name="button_master_detail_activity">To master &amp; detail activity</string>
+    <string name="button_master_detail_activity">To overview</string>
 
     <string name="pebble_not_found">Pebble not found</string>
+    <string name="pebble_found">Pebble found!</string>
     <string name="acceldata_stream">Accel Data Stream</string>
+    <string name="acceldata_datalogging">Accel Data DataLogging</string>
     <string name="generic_not_found">... generic ... not found</string>
+    <string name="generic_found">... generic ... found!</string>
     <string name="generic_toggle">generic toggle</string>
     <string name="label_acceldata_stream">Accelerometer Data Stream</string>
     <string name="label_acceldata_datalogging">Accelerometer Data Logging</string>
