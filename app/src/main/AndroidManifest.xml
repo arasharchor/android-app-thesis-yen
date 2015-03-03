@@ -2,13 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yen.androidappthesisyen" >
 
+    <!--Temporarily, for CursorListActivity-->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
-
-
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -18,8 +19,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".MasterDetailItemListActivity"
             android:label="@string/title_masterdetailitem_list"
@@ -28,8 +27,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
         </activity>
-
-
         <activity
             android:name=".MasterDetailItemDetailActivity"
             android:label="@string/title_masterdetailitem_detail"
@@ -38,8 +35,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MasterDetailItemListActivity" />
         </activity>
-
-
+        <activity
+            android:name=".CursorListActivity"
+            android:label="@string/title_activity_cursor_list"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.yen.androidappthesisyen.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

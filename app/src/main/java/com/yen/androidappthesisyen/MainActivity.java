@@ -48,10 +48,17 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // is FALSE bij ROOT ACTIVITY he.
         theActionBar.setDisplayHomeAsUpEnabled(false);
 
+        // TODO inflate the tab layout by using XML files instead of coding it here.
         // set up tabs nav
         for (int i = 1; i < 4; i++) {
             // Only recently gotten deprecated: since Android 5.0
-            theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
+            if(i == 2){
+                theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_2).setTabListener(this));
+            } else {
+                theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
+            }
+
+
         }
 
         // Only recently gotten deprecated: since Android 5.0
@@ -246,12 +253,24 @@ Note: When your activity is paused, the Activity instance is kept resident in me
     }
 
 
+    public void toCursorListActivity() {
+        Intent intent = new Intent(this, CursorListActivity.class);
+        startActivity(intent);
+    }
+
+
 
     // Following 3 methods are due to "implements ActionBar.TabListener"
     // TODO tabs are probably meant to CHANGE THE LAYOUT (change activity or fragment) while the BUTTONS on the left of the OVERFLOW BUTTON are probably for ACTIONS on the current layout
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // TODO doe iets
+        // TODO dit aangewezen manier voor vinden juiste tab?
+        // Don't check == 0 because that tab 0 is SELECTED by DEFAULT when starting the app.
+        // So tab 0 corresponds with the MainActivity!
+        if(tab.getPosition() == 1){
+            toCursorListActivity();
+        }
+
     }
 
     @Override
