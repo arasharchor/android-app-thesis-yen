@@ -35,7 +35,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // !! "R.id.framelayout_container_main_activity" werd gedefinieerd
         // in "R.layout.activity_main" !
         if (savedInstanceState == null) {
-            Fragment aPlaceholderFragment = new PlaceholderFragment();
+//            Fragment aPlaceholderFragment = new PlaceholderFragment();
+            Fragment aPlaceholderFragment = new NewPlaceholderFragment();
             getFragmentManager().beginTransaction()
                     .add(R.id.framelayout_container_main_activity, aPlaceholderFragment)
                     .commit();
@@ -189,7 +190,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             // If you do it in onCreate it seems to crash! (Even though the view has been inflated using setContentView(...) beforehand.
-            ToggleButton testToggle = (ToggleButton) findViewById(R.id.toggleButton_pebble_acceldata_stream);
+            ToggleButton testToggle = (ToggleButton) rootView.findViewById(R.id.toggleButton_pebble_acceldata_stream);
             testToggle.setEnabled(false);
 
 
