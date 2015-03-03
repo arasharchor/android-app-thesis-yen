@@ -7,6 +7,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,9 +20,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     // FOR REFRESH ICON
     private final Handler handler = new Handler();
 
-    // Probably NOT recommended to make the variable FINAL and immediately initialize a fragment here.
-    // Because in onCreate you see there is a check on the savedInstanceState so it's possible a new MainFragment has to be made, but not always!
-    private MainFragment usedFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +33,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // !! "R.id.framelayout_container_main_activity" werd gedefinieerd
         // in "R.layout.activity_main" !
         if (savedInstanceState == null) {
-//            Fragment aPlaceholderFragment = new PlaceholderFragment();
-            usedFragment = new MainFragment();
-//            Fragment aPlaceholderFragment = new MainFragment();
+            // DONT PLACE THIS FRAGMENT IN A GLOBAL VARIABLE. Since fragments get made and remade upon orientation changes and stuff!
+            // So that variable could become NULL at some point!
+            Fragment aPlaceholderFragment = new MainFragment();
             getFragmentManager().beginTransaction()
-                    .add(R.id.framelayout_container_main_activity, usedFragment)
+                    .add(R.id.framelayout_container_main_activity, aPlaceholderFragment)
                     .commit();
 
         }
@@ -128,9 +127,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                 // THIS CODE TRIGGERS THE ANIMATION. AND THE CODE ABOVE (with handler.postDelayed) STOPS the animation after 1 sec.
                 item.setActionView(R.layout.indeterminate_progress_action);
 
+                // !!
+                MainFragment currentFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.framelayout_container_main_activity);
+
+
                 // TODO here should arrive code to for example do a Bluetooth sweep of the environment, and show and enable the toggles for the discovered devices.
-                usedFragment.setLabelStates(usedFragment.getView(), true);
-                usedFragment.setToggleStates(usedFragment.getView(), true);
+                currentFragment.setLabelStates(currentFragment.getView(), true);
+                currentFragment.setToggleStates(currentFragment.getView(), true);
 
 
                 return true;
@@ -245,7 +248,9 @@ Note: When your activity is paused, the Activity instance is kept resident in me
     }
 
 
-
+    /*TODO perhaps: You can also declare the click event handler programmatically rather than in an XML layout. This might be necessary if you instantiate the Button at runtime or you need to declare the click behavior in a Fragment subclass.
+     https://developer.android.com/guide/topics/ui/controls/button.html
+      So put the following code in the FRAGMENT since it's the FRAGMENT that builds the GUI; not the ACTIVITY in our case. */
     public void toMasterDetailActivity(View view) {
         Intent intent = new Intent(this, MasterDetailItemListActivity.class);
         // nu geen extra info met de Intent verstuurd.

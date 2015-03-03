@@ -9,6 +9,8 @@
     tools:context="com.yen.androidappthesisyen.MainFragment">
 
 
+    <!--android:layout_column="0" ETC probably only need when you want to SKIP certain places in a row-->
+
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -19,7 +21,10 @@
         android:onClick="toMasterDetailActivity"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+
         />
+
+    <!-- COULD BE USEFUL FOR SOME BUTTONS: style="?android:attr/borderlessButtonStyle"-->
 
 
     <!--of fill parent of match parent maken?-->
@@ -56,13 +61,22 @@
                 android:layout_height="fill_parent"
                 android:id="@+id/tableRow_1_main">
 
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/connect_pebble"
+                    android:id="@+id/button_connect_pebble" />
+
+
+                <!-- perhaps use android:layout_span="4"-->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/pebble_not_found"
                     android:id="@+id/textView_pebble"
-                    android:layout_span="4"
+
                     />
 
             </TableRow>
@@ -76,16 +90,29 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/communication_test"
+                    android:id="@+id/label_communication_test" />
+
+                <ToggleButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/toggle_communication_test"
+                    android:id="@+id/toggle_communication_test" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/label_acceldata_stream"
                     android:id="@+id/label_acceldata_stream"
-                    android:layout_column="0" />
+                     />
 
                 <ToggleButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/acceldata_stream"
                     android:id="@+id/toggle_pebble_acceldata_stream"
-                    android:layout_column="1" />
+                     />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -93,14 +120,14 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/label_acceldata_datalogging"
                     android:id="@+id/label_acceldata_datalogging"
-                    android:layout_column="2" />
+                    />
 
                 <ToggleButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/acceldata_datalogging"
                     android:id="@+id/toggle_pebble_acceldata_datalogging"
-                    android:layout_column="3" />
+                    />
             </TableRow>
 
             <TableRow
@@ -128,7 +155,7 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:text="@string/label_generic_sensor_streaming"
                     android:id="@+id/label_generic_sensor_streaming"
-                    android:layout_column="0" />
+                    />
 
                 <ToggleButton
                     android:layout_width="wrap_content"
@@ -136,7 +163,6 @@
                     android:text="@string/generic_toggle"
                     android:id="@+id/toggle_generic"
                     android:checked="false"
-                    android:layout_column="1"
                      />
             </TableRow>
 
@@ -151,9 +177,29 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/scrollView_tableLayout_main"
 
-        android:layout_margin="16dp"
         android:padding="16dp"
-        android:background="@drawable/border_ui" />
+        android:background="@drawable/border_ui"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_toLeftOf="@+id/button"
+        android:layout_toStartOf="@+id/button" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/output_window"
+        android:id="@+id/textView_output_window"
+        android:layout_alignBottom="@+id/listView_main"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/listView_main"
+        android:layout_toRightOf="@+id/button"
+        android:layout_toEndOf="@+id/button"
+        android:background="@drawable/border_ui"
+        android:padding="16dp"/>
+
+
     <!--android:layout_marginTop="@dimen/activity_vertical_margin"-->
 
 </RelativeLayout>

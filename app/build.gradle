@@ -22,5 +22,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    // for PEBBLE
+    compile 'com.getpebble:pebblekit:2.6.0'
     compile 'com.android.support:support-v4:21.0.3'
 }

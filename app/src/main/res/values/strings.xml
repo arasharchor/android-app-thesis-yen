@@ -37,5 +37,18 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_cursor_list">CursorListActivity</string>
     <string name="label_tab_2">CursorListActivity</string>
+    <string name="output_window">Output Window</string>
+    <string name="communication_test">Communication Test</string>
+    <string name="toggle_communication_test">Communication Test</string>
+    <string name="start_communication_test">START COMMUNICATION TEST</string>
+    <string name="stop_communication_test">STOP COMMUNICATION TEST</string>
+    <string name="pebble_button_up_pressed">Pebble button UP pressed.</string>
+    <string name="pebble_button_down_pressed">Pebble button DOWN pressed.</string>
+    <string name="pebble_button_select_pressed">Pebble button SELECT pressed.</string>
+    <string name="connect_pebble">Connect Pebble</string>
+    <string name="pebble_companion_app_not_found">Pebbe Companion App not found. Redirecting to App Store.</string>
+    <string name="pebble_companion_app_found">Pebble Companion App found. Now opening.</string>
+    <string name="connect_your_pebble">Connect your Pebble through the Pebble Companion App.</string>
+    <string name="download_and_retry">Download the Pebble Companion App and retry.</string>
 
 </resources>
