@@ -5,12 +5,15 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Toast;
 
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
@@ -19,6 +22,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     // FOR REFRESH ICON
     private final Handler handler = new Handler();
+
+
+    private static final int ID_action_pebble_companion_app_install_run = 1;
 
 
 
@@ -44,12 +50,20 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         final ActionBar theActionBar = getActionBar();
 
-        // is FALSE bij ROOT ACTIVITY he.
+        // FALSE because ROOT ACTIVITY
         theActionBar.setDisplayHomeAsUpEnabled(false);
 
+
+
+        // Only recently gotten deprecated: since Android 5.0
+        theActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        // TODO perhaps work with LIST instead of TABS if you want to.
+
+
+        // TODO hoort dit niet in onCreateOptionsMenu ? UPDATE is goed volgens tutorial @ https://developer.android.com/training/implementing-navigation/lateral.html#tabs
         // TODO inflate the tab layout by using XML files instead of coding it here.
         // set up tabs nav
-        for (int i = 1; i < 4; i++) {
+        for (int i = 1; i <= 3; i++) {
             // Only recently gotten deprecated: since Android 5.0
             if(i == 2){
                 theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_2).setTabListener(this));
@@ -57,14 +71,14 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                 theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
             }
 
-
         }
 
-        // Only recently gotten deprecated: since Android 5.0
-        theActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        // TODO perhaps work with LIST instead of TABS if you want to.
 
 
+
+        // Certain apps need to keep the screen turned on, such as games or movie apps. The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
+        // From https://developer.android.com/training/scheduling/wakelock.html
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     }
 
@@ -72,6 +86,18 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // INFO OVER ALLE MOGELIJKE OPTIES: https://stackoverflow.com/questions/10303898/oncreateoptionsmenu-calling-super
+
+
+
+        super.onCreateOptionsMenu(menu);
+
+
+
+
+        // You have inflated the menu IN THE ACTIVITY. It's also possible to do it into the FRAGMENT. (right now, MainFragment doesn't have this method onCreateOptionsMenu)
+        // We could place all the following code into the MainFragment if we want.
+        // TODO perhaps?
+        // It's also possible to have a portion in an ACTIVITY and a portion into a FRAGMENTS. Those portions will then get combined at runtime!
 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
@@ -92,8 +118,54 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         });
 
 
-//        return true;
-        return super.onCreateOptionsMenu(menu);
+        // Here we work programmatically instead of via XML. Since we have to check AT RUNTIME some conditions.
+        addInstallOrRunPebbleCompanionAppOption(menu);
+
+
+        return true;
+//        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void addInstallOrRunPebbleCompanionAppOption(Menu menu) {
+
+        MenuItem firstButton = menu.findItem(R.id.action_button_1);
+
+        final Intent intent = getPackageManager().getLaunchIntentForPackage("com.getpebble.android");
+
+
+        if (intent != null) {
+            firstButton.setTitle("Pebble Companion App");
+            firstButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+
+                    return true;
+                }
+            });
+
+
+
+        } else {
+            // TODO translate
+            firstButton.setTitle("Install Pebble Companion App");
+            firstButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    Intent newIntent = new Intent(Intent.ACTION_VIEW);
+                    newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    newIntent.setData(Uri.parse("market://details?id=com.getpebble.android"));
+                    startActivity(newIntent);
+
+                    return true;
+                }
+            });
+
+
+
+        }
+
     }
 
     @Override
@@ -111,6 +183,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         }
 
         return super.onOptionsItemSelected(item);*/
+
+
+
+        // TODO of dit gebruiken. MJA, LIJKT OP ZELFDE SYSTEEM ALS HIER DUS MSS BETER NIET.
+        /*Tip: Android 3.0 adds the ability for you to define the on-click behavior for a menu item in XML, using the android:onClick attribute. The value for the attribute must be the name of a method defined by the activity using the menu.
+        The method must be public and accept a single MenuItem parameter—when the system calls this method, it passes the menu item selected. For more information and an example, see the Menu Resource document.*/
 
         switch (item.getItemId()) {
             // TODO eventueel zoekfunctie implementeren
@@ -287,6 +365,17 @@ Note: When your activity is paused, the Activity instance is kept resident in me
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
         // TODO doe iets
     }
+
+
+
+
+
+
+
+    /*
+    ON RESTART niet echt nodig. Gebruik beter ON START voor code dat je in ON RESTART zou willen zetten.
+    Zie https://developer.android.com/training/basics/activity-lifecycle/stopping.html
+     */
 
 
 }

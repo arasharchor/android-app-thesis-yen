@@ -76,6 +76,11 @@ public class CursorListActivity extends ListActivity implements LoaderManager.Lo
         // Prepare the loader.  Either re-connect with an existing one,
         // or start a new one.
         getLoaderManager().initLoader(0, null, this);
+
+
+
+        // TODO To use here as well?
+        // getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
 

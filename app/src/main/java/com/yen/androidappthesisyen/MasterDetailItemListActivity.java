@@ -58,6 +58,10 @@ public class MasterDetailItemListActivity extends Activity
         }
 
         // TODO: If exposing deep links into your app, handle intents here.
+
+
+        // TODO To use here as well?
+        // getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override

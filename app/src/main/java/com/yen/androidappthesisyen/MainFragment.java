@@ -1,10 +1,12 @@
 package com.yen.androidappthesisyen;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -19,9 +22,8 @@ import android.widget.ToggleButton;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
+import java.util.List;
 import java.util.UUID;
-
-
 
 
 /**
@@ -43,7 +45,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     // TODO use more useful name
     // For Pebble communication test
-    private PebbleKit.PebbleDataReceiver mReceiver;
+    private PebbleKit.PebbleDataReceiver myPebbleDataReceiver;
     private static final int KEY_BUTTON_EVENT = 2,
             BUTTON_EVENT_UP = 3,
             BUTTON_EVENT_DOWN = 4,
@@ -51,6 +53,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             KEY_VIBRATION = 6;
 
 
+    // For Pebble accel data logging
+    private final int DATA_LOG_ACCEL_DATA_TAG = 42;
+    private PebbleKit.PebbleDataLogReceiver myPebbleDataLOGReceiver;
+    private StringBuilder resultBuilder = new StringBuilder();
+    private final Handler handler = new Handler();
 
 
     public MainFragment() {
@@ -76,9 +83,16 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         // BEST SOLUTION TO COMPLETELY DECOUPLING THE GUI COMPONENTS AND THEIR LISTENERS FROM THE ACTIVITY THE FRAGMENT IS RESIDING IN.
         // SEE https://stackoverflow.com/questions/6091194/how-to-handle-button-clicks-using-the-xml-onclick-within-fragments
         registerButtonAndToggleListeners(returnedView);
-
+        // TODO the above doesn't really belong here in onCreateView but for example in onViewCreated or similar.
 
         initListViewMain(returnedView);
+
+
+
+        // We also place it here, since in case there is already text in the Output Window when arriving there, we immediately scroll.
+        ((ScrollView) returnedView.findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+
+
 
 
         return returnedView;
@@ -126,7 +140,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    public void setToggleStates(View returnedView, boolean state){
+    public void setToggleStates(View returnedView, boolean state) {
 
         ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
         toggleCommunicationTest.setEnabled(state);
@@ -138,10 +152,10 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         toggleGeneric.setEnabled(state);
     }
 
-    public void setLabelStates(View returnedView, boolean isFound){
+    public void setLabelStates(View returnedView, boolean isFound) {
         TextView textViewPebble = (TextView) returnedView.findViewById(R.id.textView_pebble);
         TextView textViewGeneric = (TextView) returnedView.findViewById(R.id.textView_generic);
-        if(isFound){
+        if (isFound) {
             textViewPebble.setText(R.string.pebble_found);
             textViewGeneric.setText(R.string.generic_found);
         } else {
@@ -155,7 +169,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()){
+        switch (v.getId()) {
 
             case R.id.button_connect_pebble:
 
@@ -165,9 +179,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
             case R.id.toggle_communication_test:
 
-                ToggleButton toggleCommunicationTest = (ToggleButton) v.findViewById(R.id.toggle_communication_test);
+                ToggleButton togglePebbleCommunicationTest = (ToggleButton) v.findViewById(R.id.toggle_communication_test);
 
-                if (toggleCommunicationTest.isChecked()){
+                if (togglePebbleCommunicationTest.isChecked()) {
                     // START TEST
                     startPebbleCommunicationTest();
 
@@ -177,6 +191,21 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 }
 
                 break; // NOT "return true/false" since return type is now VOID.
+
+            case R.id.toggle_pebble_acceldata_datalogging:
+
+                ToggleButton togglePebbleDataLogging = (ToggleButton) v.findViewById(R.id.toggle_pebble_acceldata_datalogging);
+
+                if (togglePebbleDataLogging.isChecked()) {
+                    // START DATA LOGGING
+                    startPebbleDataLogging();
+
+                } else {
+                    // STOP DATA LOGGING
+                    stopPebbleDataLogging();
+                }
+
+                break;
 
             default:
 
@@ -229,7 +258,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         getToggleStatesAndEnableServices();
 
 
-
     }
 
     private void getToggleStatesAndEnableServices() {
@@ -238,21 +266,21 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
         // TODO doe dit anders! door te kijken naar de waarden die je hebt gesaved in je Preferences.
         ToggleButton toggleCommunicationTest = (ToggleButton) theView.findViewById(R.id.toggle_communication_test);
-        if(toggleCommunicationTest.isChecked()){
+        if (toggleCommunicationTest.isChecked()) {
             startPebbleCommunicationTest();
         } else {
             // Do NOTHING since the service should have been disabled already when the fragment arrived in onPause().
         }
         ToggleButton togglePebbleStream = (ToggleButton) theView.findViewById(R.id.toggle_pebble_acceldata_stream);
-        if(togglePebbleStream.isChecked()){
+        if (togglePebbleStream.isChecked()) {
             // TODO
         }
         ToggleButton togglePebbleDataLogging = (ToggleButton) theView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-        if(togglePebbleDataLogging.isChecked()){
-            // TODO
+        if (togglePebbleDataLogging.isChecked()) {
+            startPebbleDataLogging();
         }
         ToggleButton toggleGeneric = (ToggleButton) theView.findViewById(R.id.toggle_generic);
-        if(toggleGeneric.isChecked()){
+        if (toggleGeneric.isChecked()) {
             // TODO
         }
 
@@ -264,21 +292,18 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     private void startPebbleCommunicationTest() {
 
 
-
-
         Log.w(LOG_TAG, "STARTED Pebble communication test BEFORE IF");
 
         // FOR DISPLAYING WHICH PEBBLE BUTTON (UP/SELECT/DOWN) WAS PRESSED.
-        if (mReceiver == null) {
+        if (myPebbleDataReceiver == null) {
 
 
             // TODO use StringBuilder of something so the TEXT REMAINS
             final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
             // Without "getResources()." it also seems to work, but better to USE IT!
             String string = getResources().getString(R.string.start_communication_test);
-            outputWindow.setText("--- " + string + " ---");
-
-
+            outputWindow.append("--- " + string + " ---" + "\n");
+            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
 
             Log.w(LOG_TAG, "STARTED Pebble communication test");
@@ -286,7 +311,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
             // public static abstract class PebbleKit.PebbleDataReceiver
             // extends android.content.BroadcastReceiver
-            mReceiver = new PebbleKit.PebbleDataReceiver(WATCHAPP_UUID) {
+            myPebbleDataReceiver = new PebbleKit.PebbleDataReceiver(WATCHAPP_UUID) {
 
                 // in tutorial: public void receiveData(Context context, int transactionId, PebbleDictionary data)
                 @Override
@@ -302,13 +327,16 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
                         switch (button) {
                             case BUTTON_EVENT_UP:
-                                outputWindow.setText(R.string.pebble_button_up_pressed);
+                                outputWindow.append(getResources().getString(R.string.pebble_button_up_pressed));
+                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
                                 break;
                             case BUTTON_EVENT_DOWN:
-                                outputWindow.setText(R.string.pebble_button_down_pressed);
+                                outputWindow.append(getResources().getString(R.string.pebble_button_down_pressed));
+                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
                                 break;
                             case BUTTON_EVENT_SELECT:
-                                outputWindow.setText(R.string.pebble_button_select_pressed);
+                                outputWindow.append(getResources().getString(R.string.pebble_button_select_pressed));
+                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
                                 break;
                         }
 
@@ -325,7 +353,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             };
 
             // first parameter was 'this' (for type CONTEXT)
-            PebbleKit.registerReceivedDataHandler(getActivity(), mReceiver);
+            PebbleKit.registerReceivedDataHandler(getActivity(), myPebbleDataReceiver);
 
 
         }
@@ -342,31 +370,30 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         A convenience function to assist in programatically registering a broadcast receiver for the 'CONNECTED' intent. To avoid leaking memory, activities registering BroadcastReceivers must unregister them in the Activity's Activity.onPause() method.
          */
 
-        // Die IF checks op NULL zijn recommended.
-        if (mReceiver != null) {
+        // Checking for null is recommended.
+        if (myPebbleDataReceiver != null) {
 
             // TODO use StringBuilder of something so the TEXT REMAINS
             final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
             String string = getResources().getString(R.string.stop_communication_test);
-            outputWindow.setText("--- " + string + " ---");
-
+            outputWindow.append("--- " + string + " ---" + "\n");
+            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
 
             Log.w(LOG_TAG, "STOPPED Pebble communication test");
-
 
 
             // TODO zien of deze try/catch werkt voor fixen: Caused by: java.lang.IllegalArgumentException: Receiver not registered: com.yen.myfirstapp.MainActivity$1@40fc03c0
             try {
 
                 Log.w(LOG_TAG, "in TRY");
-//                unregisterReceiver(mReceiver);
+//                unregisterReceiver(myPebbleDataReceiver);
                 // Changed to following since we are in a FRAGMENT; not an ACTIVITY.
-                getActivity().unregisterReceiver(mReceiver);
+                getActivity().unregisterReceiver(myPebbleDataReceiver);
 
 
                 // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
-                mReceiver = null;
+                myPebbleDataReceiver = null;
 
 
             } catch (IllegalArgumentException ex) {
@@ -377,12 +404,152 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
 
                 // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
-                mReceiver = null;
+                myPebbleDataReceiver = null;
             }
 
         }
 
     }
+
+
+    private void startPebbleDataLogging() {
+
+        // voor PEBBLE DATA LOGGING
+        if (myPebbleDataLOGReceiver == null) {
+
+
+            // TODO use StringBuilder of something so the TEXT REMAINS
+            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+            // Without "getResources()." it also seems to work, but better to USE IT!
+            String string = getResources().getString(R.string.start_pebble_data_logging);
+            outputWindow.append("--- " + string + " ---" + "\n");
+            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+
+
+            // MEER INFO https://developer.android.com/reference/android/os/Handler.html
+            // + https://developer.android.com/training/multiple-threads/communicate-ui.html
+
+
+        /*ZORGT VOOR DELAYS (skipped frames) IN EMULATOR DUS DIT NIET GEBRUIKEN.
+        TUTORIAL GEBRUIKT OOK BOVENSTAANDE FINAL IMPLEMENTATIE.
+        if(handler == null){
+            handler = new Handler();
+        }
+        */
+
+
+            myPebbleDataLOGReceiver = new PebbleKit.PebbleDataLogReceiver(WATCHAPP_UUID) {
+
+                @Override
+                public void receiveData(Context context, UUID logUuid, Long timestamp, Long tag, byte[] data) {
+                    // Important note: If your Java IDE places a call to super() by default, this will cause an UnsupportedOperationException to be thrown.
+                    // Remove this line to avoid the Exception.
+                    // super.receiveData(context, logUuid, timestamp, tag, data);
+
+
+                    if (tag.intValue() == DATA_LOG_ACCEL_DATA_TAG) {
+
+                        // TODO klopt dit systeem nog?
+                        // misaligned data, just drop it
+                        if (data.length % 15 != 0 || data.length < 15) {
+                            // System.out.println("Misaligned data while data logging");
+                            Log.w("DATA LOGGING", "Misaligned data while data logging");
+                            return;
+                        }
+
+
+                        List<AccelData> accelDataList = AccelData.fromDataArray(data);
+
+
+//                        resultBuilder.append("size van list accelDataList:" + accelDataList.size() + "\n");
+                        // size gaf 1 MAAR ZAL DIT NIET ALTIJD ZO ZIJN
+                        // OMDAT WE INGESTELD HADDEN MAAR 1 SAMPLE PER KEER TE STUREN?
+                        // maar best houden voor als we samples verhogen.
+
+
+                        for (final AccelData accelItem : accelDataList) {
+//                            try {
+
+//                                resultBuilder.append(accel.toJson().toString(2));
+//                            resultBuilder.append(accelItem.getOneLineString() + "\n");
+
+
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+//                                    outputWindow.setText(resultBuilder.toString());
+//                                    outputWindow.append(resultBuilder.toString());
+                                    outputWindow.append(accelItem.getOneLineString() + "\n");
+                                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+                                }
+                            });
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+                        }
+
+
+                    }
+                }
+
+                @Override
+                public void onFinishSession(Context context, UUID logUuid, Long timestamp, Long tag) {
+                    super.onFinishSession(context, logUuid, timestamp, tag);
+
+                    // Session is finished, use the data!
+
+                    // logView.setText("Sending data log FINISHED. " + resultBuilder.toString());
+//                    outputWindow.setText("Sending data log FINISHED.");
+
+                    outputWindow.append("--- " + getResources().getString(R.string.sending_data_log_finished) + " ---" + "\n");
+                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+                }
+            };
+
+            PebbleKit.registerDataLogReceiver(getActivity(), myPebbleDataLOGReceiver);
+
+
+            // TODO TEST: PebbleKit.requestDataLogsForApp(this, WATCHAPP_UUID);
+            // A convenience function to emit an intent to pebble.apk to request the data logs for a particular app.
+
+        }
+
+
+    }
+
+
+    private void stopPebbleDataLogging() {
+
+        // Finally, as with any Receivers registered with PebbleKit,
+        // remember to unregister your receiver when the user leaves the app:
+        if (myPebbleDataLOGReceiver != null) {
+
+
+            // TODO use StringBuilder of something so the TEXT REMAINS
+            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+            // Without "getResources()." it also seems to work, but better to USE IT!
+            String string = getResources().getString(R.string.stop_pebble_data_logging);
+            outputWindow.append("--- " + string + " ---" + "\n");
+            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+
+
+            try {
+
+                getActivity().unregisterReceiver(myPebbleDataLOGReceiver);
+
+                myPebbleDataLOGReceiver = null;
+
+            } catch (IllegalArgumentException ex) {
+                // TODO niets doen gewoon?
+
+
+                myPebbleDataLOGReceiver = null;
+            }
+        }
+
+    }
+
 
     @Override
     public void onPause() {
@@ -396,6 +563,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
 
         stopPebbleCommunicationTest();
+        stopPebbleDataLogging();
 
         // TODO voeg stop-methods van andere services toe.
     }
@@ -430,8 +598,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         super.onDetach();
         mListener = null;
     }*/
-
-
 
 
     /**

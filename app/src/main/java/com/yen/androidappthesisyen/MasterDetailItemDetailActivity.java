@@ -47,6 +47,10 @@ public class MasterDetailItemDetailActivity extends Activity {
                     .add(R.id.masterdetailitem_detail_container, fragment)
                     .commit();
         }
+
+
+        // TODO To use here as well?
+        // getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override

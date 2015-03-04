@@ -16,23 +16,27 @@
         android:title="@string/action_label_refresh"
         android:icon="@drawable/ic_menu_refresh_holo_light" />
 
+
+    <!--android:checkable="true"-->
+    <!--android:checked="false"-->
     <item android:id="@+id/action_button_1"
         android:showAsAction="ifRoom"
-        android:checkable="true"
-        android:checked="false"
         android:title="@string/action_label_button_1" />
 
 
+    <!--android:checkable="true"-->
+    <!--android:checked="false"-->
     <item android:id="@+id/action_button_2"
         android:showAsAction="ifRoom"
-        android:checkable="true"
-        android:checked="false"
         android:title="@string/action_label_button_2" />
 
     <!-- Navigation submenu -->
     <item android:id="@+id/action_menu_setting_1"
         android:title="@string/action_label_setting_1">
+
+
         <menu>
+
             <group android:id="@+id/action_group_setting_1"
                 android:checkableBehavior="single">
 
@@ -47,13 +51,22 @@
                     android:title="@string/action_label_set_1_opt_3" />
 
             </group>
+
         </menu>
+
+
     </item>
+
+
+
 
     <!-- action bar background submenu -->
     <item android:id="@+id/action_menu_setting_2"
         android:title="@string/action_label_setting_2">
+
+
         <menu>
+
             <group android:id="@+id/action_group_setting_2"
                 android:checkableBehavior="single">
 
@@ -65,7 +78,10 @@
                     android:title="@string/action_label_set_2_opt_2" />
 
             </group>
+
         </menu>
+
+
     </item>
 
 </menu>

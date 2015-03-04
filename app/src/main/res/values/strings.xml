@@ -37,7 +37,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_cursor_list">CursorListActivity</string>
     <string name="label_tab_2">CursorListActivity</string>
-    <string name="output_window">Output Window</string>
+    <string name="output_window">Output Window\n</string>
     <string name="communication_test">Communication Test</string>
     <string name="toggle_communication_test">Communication Test</string>
     <string name="start_communication_test">START COMMUNICATION TEST</string>
@@ -50,5 +50,8 @@
     <string name="pebble_companion_app_found">Pebble Companion App found. Now opening.</string>
     <string name="connect_your_pebble">Connect your Pebble through the Pebble Companion App.</string>
     <string name="download_and_retry">Download the Pebble Companion App and retry.</string>
+    <string name="start_pebble_data_logging">START PEBBLE DATA LOGGING</string>
+    <string name="stop_pebble_data_logging">STOP PEBBLE DATA LOGGING</string>
+    <string name="sending_data_log_finished">Sending data log FINISHED</string>
 
 </resources>
