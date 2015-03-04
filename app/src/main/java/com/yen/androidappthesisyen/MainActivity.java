@@ -8,12 +8,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
@@ -25,7 +23,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
 
     private static final int ID_action_pebble_companion_app_install_run = 1;
-
 
 
     @Override
@@ -54,7 +51,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         theActionBar.setDisplayHomeAsUpEnabled(false);
 
 
-
         // Only recently gotten deprecated: since Android 5.0
         theActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         // TODO perhaps work with LIST instead of TABS if you want to.
@@ -65,15 +61,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // set up tabs nav
         for (int i = 1; i <= 3; i++) {
             // Only recently gotten deprecated: since Android 5.0
-            if(i == 2){
+            if (i == 2) {
                 theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_2).setTabListener(this));
             } else {
                 theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
             }
 
         }
-
-
 
 
         // Certain apps need to keep the screen turned on, such as games or movie apps. The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
@@ -88,10 +82,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // INFO OVER ALLE MOGELIJKE OPTIES: https://stackoverflow.com/questions/10303898/oncreateoptionsmenu-calling-super
 
 
-
         super.onCreateOptionsMenu(menu);
-
-
 
 
         // You have inflated the menu IN THE ACTIVITY. It's also possible to do it into the FRAGMENT. (right now, MainFragment doesn't have this method onCreateOptionsMenu)
@@ -146,7 +137,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             });
 
 
-
         } else {
             // TODO translate
             firstButton.setTitle("Install Pebble Companion App");
@@ -161,7 +151,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     return true;
                 }
             });
-
 
 
         }
@@ -183,7 +172,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         }
 
         return super.onOptionsItemSelected(item);*/
-
 
 
         // TODO of dit gebruiken. MJA, LIJKT OP ZELFDE SYSTEEM ALS HIER DUS MSS BETER NIET.
@@ -271,7 +259,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     }
 
 
-
     // OLD CODE: fragment is now standalone instead of line.
     /*public static class PlaceholderFragment extends Fragment {
 
@@ -299,10 +286,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         super.onResume();
 
 
-
-
     }
-
 
 
     /*When the system calls onPause() for your activity, it technically means your activity is still partially visible, but most often is an indication that the user is leaving the activity and it will soon enter the Stopped state. You should usually use the onPause() callback to:
@@ -342,7 +326,6 @@ Note: When your activity is paused, the Activity instance is kept resident in me
     }
 
 
-
     // Following 3 methods are due to "implements ActionBar.TabListener"
     // TODO tabs are probably meant to CHANGE THE LAYOUT (change activity or fragment) while the BUTTONS on the left of the OVERFLOW BUTTON are probably for ACTIONS on the current layout
     @Override
@@ -350,7 +333,7 @@ Note: When your activity is paused, the Activity instance is kept resident in me
         // TODO dit aangewezen manier voor vinden juiste tab?
         // Don't check == 0 because that tab 0 is SELECTED by DEFAULT when starting the app.
         // So tab 0 corresponds with the MainActivity!
-        if(tab.getPosition() == 1){
+        if (tab.getPosition() == 1) {
             toCursorListActivity();
         }
 

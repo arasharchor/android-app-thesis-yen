@@ -3,6 +3,8 @@
     <!-- DIT STOND ER EERST: parent="Theme.AppCompat.Light.DarkActionBar -->
     <!-- Als je LIGHT theme pakt: zorg dat je de icons aanpast! -->
     <!-- Base application theme. -->
+    <!--Caution: Be certain that each theme and style declares a parent theme in the <style> tag,
+    from which it inherits all styles not explicitly declared by your theme. When modifying the action bar, using a parent theme is important so that you can simply override the action bar styles you want to change without re-implementing the styles you want to leave alone (such as text size or padding in action items).-->
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <!-- Customize your theme here. -->
 

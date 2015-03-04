@@ -1,6 +1,5 @@
 package com.yen.androidappthesisyen;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -27,7 +26,7 @@ public class CursorListActivity extends ListActivity implements LoaderManager.Lo
     SimpleCursorAdapter mAdapter;
 
     // These are the Contacts rows that we will retrieve
-    static final String[] PROJECTION = new String[] {ContactsContract.Data._ID,
+    static final String[] PROJECTION = new String[]{ContactsContract.Data._ID,
             ContactsContract.Data.DISPLAY_NAME};
 
     // This is the select criteria
@@ -48,7 +47,6 @@ public class CursorListActivity extends ListActivity implements LoaderManager.Lo
                     .add(R.id.container_cursor_list_activity, usedFragment)
                     .commit();
         }*/
-
 
 
         // Create a progress bar to display while the list loads
@@ -78,12 +76,9 @@ public class CursorListActivity extends ListActivity implements LoaderManager.Lo
         getLoaderManager().initLoader(0, null, this);
 
 
-
         // TODO To use here as well?
         // getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
-
-
 
 
     @Override
@@ -92,7 +87,6 @@ public class CursorListActivity extends ListActivity implements LoaderManager.Lo
         getMenuInflater().inflate(R.menu.menu_cursor_list_activity, menu);
         return true;
     }
-
 
 
     @Override

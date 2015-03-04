@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,11 +88,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         initListViewMain(returnedView);
 
 
-
         // We also place it here, since in case there is already text in the Output Window when arriving there, we immediately scroll.
         ((ScrollView) returnedView.findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-
 
 
         return returnedView;
@@ -221,9 +218,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("com.getpebble.android");
         if (intent != null) {
             Toast t = Toast.makeText(getActivity(), R.string.pebble_companion_app_found, Toast.LENGTH_LONG);
+            t.setGravity(Gravity.CENTER, 0, 0);
             t.show();
 
             Toast t2 = Toast.makeText(getActivity(), R.string.connect_your_pebble, Toast.LENGTH_LONG);
+            t2.setGravity(Gravity.CENTER, 0, 0);
             t2.show();
 
             // TODO check whether really needed
@@ -232,9 +231,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         } else {
 
             Toast t = Toast.makeText(getActivity(), R.string.pebble_companion_app_not_found, Toast.LENGTH_LONG);
+            t.setGravity(Gravity.CENTER, 0, 0);
             t.show();
 
             Toast t2 = Toast.makeText(getActivity(), R.string.download_and_retry, Toast.LENGTH_LONG);
+            t2.setGravity(Gravity.CENTER, 0, 0);
             t2.show();
 
             intent = new Intent(Intent.ACTION_VIEW);

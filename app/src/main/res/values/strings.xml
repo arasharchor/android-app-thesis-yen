@@ -6,7 +6,7 @@
 
     <string name="foobar">foobar</string>
 
-    <string name="button_master_detail_activity">To overview</string>
+    <string name="button_master_detail_activity">Sample overview</string>
 
     <string name="pebble_not_found">Pebble not found</string>
     <string name="pebble_found">Pebble found!</string>

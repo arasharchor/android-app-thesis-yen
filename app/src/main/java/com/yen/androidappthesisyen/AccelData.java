@@ -13,7 +13,6 @@ import java.util.TimeZone;
 /**
  * SOURCE: https://github.com/kramimus/pebble-accel-analyzer
  * GNU GENERAL PUBLIC LICENSE: https://github.com/kramimus/pebble-accel-analyzer/blob/master/LICENSE
- *
  */
 
 
@@ -56,7 +55,7 @@ public class AccelData {
 
 
     // Added by Yen.
-    public String getOneLineString(){
+    public String getOneLineString() {
         return new String("X " + x + " Y " + y + " Z " + z);
     }
 

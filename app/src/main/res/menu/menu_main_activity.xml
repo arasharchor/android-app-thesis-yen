@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
+
+    <!--TODO gebruik android:orderInCategory als andere volgorde wilt-->
+
+
+
     <!-- Settings, should always be in the overflow -->
     <!-- Here no icon defined -->
     <item android:id="@+id/action_settings"
