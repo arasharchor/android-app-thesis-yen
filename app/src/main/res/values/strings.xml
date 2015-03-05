@@ -6,18 +6,18 @@
 
     <string name="foobar">foobar</string>
 
-    <string name="button_master_detail_activity">Sample overview</string>
+    <string name="button_master_detail_activity">(Sample overview/detail)</string>
 
     <string name="pebble_not_found">Pebble not found</string>
     <string name="pebble_found">Pebble found!</string>
     <string name="acceldata_stream">Accel Data Stream</string>
     <string name="acceldata_datalogging">Accel Data DataLogging</string>
-    <string name="generic_not_found">... generic ... not found</string>
-    <string name="generic_found">... generic ... found!</string>
+    <string name="generic_not_found">[Generic] not found</string>
+    <string name="generic_found">[Generic] found!</string>
     <string name="generic_toggle">generic toggle</string>
     <string name="label_acceldata_stream">Accelerometer Data Stream</string>
     <string name="label_acceldata_datalogging">Accelerometer Data Logging</string>
-    <string name="label_generic_sensor_streaming">... generic ... sensor streaming</string>
+    <string name="label_generic_sensor_streaming">[Generic] sensor streaming</string>
 
     <string name="title_masterdetailitem_list">MasterDetailItems</string>
     <string name="title_masterdetailitem_detail">MasterDetailItem Detail</string>
@@ -53,5 +53,20 @@
     <string name="start_pebble_data_logging">START PEBBLE DATA LOGGING</string>
     <string name="stop_pebble_data_logging">STOP PEBBLE DATA LOGGING</string>
     <string name="sending_data_log_finished">Sending data log FINISHED</string>
+    <string name="icon_content_description">Mobile Device</string>
+    <string name="connect_generic">Connect [generic]</string>
+    <string name="BT">Bluetooth</string>
+    <string name="toggle_BT">Bluetooth toggle</string>
+    <string name="start_BT">Enabled Bluetooth</string>
+    <string name="BT_already_enabled">Bluetooth is enabled already</string>
+    <string name="stop_BT">Disabled Bluetooth</string>
+    <string name="BT_already_disabled">Bluetooth is disabled already</string>
+    <string name="start_BT_discoverable">Made your mobile device discoverable for 2 minutes</string>
+    <string name="BT_already_discoverable">Bluetooth is discoverable already</string>
+    <string name="BT_adapter_not_found">Bluetooth adapter not found</string>
+    <string name="BT_is_enabled">Bluetooth is enabled</string>
+    <string name="BT_is_disabled">Bluetooth is disabled</string>
+    <string name="BT_discoverable">Discoverable (2 min)</string>
+
 
 </resources>

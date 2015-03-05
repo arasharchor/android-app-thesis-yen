@@ -6,24 +6,32 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.yen.androidappthesisyen.MainFragment">
+    tools:context="com.yen.androidappthesisyen.MainFragment"
+    android:id="@+id/relative_layout_main_fragment">
+
+
+    <!-- the use of “android:layout_span” to span view in 2 cells, and “android:layout_column” to display the view in specified column. -->
+
+
+    <!-- kan handig zijn: android:layout_centerHorizontal
+    of
+    android:layout_centerInParent  :   If true, centers this child horizontally and vertically within its parent. -->
 
 
     <!--android:layout_column="0" ETC probably only need when you want to SKIP certain places in a row-->
 
     <!-- TODO change fill_parent to match_parent since it's the same but NEWER -->
 
+    <!--style="?android:attr/buttonStyleSmall"-->
     <Button
         android:id="@+id/button"
-        style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:onClick="toMasterDetailActivity"
         android:text="@string/button_master_detail_activity"
-
-        />
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/horizontalScrollView_main_fragment"
+        android:layout_alignEnd="@+id/horizontalScrollView_main_fragment" />
 
     <!-- COULD BE USEFUL FOR SOME BUTTONS: style="?android:attr/borderlessButtonStyle"-->
 
@@ -32,12 +40,15 @@
         android:id="@+id/horizontalScrollView_main_fragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_below="@+id/button"
-        android:layout_margin="16dp"
         android:background="@drawable/border_ui"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
 
         <!--of fill parent of match parent maken?-->
@@ -67,9 +78,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
+                    <!--style="?android:attr/buttonStyleSmall"-->
                     <Button
                         android:id="@+id/button_connect_pebble"
-                        style="?android:attr/buttonStyleSmall"
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/connect_pebble" />
@@ -82,8 +94,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/pebble_not_found"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-
-                        />
+                        android:textStyle="bold" />
 
                 </TableRow>
 
@@ -103,7 +114,8 @@
                         android:id="@+id/toggle_communication_test"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/toggle_communication_test" />
+                        android:text="@string/toggle_communication_test"
+                        android:enabled="false" />
 
                     <TextView
                         android:id="@+id/label_acceldata_stream"
@@ -116,7 +128,8 @@
                         android:id="@+id/toggle_pebble_acceldata_stream"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/acceldata_stream" />
+                        android:text="@string/acceldata_stream"
+                        android:enabled="false" />
 
                     <TextView
                         android:id="@+id/label_acceldata_datalogging"
@@ -129,7 +142,8 @@
                         android:id="@+id/toggle_pebble_acceldata_datalogging"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/acceldata_datalogging" />
+                        android:text="@string/acceldata_datalogging"
+                        android:enabled="false" />
                 </TableRow>
 
                 <TableRow
@@ -137,13 +151,27 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
+
+                    <!--android:layout_span="4"-->
+                    <!--style="?android:attr/buttonStyleSmall"-->
+                    <Button
+
+                        android:id="@+id/button_connect_generic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/connect_generic"
+                        android:layout_column="0" />
+
                     <TextView
                         android:id="@+id/textView_generic"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_span="4"
+
                         android:text="@string/generic_not_found"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+
+                        android:layout_column="1"
+                        android:textStyle="bold" />
                 </TableRow>
 
                 <TableRow
@@ -163,7 +191,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="false"
-                        android:text="@string/generic_toggle" />
+                        android:text="@string/generic_toggle"
+                        android:enabled="false" />
                 </TableRow>
 
             </TableLayout>
@@ -178,16 +207,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/horizontalScrollView_main_fragment"
 
         android:layout_marginBottom="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
-        android:layout_toLeftOf="@+id/button"
-        android:layout_toStartOf="@+id/button"
         android:background="@drawable/border_ui"
-        android:padding="16dp" />
+        android:padding="16dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/button_BT_discoverable"
+        android:layout_alignEnd="@+id/button_BT_discoverable" />
 
 
     <ScrollView
@@ -195,14 +224,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/listView_main"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/listView_main"
-        android:layout_toEndOf="@+id/button"
-        android:layout_toRightOf="@+id/button"
         android:background="@drawable/border_ui"
         android:padding="16dp"
-        >
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/button_BT_discoverable"
+        android:layout_toEndOf="@+id/button_BT_discoverable">
 
 
         <!--TODO Eventueel aanpassen naar EditText als dit meer opties zou bieden? -->
@@ -210,11 +238,47 @@
             android:id="@+id/textView_output_window"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/output_window"
-            />
+            android:text="@string/output_window" />
 
 
     </ScrollView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/BT"
+        android:id="@+id/textView_BT"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignBottom="@+id/button"
+        android:layout_alignLeft="@+id/horizontalScrollView_main_fragment"
+        android:layout_alignStart="@+id/horizontalScrollView_main_fragment"
+        android:textStyle="bold" />
+
+    <!--android:enabled="false"-->
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/toggle_BT"
+        android:id="@+id/toggle_BT"
+        android:layout_above="@+id/horizontalScrollView_main_fragment"
+        android:layout_toRightOf="@+id/textView_BT"
+        android:layout_toEndOf="@+id/textView_BT"
+        android:enabled="false"
+        />
+
+    <!-- This button is BY DEFAULT DISABLED, because the DEFAULT STATE for toggle_BT is also DISABLED. -->
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/BT_discoverable"
+        android:id="@+id/button_BT_discoverable"
+        android:layout_alignBottom="@+id/toggle_BT"
+        android:layout_toRightOf="@+id/toggle_BT"
+        android:layout_toEndOf="@+id/toggle_BT"
+        android:enabled="false"/>
+    <!-- android:onClick="" bij BUTTON laat toe om methode in FRAGMENT te specifiëren.
+    Maar bij TOGGLEBUTTON kan je enkel methode uit ACTIVITY kiezen?!
+     Dus als je in FRAGMENT je behavior code wilt plaatsen, blijf je werken met: programmatorisch listener toevoegen bij maken fragment. -->
 
 
     <!--android:layout_marginTop="@dimen/activity_vertical_margin"-->

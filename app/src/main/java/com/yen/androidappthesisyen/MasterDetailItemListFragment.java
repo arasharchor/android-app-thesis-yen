@@ -71,6 +71,11 @@ public class MasterDetailItemListFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Useful and good practice! See http://www.androiddesignpatterns.com/2013/04/retaining-objects-across-config-changes.html
+        // Retain this fragment across configuration changes.
+        setRetainInstance(true);
+
+
         // TODO: replace with a real list adapter.
         setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
                 getActivity(),

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // !! "R.id.framelayout_container_main_activity" werd gedefinieerd
         // in "R.layout.activity_main" !
         if (savedInstanceState == null) {
+
+            Log.w("MAIN ACTIVITY", "arrived IN if in ACTIVITY");
+
             // DONT PLACE THIS FRAGMENT IN A GLOBAL VARIABLE. Since fragments get made and remade upon orientation changes and stuff!
             // So that variable could become NULL at some point!
             Fragment aPlaceholderFragment = new MainFragment();
@@ -199,8 +203,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
                 // TODO here should arrive code to for example do a Bluetooth sweep of the environment, and show and enable the toggles for the discovered devices.
                 currentFragment.setLabelStates(currentFragment.getView(), true);
-                currentFragment.setToggleStates(currentFragment.getView(), true);
-
+                currentFragment.setEnableDisableStates(currentFragment.getView(), true);
+                // When clicking REFRESH we for now simulate the behavior that several (2) devices get detected.
+                // So their toggles get enabled but we don't set it on ON automatically. (That would be insane)
+                currentFragment.setToggleStates(currentFragment.getView(), false);
 
                 return true;
 

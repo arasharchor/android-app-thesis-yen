@@ -4,9 +4,10 @@
     <string name="action_settings">Instellingen</string>
     <string name="hello_world">Hallo wereld!</string>
     <string name="foobar">foobar</string>
-    <string name="button_master_detail_activity">Voorbeeld overzicht</string>
+    <string name="button_master_detail_activity">(Voorbeeld overzicht/detail)</string>
     <string name="pebble_not_found">Pebble niet gevonden</string>
     <string name="acceldata_stream">Accel Data Stream</string>
-    <string name="generic_not_found">... generiek ... niet gevonden</string>
+    <string name="generic_not_found">[Generiek] niet gevonden</string>
     <string name="generic_toggle">generieke toggle</string>
+
 </resources>

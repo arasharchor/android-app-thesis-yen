@@ -2,8 +2,7 @@
 <ProgressBar xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:indeterminate="true"
-    >
+    android:indeterminate="true">
     <!--TODO perhaps use this since it was used in sample project:
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
