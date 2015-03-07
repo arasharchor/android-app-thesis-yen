@@ -38,7 +38,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // in "R.layout.activity_main" !
         if (savedInstanceState == null) {
 
-            Log.w("MAIN ACTIVITY", "arrived IN if in ACTIVITY");
 
             // DONT PLACE THIS FRAGMENT IN A GLOBAL VARIABLE. Since fragments get made and remade upon orientation changes and stuff!
             // So that variable could become NULL at some point!

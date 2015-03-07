@@ -2,6 +2,7 @@ package com.yen.androidappthesisyen;
 
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -24,7 +26,9 @@ import android.widget.ToggleButton;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -79,10 +83,16 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     // je kon BOOLEAN ARRAY toepassen, maar nu heb je Bundle, voor het geval je TOCH met savedInstanceState gaat werken voor terugkrijgen van states.
 
 
-    // TODO final of niet? static of niet?
+
     private BluetoothAdapter BTadapter; // = BluetoothAdapter.getDefaultAdapter();
-    private final int REQUEST_ENABLE_BT = 50;
-    private final int REQUEST_BT_DISCOVERABLE = 51;
+    private static final int REQUEST_ENABLE_BT = 50;
+    private static final int REQUEST_BT_DISCOVERABLE = 51;
+    private Set<BluetoothDevice> setPairedBTDevices;
+
+
+
+    private ArrayAdapter<String> arrayListMainAdapter;
+    private List<String> arrayListNamesPairedBTDevices;
 
 
     public MainFragment() {
@@ -122,6 +132,12 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
         BTadapter = BluetoothAdapter.getDefaultAdapter();
+//        Log.w("BLUETOOTH", "name BT adapter: " + BTadapter.getName());
+
+        // direct ook die lijst van paired BT devices opvullen.
+        // get a list of paired devices by calling getBondedDevices()
+        // maar lijst LEEG als BT uit staat!
+        setPairedBTDevices = BTadapter.getBondedDevices();
 
 
     }
@@ -137,7 +153,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
         // SYSTEEM DAT WE NU NIET TOEPASSEN
 //        if(savedInstanceState == null){
-//            Log.w("MAIN FRAGMENT", "arrived IN if in FRAGMENT");
 //
 //            // If you do it in onCreate in MainActivity it seems to crash! (Even though the view has been inflated using setContentView(...) beforehand.
 //            // UPDATE: this is logical! Since the FRAGMENT inflates the View objects; not the ACTIVITY, in your case.
@@ -368,7 +383,8 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     // TODO in XML met onClick werken.
     private void registerButtonAndToggleListeners(View returnedView) {
 
-        Log.w("MAIN FRAGMENT", "registered BUTTON TOGGLE LISTENERS");
+        // Die LOG zie je dus bij elke orientation change. Maar das normaal want VIEW wordt HERMAAKT steeds.
+//        Log.w("MAIN FRAGMENT", "registered BUTTON TOGGLE LISTENERS");
 
         // TODO zien voor optie om gewoon alle Buttons en ToggleButtons (+ nog?) te vinden in huidige interface?
 
@@ -395,20 +411,30 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
     private void initListViewMain(View returnedView) {
 
-        String[] myStringArray = {
+        /* If you know in advance what the size of the ArrayList is going to be, it is more efficient to specify the initial capacity. If you don't do this, the internal array will have to be repeatedly reallocated as the list grows. */
+        arrayListNamesPairedBTDevices = new ArrayList<>(setPairedBTDevices.size());
+        // FOR EACH is recommended usage, performance wise, compared to for (int i = ...
+        for (BluetoothDevice pairedBTDevice : setPairedBTDevices){
+            arrayListNamesPairedBTDevices.add(pairedBTDevice.getName());
+        }
+
+
+        /*String[] myStringArray = {
                 "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7",
                 "Item 8", "Item 9", "Item 10"
-        };
+        };*/
         /*, "Item 11", "Item 12", "Item 13", "Item 14",
                 "Item 15"*/
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+//                R.layout.listview_main_item, R.id.list_main_title, myStringArray);
 
-        // changed 'this' to 'getActivity()'
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                R.layout.listview_main_item, R.id.list_main_title, myStringArray);
+
+        arrayListMainAdapter = new ArrayAdapter<>(getActivity(),
+                R.layout.listview_main_item, R.id.list_main_title, arrayListNamesPairedBTDevices);
 //        DEFAULT LAYOUT: android.R.layout.simple_list_item_1
 
         ListView listView = (ListView) returnedView.findViewById(R.id.listView_main);
-        listView.setAdapter(adapter);
+        listView.setAdapter(arrayListMainAdapter);
 
         /*To customize the appearance of each item you can override the toString() method for the objects in your array.
         Or, to create a view for each item that's something other than a TextView (for example, if you want an ImageView for each array item),
@@ -483,6 +509,7 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
     @Override
     public void onClick(View v) {
+        // View v is hier HET OBJECT DAT WERD AANGEKLIKT. Niet de View dat je veel gebruikt!
 
         switch (v.getId()) {
 
@@ -557,10 +584,35 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
             // DO NOT USE BTadapter.enable(); HERE: that wouldn't show a dialog to the user. Bad practice!
 
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
-
             // TODO eventueel: checken dat er geen error was bij enablen, via https://developer.android.com/training/basics/intents/result.html#ReceiveResult
             // en dan daarop de Toast aanpassen.
 
+            // TODO kunnen dit stuk BUITEN de IF lus zetten, zodat sowieso de button wordt geenabled. Maar is wrsl overbodig en kan mss ongewenst gedrag geven...
+            Button buttonBTDiscoverable = (Button) getView().findViewById(R.id.button_BT_discoverable);
+            buttonBTDiscoverable.setEnabled(true);
+            bundleEnableDisableStates.putBoolean("R.id.button_BT_discoverable", true);
+
+
+            // TODO SYSTEEM LIJKT NIET TE WERKEN?
+            // ! Lijst werd al ingevuld in onCreate ALS BT AANSTOND.
+            // maar indien niet, wordt het NU gedaan.
+            setPairedBTDevices = BTadapter.getBondedDevices();
+            // arrayListNamesPairedBTDevices herbouwen: clearen + alles toevoegen
+            // en clearen ADAPTER + alles toevoegen!
+            arrayListNamesPairedBTDevices.clear();
+            arrayListMainAdapter.clear();
+            for (BluetoothDevice pairedBTDevice : setPairedBTDevices){
+                arrayListNamesPairedBTDevices.add(pairedBTDevice.getName());
+                arrayListMainAdapter.add(pairedBTDevice.getName());
+            }
+            arrayListMainAdapter.notifyDataSetChanged();
+//            ListView listViewMain = (ListView) getView().findViewById(R.id.listView_main);
+
+
+
+            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+            outputWindow.append("--- " + getResources().getString(R.string.start_BT) + " ---" + "\n");
+            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
             // THE REASON parameter "R.string.pebble_companion_app_found" WORKS INSTEAD OF NEEDING
             // "getResources().getString() is because makeText also has a parameter list that
@@ -573,20 +625,63 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
         }
 
-
-
-
     }
+
+    // TODO
+    /*@Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // TODO nodig?
+//        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == REQUEST_ENABLE_BT){
+
+            if(resultCode == RESULT_OK){
+
+            }
+        }
+
+    }*/
 
     private void setBTDiscoverable() {
 
+        // TODO eventueel de button DISABLEN gedurende 2 min.
+        // maar op zich hoeft het niet: als je erop klikt en 2 min. nog niet voorbij, zorgt de IF lus dat er geen problemen komen.
+
+        if(BTadapter == null){
+            Log.w("BLUETOOTH", "BT adapter is null");
+        }
 
         if (!BTadapter.isDiscovering()) {
 
+
+            // TODO zien of je volgende werkende kan krijgen.
+            // Om zo die 2de ListView op te vullen met discoverable devices.
+            // Maar die 2de ListView zit dus in ANDER fragment.
+            // Communiceren via andere fragments: TO RESEARCH.
+//            ArrayAdapter<String> neededAdapter = (ArrayAdapter<String>) ((MasterDetailItemListFragment) getFragmentManager().findFragmentById(R.id.masterdetailitem_list)).getListAdapter();
+//            neededAdapter.clear();
+//            neededAdapter.add("blaaa");
+
+
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE), REQUEST_BT_DISCOVERABLE);
+
+            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+            outputWindow.append("--- " + getResources().getString(R.string.start_BT_discoverable) + " ---" + "\n");
+            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+
             Toast.makeText(getActivity(), R.string.start_BT_discoverable, Toast.LENGTH_LONG).show();
 
         } else {
+
+
+            // TODO mss dus best met TOGGLE button werken want met normal button ziet er raar uit.
+            // TODO systeem werkt niet? we geraken hier nooit?
+            BTadapter.cancelDiscovery();
+
+            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+            outputWindow.append("--- " + getResources().getString(R.string.BT_already_discoverable) + " ---" + "\n");
+            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+
             Toast.makeText(getActivity(), R.string.BT_already_discoverable, Toast.LENGTH_LONG).show();
         }
 
@@ -600,8 +695,17 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
             BTadapter.disable();
             // hiervoor bestaat er precies geen equivalent voor startActivityForResult
 
+            Button buttonBTDiscoverable = (Button) getView().findViewById(R.id.button_BT_discoverable);
+            buttonBTDiscoverable.setEnabled(false);
+            bundleEnableDisableStates.putBoolean("R.id.button_BT_discoverable", false);
+
+            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+            outputWindow.append("--- " + getResources().getString(R.string.stop_BT) + " ---" + "\n");
+            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+
             Toast.makeText(getActivity(), R.string.stop_BT, Toast.LENGTH_LONG).show();
         } else {
+
             Toast.makeText(getActivity(), R.string.BT_already_disabled, Toast.LENGTH_LONG).show();
         }
 
@@ -704,7 +808,6 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
     private void startPebbleCommunicationTest() {
 
 
-        Log.w(LOG_TAG, "STARTED Pebble communication test BEFORE IF");
 
         // FOR DISPLAYING WHICH PEBBLE BUTTON (UP/SELECT/DOWN) WAS PRESSED.
         if (myPebbleDataReceiver == null) {
@@ -712,12 +815,9 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
 
             final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
             // Without "getResources()." it also seems to work, but better to USE IT!
-            String string = getResources().getString(R.string.start_communication_test);
-            outputWindow.append("--- " + string + " ---" + "\n");
+            outputWindow.append("--- " + getResources().getString(R.string.start_communication_test) + " ---" + "\n");
             ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
-
-            Log.w(LOG_TAG, "STARTED Pebble communication test");
 
 
             // public static abstract class PebbleKit.PebbleDataReceiver
@@ -786,18 +886,15 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
 
 
             final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-            String string = getResources().getString(R.string.stop_communication_test);
-            outputWindow.append("--- " + string + " ---" + "\n");
+            outputWindow.append("--- " + getResources().getString(R.string.stop_communication_test) + " ---" + "\n");
             ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
 
-            Log.w(LOG_TAG, "STOPPED Pebble communication test");
 
 
             // TODO zien of deze try/catch werkt voor fixen: Caused by: java.lang.IllegalArgumentException: Receiver not registered: com.yen.myfirstapp.MainActivity$1@40fc03c0
             try {
 
-                Log.w(LOG_TAG, "in TRY");
 //                unregisterReceiver(myPebbleDataReceiver);
                 // Changed to following since we are in a FRAGMENT; not an ACTIVITY.
                 getActivity().unregisterReceiver(myPebbleDataReceiver);
@@ -809,7 +906,6 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
 
             } catch (IllegalArgumentException ex) {
 
-                Log.w(LOG_TAG, "in CATCH");
 
                 // TODO niets doen gewoon?
 
@@ -831,8 +927,7 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
 
             final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
             // Without "getResources()." it also seems to work, but better to USE IT!
-            String string = getResources().getString(R.string.start_pebble_data_logging);
-            outputWindow.append("--- " + string + " ---" + "\n");
+            outputWindow.append("--- " + getResources().getString(R.string.start_pebble_data_logging) + " ---" + "\n");
             ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
 
@@ -862,7 +957,6 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
                         // TODO klopt dit systeem nog?
                         // misaligned data, just drop it
                         if (data.length % 15 != 0 || data.length < 15) {
-                            // System.out.println("Misaligned data while data logging");
                             Log.w("DATA LOGGING", "Misaligned data while data logging");
                             return;
                         }
@@ -947,8 +1041,7 @@ So, you should use the enhanced for loop by default, but consider a hand-written
 
             final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
             // Without "getResources()." it also seems to work, but better to USE IT!
-            String string = getResources().getString(R.string.stop_pebble_data_logging);
-            outputWindow.append("--- " + string + " ---" + "\n");
+            outputWindow.append("--- " + getResources().getString(R.string.stop_pebble_data_logging) + " ---" + "\n");
             ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
 
@@ -985,6 +1078,18 @@ So, you should use the enhanced for loop by default, but consider a hand-written
         stopPebbleDataLogging();
 
         // TODO voeg stop-methods van andere services toe.
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+
+        // just to make sure.
+        if (BTadapter.isDiscovering()) {
+            BTadapter.cancelDiscovery();
+        }
+
     }
 
 

@@ -38,6 +38,16 @@ public class MasterDetailItemListFragment extends ListFragment {
      */
     private int mActivatedPosition = ListView.INVALID_POSITION;
 
+    // TODO static of niet?
+    private ArrayAdapter<DummyContent.DummyItem> adapterSecondListView;
+
+
+
+
+
+
+
+
     /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
@@ -75,13 +85,14 @@ public class MasterDetailItemListFragment extends ListFragment {
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
 
+//        String[] arrayStrings = { "bla", "meh"};
 
-        // TODO: replace with a real list adapter.
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
+        adapterSecondListView = new ArrayAdapter<DummyContent.DummyItem>(
                 getActivity(),
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
-                DummyContent.ITEMS));
+                DummyContent.ITEMS);
+        setListAdapter(adapterSecondListView);
     }
 
     @Override

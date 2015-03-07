@@ -62,7 +62,7 @@
     <string name="stop_BT">Disabled Bluetooth</string>
     <string name="BT_already_disabled">Bluetooth is disabled already</string>
     <string name="start_BT_discoverable">Made your mobile device discoverable for 2 minutes</string>
-    <string name="BT_already_discoverable">Bluetooth is discoverable already</string>
+    <string name="BT_already_discoverable">Bluetooth is discoverable already. Now cancelled</string>
     <string name="BT_adapter_not_found">Bluetooth adapter not found</string>
     <string name="BT_is_enabled">Bluetooth is enabled</string>
     <string name="BT_is_disabled">Bluetooth is disabled</string>
