@@ -94,6 +94,9 @@ public class CursorListActivity extends ListActivity implements LoaderManager.Lo
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
+        // TODO wat nog nodig van hieronder, als we alles willen erven van de MainActivity/Fragment?
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -139,20 +142,4 @@ public class CursorListActivity extends ListActivity implements LoaderManager.Lo
         // Do something when a list item is clicked
     }
 
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    /*public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_cursor_list, container, false);
-            return rootView;
-        }
-    }*/
 }

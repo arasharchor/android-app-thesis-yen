@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,6 +65,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             // Only recently gotten deprecated: since Android 5.0
             if (i == 2) {
                 theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_2).setTabListener(this));
+            } else if (i == 3) {
+                theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_3).setTabListener(this));
             } else {
                 theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
             }
@@ -218,7 +219,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                 return true;
 
             case R.id.action_button_2:
-                // TODO doe iets
+
+                toPebblePointerActivity();
+
                 /*showHomeUp = !showHomeUp;
                 item.setChecked(showHomeUp);
                 getActionBar().setDisplayHomeAsUpEnabled(showHomeUp);*/
@@ -260,6 +263,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             default:
                 return super.onOptionsItemSelected(item);
         }
+
+    }
+
+    private void toPebblePointerActivity() {
+
+        Intent intent = new Intent(this, PebblePointerActivity.class);
+        startActivity(intent);
 
     }
 
@@ -340,8 +350,15 @@ Note: When your activity is paused, the Activity instance is kept resident in me
         // So tab 0 corresponds with the MainActivity!
         if (tab.getPosition() == 1) {
             toCursorListActivity();
+        } else if (tab.getPosition() == 2) {
+            toPebbleAccelStreamActivity();
         }
 
+    }
+
+    private void toPebbleAccelStreamActivity() {
+        Intent intent = new Intent(this, PebbleAccelStreamActivity.class);
+        startActivity(intent);
     }
 
     @Override

@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -57,6 +56,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
     public static final UUID WATCHAPP_UUID = UUID.fromString("7c5167e8-9df4-479f-9353-714481681af1");
 
+
     // TODO use more useful name
     // For Pebble communication test
     private PebbleKit.PebbleDataReceiver myPebbleDataReceiver;
@@ -83,12 +83,10 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     // je kon BOOLEAN ARRAY toepassen, maar nu heb je Bundle, voor het geval je TOCH met savedInstanceState gaat werken voor terugkrijgen van states.
 
 
-
     private BluetoothAdapter BTadapter = BluetoothAdapter.getDefaultAdapter();
     private static final int REQUEST_ENABLE_BT = 50;
     private static final int REQUEST_BT_DISCOVERABLE = 51;
     private Set<BluetoothDevice> setPairedBTDevices;
-
 
 
     private ArrayAdapter<String> arrayListMainAdapter;
@@ -414,7 +412,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         /* If you know in advance what the size of the ArrayList is going to be, it is more efficient to specify the initial capacity. If you don't do this, the internal array will have to be repeatedly reallocated as the list grows. */
         arrayListNamesPairedBTDevices = new ArrayList<>(setPairedBTDevices.size());
         // FOR EACH is recommended usage, performance wise, compared to for (int i = ...
-        for (BluetoothDevice pairedBTDevice : setPairedBTDevices){
+        for (BluetoothDevice pairedBTDevice : setPairedBTDevices) {
             arrayListNamesPairedBTDevices.add(pairedBTDevice.getName());
         }
 
@@ -601,13 +599,12 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
             // en clearen ADAPTER + alles toevoegen!
             arrayListNamesPairedBTDevices.clear();
             arrayListMainAdapter.clear();
-            for (BluetoothDevice pairedBTDevice : setPairedBTDevices){
+            for (BluetoothDevice pairedBTDevice : setPairedBTDevices) {
                 arrayListNamesPairedBTDevices.add(pairedBTDevice.getName());
                 arrayListMainAdapter.add(pairedBTDevice.getName());
             }
             arrayListMainAdapter.notifyDataSetChanged();
 //            ListView listViewMain = (ListView) getView().findViewById(R.id.listView_main);
-
 
 
             final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
@@ -647,7 +644,7 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
         // TODO eventueel de button DISABLEN gedurende 2 min.
         // maar op zich hoeft het niet: als je erop klikt en 2 min. nog niet voorbij, zorgt de IF lus dat er geen problemen komen.
 
-        if(BTadapter == null){
+        if (BTadapter == null) {
             Log.w("BLUETOOTH", "BT adapter is null");
         }
 
@@ -808,7 +805,6 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
     private void startPebbleCommunicationTest() {
 
 
-
         // FOR DISPLAYING WHICH PEBBLE BUTTON (UP/SELECT/DOWN) WAS PRESSED.
         if (myPebbleDataReceiver == null) {
 
@@ -817,7 +813,6 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
             // Without "getResources()." it also seems to work, but better to USE IT!
             outputWindow.append("--- " + getResources().getString(R.string.start_communication_test) + " ---" + "\n");
             ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
 
 
             // public static abstract class PebbleKit.PebbleDataReceiver
@@ -875,10 +870,8 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
     private void stopPebbleCommunicationTest() {
 
 
-
-
         /* http://developer.getpebble.com/docs/android/com/getpebble/android/kit/PebbleKit/
-        A convenience function to assist in programatically registering a broadcast receiver for the 'CONNECTED' intent. To avoid leaking memory, activities registering BroadcastReceivers must unregister them in the Activity's Activity.onPause() method.
+        A convenience function to assist in programmatically registering a broadcast receiver for the 'CONNECTED' intent. To avoid leaking memory, activities registering BroadcastReceivers must unregister them in the Activity's Activity.onPause() method.
          */
 
         // Checking for null is recommended.
@@ -888,8 +881,6 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
             final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
             outputWindow.append("--- " + getResources().getString(R.string.stop_communication_test) + " ---" + "\n");
             ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-
 
 
             // TODO zien of deze try/catch werkt voor fixen: Caused by: java.lang.IllegalArgumentException: Receiver not registered: com.yen.myfirstapp.MainActivity$1@40fc03c0

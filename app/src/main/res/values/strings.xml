@@ -24,7 +24,7 @@
 
     <string name="action_label_refresh">Refresh</string>
     <string name="action_label_button_1">Button 1</string>
-    <string name="action_label_button_2">Button 2</string>
+    <string name="action_label_button_2">Pebble Pointer Activity</string>
     <string name="action_label_setting_1">Setting 1</string>
     <string name="action_label_set_1_opt_1">Set 1 Opt 1</string>
     <string name="action_label_set_1_opt_2">Set 1 Opt 2</string>
@@ -36,7 +36,7 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_cursor_list">CursorListActivity</string>
-    <string name="label_tab_2">CursorListActivity</string>
+    <string name="label_tab_2">Sample list Activity</string>
     <string name="output_window">Output Window\n</string>
     <string name="communication_test">Communication Test</string>
     <string name="toggle_communication_test">Communication Test</string>
@@ -67,6 +67,18 @@
     <string name="BT_is_enabled">Bluetooth is enabled</string>
     <string name="BT_is_disabled">Bluetooth is disabled</string>
     <string name="BT_discoverable">Discoverable (2 min)</string>
+    <string name="title_activity_pebble_accel_stream">Pebble Acceleration Data Stream</string>
+    <string name="no_data">NO DATA</string>
+    <string name="start">START</string>
+    <string name="label_pebble_accelerometer_history">Pebble Accelerometer History</string>
+    <string name="label_tab_3">Pebble Accel Data Stream</string>
+    <string name="title_activity_pebble_pointer">Pebble Pointer Activity</string>
 
+
+    <string name="x_axis_title">x-axis</string>
+    <string name="y_axis_title">y-axis</string>
+    <string name="z_axis_title">z-axis</string>
+    <!--<string name="activity_Plot">Plot</string>-->
+    <string name="dynamic_plot">Dynamic Plot</string>
 
 </resources>

@@ -12,12 +12,16 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+
 }
 
 dependencies {
@@ -25,4 +29,12 @@ dependencies {
     // for PEBBLE
     compile 'com.getpebble:pebblekit:2.6.0'
     compile 'com.android.support:support-v4:21.0.3'
+//    compile files('libs/GraphView-3.1.1.jar')
+    // niet compatibel met bepaalde methodes:
+//    compile 'com.jjoe64:graphview:4.0.0'
+    // voor ACCEL_STREAM
+    compile 'com.jjoe64:graphview:3.1.4'
+    // voor PEBBLEPOINTER
+//    compile files('libs/androidplot-core-0.6.1.jar')
+    compile 'com.androidplot:androidplot-core:0.6.1'
 }
