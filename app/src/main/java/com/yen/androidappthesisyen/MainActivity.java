@@ -17,7 +17,7 @@ import android.view.WindowManager;
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
 
-    private static final String LOG_TAG = "MainActivity";
+    private static final String LOG_TAG = MainActivity.class.getName();
 
     // FOR REFRESH ICON
     private final Handler handler = new Handler();

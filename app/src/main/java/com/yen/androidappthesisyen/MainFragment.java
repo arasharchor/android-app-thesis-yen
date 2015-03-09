@@ -53,7 +53,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
     /*Use Static Final For Constants
     * See https://developer.android.com/training/articles/perf-tips.html */
-    private static final String LOG_TAG = "MainFragment";
+    private static final String LOG_TAG = MainFragment.class.getName();
 
     public static final UUID WATCHAPP_UUID = UUID.fromString("7c5167e8-9df4-479f-9353-714481681af1");
 
@@ -77,14 +77,14 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     private static boolean areDefaultsInserted = false;
     // TODO testen of het STATIC moet/mag zijn!
     // TODO of moet die = new in onCreate? TO TEST: want mss als fragment GANS opnieuw wordt gemaakt (wanneer?) zijn onze Bundles weer leeg?!
-    private static Bundle bundleLabelStates; // = new Bundle();
-    private static Bundle bundleEnableDisableStates; // = new Bundle();
-    private static Bundle bundleToggleStates; // = new Bundle();
+    private static Bundle bundleLabelStates = new Bundle();
+    private static Bundle bundleEnableDisableStates = new Bundle();
+    private static Bundle bundleToggleStates = new Bundle();
     // je kon BOOLEAN ARRAY toepassen, maar nu heb je Bundle, voor het geval je TOCH met savedInstanceState gaat werken voor terugkrijgen van states.
 
 
 
-    private BluetoothAdapter BTadapter; // = BluetoothAdapter.getDefaultAdapter();
+    private BluetoothAdapter BTadapter = BluetoothAdapter.getDefaultAdapter();
     private static final int REQUEST_ENABLE_BT = 50;
     private static final int REQUEST_BT_DISCOVERABLE = 51;
     private Set<BluetoothDevice> setPairedBTDevices;
@@ -126,12 +126,12 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         // DUS HIER KOMEN WE ENKEL DE ALLEREERSTE KEER DAT FRAGMENT WORDT GEMAAKT.
         // DUS HIER INITIALISEREN VAN DE BUNDLES?
         // EN DIRECT DUS DE BEGIN STATES INVULLEN HIER ZEKER?!
-        bundleLabelStates = new Bundle();
-        bundleEnableDisableStates = new Bundle();
-        bundleToggleStates = new Bundle();
+//        bundleLabelStates = new Bundle();
+//        bundleEnableDisableStates = new Bundle();
+//        bundleToggleStates = new Bundle();
 
 
-        BTadapter = BluetoothAdapter.getDefaultAdapter();
+//        BTadapter = BluetoothAdapter.getDefaultAdapter();
 //        Log.w("BLUETOOTH", "name BT adapter: " + BTadapter.getName());
 
         // direct ook die lijst van paired BT devices opvullen.
