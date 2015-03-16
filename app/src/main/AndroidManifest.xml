@@ -7,9 +7,16 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
-    <!-- TODO is dit echt nodig?
-     UPDATE wordt precies nergens toegepast?-->
+    <!--
+     TODO is dit echt nodig?
+     UPDATE wordt precies nergens toegepast?
+    -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- voor COMPLEXE gesture detection -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -63,8 +70,6 @@
                 android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
         </activity>
-
-
         <activity
             android:name=".PebbleAccelStreamActivity"
             android:label="@string/title_activity_pebble_accel_stream"
@@ -74,22 +79,60 @@
                 android:value="com.yen.androidappthesisyen.MainActivity" />
         </activity>
 
-
         <!-- portrait mode wordt geforceerd! -->
-        <!-- android:configChanges="orientation"
-            android:screenOrientation="portrait" -->
+        <!--
+             android:configChanges="orientation"
+            android:screenOrientation="portrait"
+        -->
         TODO test of werkt zonder forceren -->
         <activity
             android:name=".PebblePointerActivity"
             android:label="@string/title_activity_pebble_pointer"
-            android:parentActivityName=".MainActivity"
-            >
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.yen.androidappthesisyen.MainActivity" />
+        </activity>
+        <activity
+            android:name=".PebbleGesturesActivity"
+            android:label="@string/title_activity_pebble_gestures"
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
         </activity>
 
+        <!-- TODO zien of android:name="de.dfki.android.gestureTrainer.GestureTrainer" nodig is -->
+        <!-- TODO mag wrsl weg, die restricties van orientation? -->
+        <activity
+            android:name=".PebbleGestureRecognitionActivity"
+            android:configChanges="orientation"
+            android:label="@string/title_activity_pebble_gesture_recognition"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.yen.androidappthesisyen.MainActivity" />
+        </activity>
 
+        <!-- TODO zien of dit wel nodig is want die AIDL dinges is mss overbodig? -->
+        <service
+            android:name="de.dfki.ccaal.gestures.GestureRecognitionService"
+            android:enabled="true"
+            android:label="GestureRecognitionService" >
+            <intent-filter>
+                <action android:name="de.dfki.ccaal.gestures.GESTURE_RECOGNIZER" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".PebbleGestureOverviewActivity"
+            android:label="@string/title_activity_pebble_gesture_overview"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.yen.androidappthesisyen.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

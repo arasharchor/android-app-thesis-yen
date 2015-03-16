@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,8 @@ public class PebbleAccelStreamFragment extends Fragment {
 
 
     //Constants
-    public static final String TAG = PebbleAccelStreamFragment.class.getName();
+    // Had je al zelf gemaakt
+//    public static final String TAG = PebbleAccelStreamFragment.class.getName();
     private static final int NUM_SAMPLES = 15;
     private static final int GRAPH_HISTORY = 200;
 
@@ -67,6 +69,62 @@ public class PebbleAccelStreamFragment extends Fragment {
 
     private Handler handler = new Handler();
 
+    private static final String LOG_TAG = PebbleAccelStreamFragment.class.getName();
+
+
+    private PebbleGestureModelImplementation test;
+
+
+    private class PebbleGestureModelImplementation extends PebbleGestureModel {
+
+
+        /**
+         * Object that manages Pebble wrist movement gestures.
+         * The user should extend their wrist with the fist pointing directly out from the chest as if to punch, with the watch's face pointing upwards
+         *
+         * @param threshold            Value from 0 to 4000 above which an action on an axis will be triggered
+         * @param durationMilliseconds Minimum time between gestures in milliseconds
+         * @param modeConstant         Mode constant from this class for FLICK or TILT operation
+         */
+        public PebbleGestureModelImplementation(int threshold, long durationMilliseconds, int modeConstant) {
+            super(threshold, durationMilliseconds, modeConstant);
+        }
+
+        @Override
+        public void onWristLeft() {
+            // TODO
+            Log.w(LOG_TAG, "wrist LEFT <--");
+        }
+
+        @Override
+        public void onWristRight() {
+            // TODO
+            Log.w(LOG_TAG, "wrist RIGHT -->");
+        }
+
+        @Override
+        public void onWristUp() {
+            // TODO
+            Log.w(LOG_TAG, "wrist UP ^^");
+        }
+
+        @Override
+        public void onWristDown() {
+            // TODO
+            Log.w(LOG_TAG, "wrist DOWN __");
+        }
+
+
+        /**
+         * When an action ends - fired after duration
+         */
+        @Override
+        public void onActionEnd() {
+            // TODO
+            Log.w(LOG_TAG, "onActionEnd()");
+        }
+    }
+
 
     public PebbleAccelStreamFragment() {
         // Required empty public constructor
@@ -80,6 +138,16 @@ public class PebbleAccelStreamFragment extends Fragment {
 
         // TODO nodig? of gwn standaard bij alle fragments zetten?
         setRetainInstance(true);
+
+        // TODO werkt niet ook al geraken we hier!
+        // de andere gelijkaardige regels in andere klassen, werken wel!
+        // (en btw, de code hier hoort hier niet te staan - wel in onResume en onPause - maar is als test.
+        Log.w(LOG_TAG, "arrived here!");
+        PebbleKit.startAppOnPebble(getActivity(), uuid);
+
+
+        // TODO modes
+        test = new PebbleGestureModelImplementation(700, 500, PebbleGestureModel.MODE_FLICK);
 
 
     }
@@ -181,7 +249,7 @@ public class PebbleAccelStreamFragment extends Fragment {
 
                     //Get data
                     latest_data = new int[3 * NUM_SAMPLES];
-//                    Log.w(TAG, "NEW DATA PACKET");
+//                    Log.w(LOG_TAG, "NEW DATA PACKET");
                     for (int i = 0; i < NUM_SAMPLES; i++) {
                         for (int j = 0; j < 3; j++) {
                             try {
@@ -190,8 +258,18 @@ public class PebbleAccelStreamFragment extends Fragment {
                                 latest_data[(3 * i) + j] = -1;
                             }
                         }
-//                        Log.w(TAG, "Sample " + i + " data: X: " + latest_data[(3 * i)] + ", Y: " + latest_data[(3 * i) + 1] + ", Z: " + latest_data[(3 * i) + 2]);
+//                        Log.w(LOG_TAG, "Sample " + i + " data: X: " + latest_data[(3 * i)] + ", Y: " + latest_data[(3 * i) + 1] + ", Z: " + latest_data[(3 * i) + 2]);
                     }
+
+
+                    // ------ TEST
+                    // TODO plek van deze code is veranderen!
+                    // TODO alsook de para's
+                    PebbleAccelPacket pebbleAccelPacket = new PebbleAccelPacket(latest_data[0], latest_data[1], latest_data[2]);
+                    test.update(pebbleAccelPacket);
+
+                    // ------ TEST
+
 
                     //Show
                     handler.post(new Runnable() {
@@ -242,6 +320,9 @@ public class PebbleAccelStreamFragment extends Fragment {
 
         }
 
+        // TODO of beter IN if lus?
+        PebbleKit.startAppOnPebble(getActivity(), uuid);
+
     }
 
 
@@ -281,6 +362,8 @@ public class PebbleAccelStreamFragment extends Fragment {
 
         }
 
+        // TODO of IN de if lus? Maar mag erbuiten.
+        PebbleKit.closeAppOnPebble(getActivity(), uuid);
 
     }
 

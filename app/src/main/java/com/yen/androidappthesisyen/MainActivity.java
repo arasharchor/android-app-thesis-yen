@@ -61,12 +61,14 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // TODO hoort dit niet in onCreateOptionsMenu ? UPDATE is goed volgens tutorial @ https://developer.android.com/training/implementing-navigation/lateral.html#tabs
         // TODO inflate the tab layout by using XML files instead of coding it here.
         // set up tabs nav
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 1; i <= 4; i++) {
             // Only recently gotten deprecated: since Android 5.0
             if (i == 2) {
                 theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_2).setTabListener(this));
             } else if (i == 3) {
                 theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_3).setTabListener(this));
+            } else if (i == 4) {
+                theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_4).setTabListener(this));
             } else {
                 theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
             }
@@ -352,8 +354,15 @@ Note: When your activity is paused, the Activity instance is kept resident in me
             toCursorListActivity();
         } else if (tab.getPosition() == 2) {
             toPebbleAccelStreamActivity();
+        } else if (tab.getPosition() == 3) {
+            toPebbleGestureRecognitionActivity();
         }
 
+    }
+
+    private void toPebbleGestureRecognitionActivity() {
+        Intent intent = new Intent(this, PebbleGestureRecognitionActivity.class);
+        startActivity(intent);
     }
 
     private void toPebbleAccelStreamActivity() {

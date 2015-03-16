@@ -1,44 +1,40 @@
 package com.yen.androidappthesisyen;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
+import android.view.View;
+import android.view.ViewGroup;
 
 
-public class PebblePointerActivity extends Activity {
+public class PebbleGesturesActivity extends Activity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
 
-        setContentView(R.layout.activity_pebble_pointer);
-
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.activity_pebble_gestures);
 
 
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
-                    .add(R.id.container_pebble_gesture_recognition, new PebblePointerFragment())
+                    .add(R.id.container_pebble_gesture_recognition, new PlaceholderFragment())
                     .commit();
         }
 
-        /* TODO zorgen dat de TABS in deze activity ook te zien zijn!
-        * Maar neem aan dat dit niet zomaar copy/paste mag zijn van code in de MainActivity.
-         * Je zult het moeten erven ofzo wrsl? */
 
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_pebble_pointer, menu);
+        getMenuInflater().inflate(R.menu.menu_pebble_gestures, menu);
         return true;
     }
 
@@ -47,9 +43,6 @@ public class PebblePointerActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-
-        // TODO zien of dit nodig is.
-
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -58,6 +51,25 @@ public class PebblePointerActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+
+        // TODO retain state dinges etc.
+
+        public PlaceholderFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_pebble_gestures, container, false);
+            return rootView;
+        }
     }
 
 

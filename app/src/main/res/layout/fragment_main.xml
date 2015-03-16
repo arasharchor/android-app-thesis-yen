@@ -262,8 +262,7 @@
         android:layout_above="@+id/horizontalScrollView_main_fragment"
         android:layout_toRightOf="@+id/textView_BT"
         android:layout_toEndOf="@+id/textView_BT"
-        android:enabled="false"
-        />
+        android:enabled="false" />
 
     <!-- This button is BY DEFAULT DISABLED, because the DEFAULT STATE for toggle_BT is also DISABLED. -->
     <Button
@@ -274,7 +273,7 @@
         android:layout_alignBottom="@+id/toggle_BT"
         android:layout_toRightOf="@+id/toggle_BT"
         android:layout_toEndOf="@+id/toggle_BT"
-        android:enabled="false"/>
+        android:enabled="false" />
     <!-- android:onClick="" bij BUTTON laat toe om methode in FRAGMENT te specifiëren.
     Maar bij TOGGLEBUTTON kan je enkel methode uit ACTIVITY kiezen?!
      Dus als je in FRAGMENT je behavior code wilt plaatsen, blijf je werken met: programmatorisch listener toevoegen bij maken fragment. -->

@@ -75,10 +75,20 @@
     <string name="title_activity_pebble_pointer">Pebble Pointer Activity</string>
 
 
+    <!-- voor PEBBLE DATA STREAM -->
     <string name="x_axis_title">x-axis</string>
     <string name="y_axis_title">y-axis</string>
     <string name="z_axis_title">z-axis</string>
     <!--<string name="activity_Plot">Plot</string>-->
     <string name="dynamic_plot">Dynamic Plot</string>
+
+	
+	<!-- voor COMPLEXE gesture detection -->
+    <string name="title_activity_pebble_gestures">Pebble Gestures Activity</string>
+    <string name="label_tab_4">Pebble Gesture Recognition</string>
+    <string name="title_activity_pebble_gesture_recognition">Pebble Gesture Recognition</string>
+	<!--<string name="app_name">Gesture Trainer</string>-->
+    <string name="title_activity_pebble_gesture_overview">Pebble Gesture Overview</string>
+    <string name="edit_gestures">Edit Gestures</string>
 
 </resources>

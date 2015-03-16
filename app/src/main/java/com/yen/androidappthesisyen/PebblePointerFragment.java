@@ -47,17 +47,17 @@ public class PebblePointerFragment extends Fragment {
     // Het heeft niet dat meerdere keys dezelfde int waarden heeft he! Toch niet als ze tot verschillende collecties/doeleinden behoren!
     // The tuple key corresponding to a vector received from the watch
     private static final int PP_KEY_CMD = 128;
-    private static final int PP_KEY_X   = 1;
-    private static final int PP_KEY_Y   = 2;
-    private static final int PP_KEY_Z   = 3;
+    private static final int PP_KEY_X = 1;
+    private static final int PP_KEY_Y = 2;
+    private static final int PP_KEY_Z = 3;
 
     @SuppressWarnings("unused")
     private static final int PP_CMD_INVALID = 0;
-    private static final int PP_CMD_VECTOR  = 1;
+    private static final int PP_CMD_VECTOR = 1;
 
-    public static final int VECTOR_INDEX_X  = 0;
-    public static final int VECTOR_INDEX_Y  = 1;
-    public static final int VECTOR_INDEX_Z  = 2;
+    public static final int VECTOR_INDEX_X = 0;
+    public static final int VECTOR_INDEX_Y = 1;
+    public static final int VECTOR_INDEX_Z = 2;
 
     private static int vector[] = new int[3];
 
@@ -75,7 +75,6 @@ public class PebblePointerFragment extends Fragment {
     SimpleXYSeries zSeries = null;
 
 
-
     private final Handler handler = new Handler();
 
 
@@ -91,12 +90,12 @@ public class PebblePointerFragment extends Fragment {
         setRetainInstance(true);
 
 
-
         vector[VECTOR_INDEX_X] = 0;
         vector[VECTOR_INDEX_Y] = 0;
         vector[VECTOR_INDEX_Z] = 0;
 
-        PebbleKit.startAppOnPebble(getActivity(), PEBBLEPOINTER_UUID);
+        // handy!
+//        PebbleKit.startAppOnPebble(getActivity(), PEBBLEPOINTER_UUID);
     }
 
     @Override
@@ -155,14 +154,13 @@ public class PebblePointerFragment extends Fragment {
         dynamicPlot.addSeries(xSeries, fmtX);
 
         // Green line for Y axis.
-        LineAndPointFormatter fmtY = new LineAndPointFormatter(Color.GREEN, null, null, null);;
+        LineAndPointFormatter fmtY = new LineAndPointFormatter(Color.GREEN, null, null, null);
+        ;
         dynamicPlot.addSeries(ySeries, fmtY);
 
         // Red line for Z axis.
         LineAndPointFormatter fmtZ = new LineAndPointFormatter(Color.RED, null, null, null);
         dynamicPlot.addSeries(zSeries, fmtZ);
-
-
 
 
         return returnedView;
@@ -176,7 +174,6 @@ public class PebblePointerFragment extends Fragment {
         // pas dan getToggleStatesAndEnableServices(); enzo toe.
         // +
         // check op (dataReceiver == null) enzo
-
 
 
         dataReceiver = new PebbleKit.PebbleDataReceiver(PEBBLEPOINTER_UUID) {
@@ -224,6 +221,8 @@ public class PebblePointerFragment extends Fragment {
         PebbleKit.registerReceivedDataHandler(getActivity(), dataReceiver);
 
 
+        PebbleKit.startAppOnPebble(getActivity(), PEBBLEPOINTER_UUID);
+
     }
 
 
@@ -264,7 +263,6 @@ public class PebblePointerFragment extends Fragment {
     }
 
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -274,6 +272,8 @@ public class PebblePointerFragment extends Fragment {
             getActivity().unregisterReceiver(dataReceiver);
             dataReceiver = null;
         }
+
+
         PebbleKit.closeAppOnPebble(getActivity(), PEBBLEPOINTER_UUID);
 
     }

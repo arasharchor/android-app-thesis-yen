@@ -864,6 +864,9 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
 
         }
 
+        // of IN if lus?
+        PebbleKit.startAppOnPebble(getActivity(), WATCHAPP_UUID);
+
     }
 
 
@@ -906,6 +909,10 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
             }
 
         }
+
+
+        // IN if?
+        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
 
     }
 
@@ -1019,6 +1026,9 @@ So, you should use the enhanced for loop by default, but consider a hand-written
 
         }
 
+        // IN if lus?
+        PebbleKit.startAppOnPebble(getActivity(), WATCHAPP_UUID);
+
 
     }
 
@@ -1050,6 +1060,10 @@ So, you should use the enhanced for loop by default, but consider a hand-written
             }
         }
 
+
+        // IN if?
+        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
+
     }
 
 
@@ -1067,6 +1081,9 @@ So, you should use the enhanced for loop by default, but consider a hand-written
 
         stopPebbleCommunicationTest();
         stopPebbleDataLogging();
+
+        // hier dus best NIET maar wel in de individuele methodes?
+//        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
 
         // TODO voeg stop-methods van andere services toe.
     }

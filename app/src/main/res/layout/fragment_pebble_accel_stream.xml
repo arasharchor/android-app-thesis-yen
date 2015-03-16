@@ -9,8 +9,6 @@
     tools:context="com.yen.androidappthesisyen.PebbleAccelStreamFragment">
 
 
-
-
     <TextView
         android:id="@+id/x_view"
         android:layout_width="wrap_content"
@@ -56,15 +54,13 @@
         android:layout_below="@id/start_button"
         android:layout_width="fill_parent"
         android:layout_height="300dp"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <!--<com.jjoe64.graphview.GraphView>-->
         <!--TODO werken met dit element: zie http://www.android-graphview.org/documentation/how-to-create-a-simple-graph-->
         <!--</com.jjoe64.graphview.GraphView>-->
 
     </LinearLayout>
-
-
 
 
 </RelativeLayout>
