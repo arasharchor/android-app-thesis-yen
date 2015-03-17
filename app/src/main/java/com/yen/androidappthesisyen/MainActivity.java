@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.ThreeDollarGestureActivity;
+
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
 
@@ -331,8 +333,8 @@ Note: When your activity is paused, the Activity instance is kept resident in me
      https://developer.android.com/guide/topics/ui/controls/button.html
       So put the following code in the FRAGMENT since it's the FRAGMENT that builds the GUI; not the ACTIVITY in our case. */
     public void toMasterDetailActivity(View view) {
-        Intent intent = new Intent(this, MasterDetailItemListActivity.class);
-        // nu geen extra info met de Intent verstuurd.
+//        Intent intent = new Intent(this, MasterDetailItemListActivity.class);
+        Intent intent = new Intent(this, ThreeDollarGestureActivity.class);
         startActivity(intent);
     }
 

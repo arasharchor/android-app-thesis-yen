@@ -99,25 +99,25 @@ public class PebbleGestureRecognitionFragment extends Fragment {
         @Override
         public void onWristLeft() {
             // TODO
-            Log.w(LOG_TAG, "wrist LEFT <--");
+//            Log.w(LOG_TAG, "wrist LEFT <--");
         }
 
         @Override
         public void onWristRight() {
             // TODO
-            Log.w(LOG_TAG, "wrist RIGHT -->");
+//            Log.w(LOG_TAG, "wrist RIGHT -->");
         }
 
         @Override
         public void onWristUp() {
             // TODO
-            Log.w(LOG_TAG, "wrist UP ^^");
+//            Log.w(LOG_TAG, "wrist UP ^^");
         }
 
         @Override
         public void onWristDown() {
             // TODO
-            Log.w(LOG_TAG, "wrist DOWN __");
+//            Log.w(LOG_TAG, "wrist DOWN __");
         }
 
 
@@ -127,7 +127,7 @@ public class PebbleGestureRecognitionFragment extends Fragment {
         @Override
         public void onActionEnd() {
             // TODO
-            Log.w(LOG_TAG, "onActionEnd()");
+//            Log.w(LOG_TAG, "onActionEnd()");
         }
     }
 
@@ -392,7 +392,18 @@ public class PebbleGestureRecognitionFragment extends Fragment {
 
 
                     // ------ TEST - voor MOEILIJKERE gesture detection
-                    // TODO
+
+                    // TODO we werken nu met INTs maar de gesture recognizer werkt eigenlijk met FLOATs
+                    // is het nuttig om met FLOATs te werken? to test...
+                    float[] floatArray = {latest_data[0], latest_data[1], latest_data[2]};
+
+                    try {
+                        Log.w("CHECK", "---------- net voor aanroep giveNewAccelDataToService");
+                        // TODO ZIEN WANNEER recognitionService wordt aangemaakt/gecalled!
+                        recognitionService.giveNewAccelDataToService(floatArray);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                     // ------ TEST - voor MOEILIJKERE gesture detection
 
 
@@ -527,12 +538,14 @@ public class PebbleGestureRecognitionFragment extends Fragment {
 
 
     // voor COMPLEXERE gesture detection
-
     private final ServiceConnection serviceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             recognitionService = IGestureRecognitionService.Stub.asInterface(service);
+
+            Log.w("TEST", "--------------- recognitionService aangemaakt");
+
             try {
                 recognitionService.startClassificationMode(activeTrainingSet);
                 recognitionService.registerListener(IGestureRecognitionListener.Stub.asInterface(gestureListenerStub));

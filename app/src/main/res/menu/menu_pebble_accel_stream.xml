@@ -3,7 +3,8 @@
     tools:context="com.yen.androidappthesisyen.PebbleAccelStreamActivity">
 
     <!-- TODO Dit gewoon wissen of? -->
-    <item android:id="@+id/action_settings"
+    <item
+        android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
