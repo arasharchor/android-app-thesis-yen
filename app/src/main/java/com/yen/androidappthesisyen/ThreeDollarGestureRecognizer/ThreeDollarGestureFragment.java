@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,8 +25,38 @@ import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.yen.androidappthesisyen.R;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.protocol.HTTP;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.UUID;
+
+// FOR SENDING GESTURES TO LINUX SERVER
+// The Client sessions package
+// The Base package for representing JSON-RPC 2.0 messages
+// The JSON Smart package for JSON encoding/decoding (optional)
+// For creating URLs
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,6 +65,9 @@ import java.util.UUID;
  * to handle interaction events.
  */
 public class ThreeDollarGestureFragment extends Fragment implements DialogInterface.OnClickListener {
+
+
+    private static final String LOG_TAG = ThreeDollarGestureFragment.class.getName();
 
 //    private OnFragmentInteractionListener mListener;
 
@@ -106,6 +142,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     // private MENUITEMS menuitems;
 
     public void show_alert_box() {
+
         /*
          * Shows alert box when gesture recognition thread returns
 		 *
@@ -233,7 +270,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
     private synchronized void startRecordingGesture() {
         /*
-		 *  initiate recording of gesture
+         *  initiate recording of gesture
 		 *  usually called after onTouchListener, ACTION_DOWN
 		 */
         // recordingGesture = new Gesture();
@@ -249,7 +286,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     }
 
     private synchronized void stopRecordingGesture() {/*
-		 *  stop recording of gesture
+         *  stop recording of gesture
 		 *  usually called after onTouchListener, ACTION_UP / CANCEL
 		 */
 
@@ -260,8 +297,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
         RECORD_GESTURE = false;
         // Object[] gestureTrace = recordingGestureTrace.toArray();
-		/*int numItems = recordingGestureTrace.size();
-		// malloc LOL
+        /*int numItems = recordingGestureTrace.size();
+        // malloc LOL
 		float [][] traces = new float [numItems][3];
 		// "copy" gesture info to traces!!!*/
         // traces = recordingGestureTrace.toArray(traces);
@@ -288,24 +325,67 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                 // BUGFIX VIA https://code.google.com/p/three-dollar-gesture-recognizer/issues/detail?id=1
                 final Gesture candidate = new Gesture(null, new ArrayList<float[]>(recordingGestureTrace));
 
+
                 // save a reference to activity for this context
                 Thread t = new Thread() {
                     public void run() {
                         if (DEBUG)
-                            Log.w("stopRecordingGesture-recogThread", "Attempting Gesture Recognition Trace-Length: " + recordingGestureTrace.size());
+                            Log.w("stopRecordGest-recogThread", "Attempting Gesture Recognition Trace-Length: " + recordingGestureTrace.size());
                         String gid = myGestureRecognizer.recognize_gesture(candidate);
-                        if (DEBUG) Log.w("stopRecordingGesture-recogThread", "===== \n" +
-                                "Recognized Gesture: " + gid +
-                                "\n===");
+                        if (DEBUG)
+                            Log.w("stopRecordGest-recogThread", "===== \n" + "Recognized Gesture: " + gid + "\n===");
                         // set gid as currently detected gid
                         detected_gid = gid;
 
-                        // show the alert
-                        alertHandler.post(showAlert);
 
+                        // ---- START EIGEN TOEVOEGING
+                        // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
+
+
+                        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                        if (networkInfo != null && networkInfo.isConnected()) {
+
+                            // fetch data
+
+
+                            // TODO met of zonder slash?
+                            String stringURL = "http://192.168.1.11:8080/RESTWithJAXB/rest/handlegesture/invoer";
+                            // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
+
+
+                            // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
+//                            new AsyncPOSTGestureToServer().execute(stringURL, gid);
+
+
+                            // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
+                            // UPDATE: EIGEN CODE WERKT NU :D
+                            int httpResult = POSTGestureToServer(stringURL, gid);
+                            // DIT DUS NIET MEER NODIG:
+//                            nieuweTestcode(stringURL, gid);
+
+
+                        } else {
+                            // Arriving here if no internet connection.
+
+                        }
+
+
+                        // ---- STOP EIGEN TOEVOEGING
+
+                        // show the alert
+                        alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
                     }
                 };
                 t.start();
+
+                // TEST LOCATIE ASYNCTASK
+                // UPDATE: werkt wrsl niet OMDAT DETECTED_GID hier nog de VORIGE waarde bevat
+                // omdat de THREAD nog aan het runnen is terwijl men HIER komt!
+//                Log.w(LOG_TAG, "DETECTED GID: " + detected_gid);
+//                new AsyncPOSTGestureToServer().execute(stringURL, detected_gid);
+
+
                 if (DEBUG) Log.w("stopRecordingGesture", "STATE_RECOGNIZE --> thread dispatched");
                 break;
             case STATE_LIBRARY:
@@ -314,6 +394,171 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                 break;
         }
         recordingGestureTrace.clear();
+
+    }
+
+
+    private void nieuweTestcode(String stringURL, String stringGesture) {
+
+
+        HttpClient client = new DefaultHttpClient();
+        HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000); //Timeout Limit
+        HttpResponse response;
+        JSONObject json = new JSONObject();
+
+        try {
+            HttpPost post = new HttpPost(stringURL);
+            json.put("gesture", stringGesture);
+//            json.put("emailid", email);
+            Log.w("JSON NAAR STRING", json.toString());
+            StringEntity se = new StringEntity(json.toString());
+            se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            post.setEntity(se);
+            response = client.execute(post);
+
+        /*Checking response */
+            if (response != null) {
+                InputStream in = response.getEntity().getContent(); //Get the data in the entity
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.v("Error", "Cannot Establish Connection");
+        }
+
+    }
+
+
+    private class AsyncPOSTGestureToServer extends AsyncTask<String, Void, Integer> {
+
+        @Override
+        protected Integer doInBackground(String... params) {
+
+
+            int httpResult = POSTGestureToServer(params[0], params[1]);
+
+
+            return httpResult;
+        }
+
+
+        @Override
+        protected void onPostExecute(Integer httpResult) {
+//            super.onPostExecute(httpResult);
+
+            // TODO DIALOG OF TOAST OFZO TONEN ALS HET FOUTLIEP
+            // TODO OOK TELKENS MELDEN ALS GOED GING?
+
+        }
+    }
+
+
+    private int POSTGestureToServer(String stringURL, String stringGesture) {
+
+
+        HttpURLConnection httpcon = null;
+        int httpResult = -1; // initial value
+
+        try {
+
+//Connect
+            httpcon = (HttpURLConnection) ((new URL(stringURL).openConnection()));
+            // TODO nodig? Best enablen zeker.
+            httpcon.setDoInput(true); // Sets the flag indicating whether this URLConnection allows input. It cannot be set after the connection is established.
+            httpcon.setDoOutput(true);
+            httpcon.setRequestProperty("Content-Type", "application/json");
+            // TODO nodig? UPDATE: JA voor mogelijke problemen te voorkomen.
+            httpcon.setRequestProperty("charset", "utf-8");
+            // TODO dit enablen ALS JSON ONTVANGEN! ipv gewoon een code?
+//            httpcon.setRequestProperty("Accept", "application/json");
+            httpcon.setRequestMethod("POST");
+            httpcon.setUseCaches(false);
+            // TODO EVENTUEEL MEE SPELEN:
+            httpcon.setConnectTimeout(10000);
+            httpcon.setReadTimeout(10000);
+
+
+            // TODO is testen: (dan moet JSON object hier gemaakt worden ipv verderop)
+            // REDEN: http://www.evanjbrunner.info/posts/json-requests-with-httpurlconnection-in-android/
+//            String message = new JSONObject().toString();
+//            conn.setFixedLengthStreamingMode(message.getBytes().length)
+
+            httpcon.connect();
+
+
+            // JSON
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("gesture", stringGesture);
+            // TODO NOG ANDERE DATA STUREN?
+//            jsonObject.put("description", "Real");
+//            jsonObject.put("enable", "true");
+
+
+//Write
+            OutputStream os = httpcon.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            writer.write(jsonObject.toString());
+            // TODO TEST OF NODIG:
+//            OS IPV WRITER.write(jsonObject.toString().getBytes("UTF-8"));
+            writer.close(); // Closes this writer. The contents of the buffer are flushed, the target writer is closed, and the buffer is released. Only the first invocation of close has any effect.
+            os.close();
+
+
+            httpResult = httpcon.getResponseCode();
+            if (httpResult == HttpURLConnection.HTTP_OK) { // Numeric status code, 200: OK
+
+
+                //Read
+                BufferedReader br = new BufferedReader(new InputStreamReader(httpcon.getInputStream(), "UTF-8"));
+
+
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                    // TODO test: andere tut had: sb.append(line + "\n");
+                }
+
+                br.close();
+                String resultString = sb.toString();
+                System.out.println(" ------- RESULT STRING: " + resultString);
+
+            } else {
+                // TODO eventueel:
+//            } else if (statusCode != HttpURLConnection.HTTP_OK) {
+//                // handle any other errors, like 404, 500,..
+//            }
+                // TODO bijvoorbeeld: throw new RuntimeException
+
+                System.out.println("RESPONSE WAS NOT CODE HTTP_OK: " + httpcon.getResponseMessage());
+                // TODO toast?
+            }
+
+
+            // TODO  test of nodig:
+//            httpcon.disconnect();
+
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (SocketTimeoutException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+
+            if (httpcon != null) {
+                httpcon.disconnect();
+            }
+
+        }
+
+        return httpResult;
 
     }
 
