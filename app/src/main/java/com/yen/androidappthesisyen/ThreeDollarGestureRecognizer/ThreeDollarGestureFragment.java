@@ -350,7 +350,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
                             // TODO met of zonder slash?
-                            String stringURL = "http://192.168.1.11:8080/RESTWithJAXB/rest/handlegesture/invoer";
+                            String stringURL = "http://192.168.5.152:8080/RESTWithJAXB/rest/handlegesture/invoer";
                             // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
 
 
@@ -474,8 +474,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
             httpcon.setRequestMethod("POST");
             httpcon.setUseCaches(false);
             // TODO EVENTUEEL MEE SPELEN:
-            httpcon.setConnectTimeout(10000);
-            httpcon.setReadTimeout(10000);
+            httpcon.setConnectTimeout(60000); // stond op 10000
+            httpcon.setReadTimeout(60000); // stond op 10000
 
 
             // TODO is testen: (dan moet JSON object hier gemaakt worden ipv verderop)
@@ -503,6 +503,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
             writer.close(); // Closes this writer. The contents of the buffer are flushed, the target writer is closed, and the buffer is released. Only the first invocation of close has any effect.
             os.close();
 
+
+            // -------------- EVEN UITGEZET OMDAT PAS REPONSE KRIJGT ALS JE HET C GUI WINDOW SLUIT.
 
             httpResult = httpcon.getResponseCode();
             if (httpResult == HttpURLConnection.HTTP_OK) { // Numeric status code, 200: OK

@@ -4,16 +4,23 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
 import com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.ThreeDollarGestureActivity;
+import com.yen.androidappthesisyen.mqtt.MQTTService;
 
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
@@ -25,6 +32,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
 
     private static final int ID_action_pebble_companion_app_install_run = 1;
+
+
+    /* FOR MQTT SERVICE */
+    private StatusUpdateReceiver statusUpdateIntentReceiver;
+    private MQTTMessageReceiver  messageIntentReceiver;
 
 
     @Override
@@ -78,11 +90,86 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         }
 
 
+
+
+        /* REGARDING THE MQTT SERVICE */
+        // TODO juiste plek om het hier te zetten?
+        SharedPreferences settings = getSharedPreferences(MQTTService.APP_ID, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("broker", "192.168.1.13");
+        editor.putString("topic",  "accelstream/state");
+        editor.commit();
+        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na editor.commit()");
+
+
+
+        statusUpdateIntentReceiver = new StatusUpdateReceiver();
+        IntentFilter intentSFilter = new IntentFilter(MQTTService.MQTT_STATUS_INTENT);
+        registerReceiver(statusUpdateIntentReceiver, intentSFilter);
+
+        messageIntentReceiver = new MQTTMessageReceiver();
+        IntentFilter intentCFilter = new IntentFilter(MQTTService.MQTT_MSG_RECEIVED_INTENT);
+        registerReceiver(messageIntentReceiver, intentCFilter);
+
+        Intent svc = new Intent(this, MQTTService.class);
+        startService(svc);
+        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na startService(svc)");
+
+
+
         // Certain apps need to keep the screen turned on, such as games or movie apps. The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
         // From https://developer.android.com/training/scheduling/wakelock.html
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     }
+
+
+    /* FOR MQTT SERVICE */
+    public class StatusUpdateReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            Bundle notificationData = intent.getExtras();
+            String newStatus = notificationData.getString(MQTTService.MQTT_STATUS_MSG);
+
+            // ...
+        }
+    }
+    public class MQTTMessageReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            Bundle notificationData = intent.getExtras();
+            String newTopic = notificationData.getString(MQTTService.MQTT_MSG_RECEIVED_TOPIC);
+            String newData  = notificationData.getString(MQTTService.MQTT_MSG_RECEIVED_MSG);
+
+            // ...
+        }
+    }
+    @Override
+    protected void onDestroy()
+    {
+        // ...
+
+        unregisterReceiver(statusUpdateIntentReceiver);
+        unregisterReceiver(messageIntentReceiver);
+
+        // ...
+    }
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus)
+        {
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(MQTTService.MQTT_NOTIFICATION_UPDATE);
+        }
+    }
+
+
 
 
     @Override

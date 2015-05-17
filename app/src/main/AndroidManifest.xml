@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yen.androidappthesisyen">
+    package="com.yen.androidappthesisyen" >
 
     <!-- Temporarily, for CursorListActivity -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
-    <!--
-     TODO is dit echt nodig?
-     UPDATE wordt precies nergens toegepast?
-    -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
 
     <!-- voor COMPLEXE gesture detection -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
@@ -23,15 +19,19 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 
+    <!-- Bijkomend voor MQTT service -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:uiOptions="splitActionBarWhenNarrow">
+        android:uiOptions="splitActionBarWhenNarrow" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
@@ -45,7 +45,7 @@
         <activity
             android:name=".MasterDetailItemListActivity"
             android:label="@string/title_masterdetailitem_list"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
@@ -56,7 +56,7 @@
         <activity
             android:name=".MasterDetailItemDetailActivity"
             android:label="@string/title_masterdetailitem_detail"
-            android:parentActivityName=".MasterDetailItemListActivity">
+            android:parentActivityName=".MasterDetailItemListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MasterDetailItemListActivity" />
@@ -67,7 +67,7 @@
         <activity
             android:name=".CursorListActivity"
             android:label="@string/title_activity_cursor_list"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
@@ -78,7 +78,7 @@
         <activity
             android:name=".PebbleAccelStreamActivity"
             android:label="@string/title_activity_pebble_accel_stream"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
@@ -93,7 +93,7 @@
         <activity
             android:name=".PebblePointerActivity"
             android:label="@string/title_activity_pebble_pointer"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
@@ -101,7 +101,7 @@
         <activity
             android:name=".PebbleGesturesActivity"
             android:label="@string/title_activity_pebble_gestures"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
@@ -114,7 +114,7 @@
             android:configChanges="orientation"
             android:label="@string/title_activity_pebble_gesture_recognition"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
@@ -124,7 +124,7 @@
         <service
             android:name="de.dfki.ccaal.gestures.GestureRecognitionService"
             android:enabled="true"
-            android:label="GestureRecognitionService">
+            android:label="GestureRecognitionService" >
             <intent-filter>
                 <action android:name="de.dfki.ccaal.gestures.GESTURE_RECOGNIZER" />
             </intent-filter>
@@ -133,7 +133,7 @@
         <activity
             android:name=".PebbleGestureOverviewActivity"
             android:label="@string/title_activity_pebble_gesture_overview"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
@@ -141,17 +141,21 @@
         <activity
             android:name=".ThreeDollarGestureRecognizer.ThreeDollarGestureActivity"
             android:label="@string/title_activity_three_dollar_gesture"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
         </activity>
-
         <activity
             android:name=".ThreeDollarGestureRecognizer.DBManagerUIActivity"
-            android:label="dbmanager">
-
+            android:label="dbmanager" >
         </activity>
+
+        <service
+            android:name=".mqtt.MQTTService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

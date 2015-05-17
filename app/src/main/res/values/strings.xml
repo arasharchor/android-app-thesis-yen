@@ -90,7 +90,7 @@
     <!--<string name="app_name">Gesture Trainer</string>-->
     <string name="title_activity_pebble_gesture_overview">Pebble Gesture Overview</string>
     <string name="edit_gestures">Edit Gestures</string>
-    <string name="title_activity_three_dollar_gesture">Three Dollar Gesture Activity</string>
+    <string name="title_activity_three_dollar_gesture">Gesture Recognizer</string>
 
 
     <!-- voor THREE DOLLAR gesture detection -->
