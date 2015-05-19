@@ -94,12 +94,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         /* REGARDING THE MQTT SERVICE */
         // TODO juiste plek om het hier te zetten?
-        SharedPreferences settings = getSharedPreferences(MQTTService.APP_ID, 0);
+        /*SharedPreferences settings = getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("broker", "192.168.1.13");
-        editor.putString("topic",  "accelstream/state");
+        editor.putString("ip_address_broker", "192.168.1.1");
+        editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
         editor.commit();
-        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na editor.commit()");
+        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na editor.commit()");*/
 
 
 
@@ -111,9 +111,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         IntentFilter intentCFilter = new IntentFilter(MQTTService.MQTT_MSG_RECEIVED_INTENT);
         registerReceiver(messageIntentReceiver, intentCFilter);
 
-        Intent svc = new Intent(this, MQTTService.class);
-        startService(svc);
-        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na startService(svc)");
+
+        // SERVICE NU PAS GESTART NADAT IP ADRES WERD INGEGEVEN.
+//        Intent svc = new Intent(this, MQTTService.class);
+//        startService(svc);
+//        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na startService(svc)");
 
 
 
@@ -151,12 +153,22 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     @Override
     protected void onDestroy()
     {
+
         // ...
+
+        // MQTT SERVICE IS GEKILLED IN THREE DOLLAR GESTURE ACTIVITY (niet fragment!)
+        // UPDATE: toch niet want bij orientatie change wordt service dan gekilled! (en daarnaast start ze precies niet meer automatisch op!)
+        // UPDATE: toch NIET gezet want bij orientatie verandering in mainactivity wordt service gekilled dan!
+//        Intent svc = new Intent(getApplicationContext(), MQTTService.class);
+//        stopService(svc);
+
 
         unregisterReceiver(statusUpdateIntentReceiver);
         unregisterReceiver(messageIntentReceiver);
 
-        // ...
+
+        super.onDestroy();
+
     }
     @Override
     public void onWindowFocusChanged(boolean hasFocus)

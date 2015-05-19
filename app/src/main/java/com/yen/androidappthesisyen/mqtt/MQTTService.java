@@ -20,6 +20,8 @@ import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
+import com.getpebble.android.kit.PebbleKit;
+import com.getpebble.android.kit.util.PebbleDictionary;
 import com.ibm.mqtt.IMqttClient;
 import com.ibm.mqtt.MqttClient;
 import com.ibm.mqtt.MqttException;
@@ -35,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.UUID;
 
 /*
  * An example of how to implement an MQTT client in Android, able to receive
@@ -193,9 +196,9 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         // get the broker settings out of app preferences
         //   this is not the only way to do this - for example, you could use
         //   the Intent that starts the Service to pass on configuration values
-        SharedPreferences settings = getSharedPreferences(APP_ID, MODE_PRIVATE);
-        brokerHostName = settings.getString("broker", "");
-        topicName = settings.getString("topic", "");
+        SharedPreferences settings = getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
+        brokerHostName = settings.getString("ip_address_broker", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+        topicName = settings.getString("topic", "accelstream/state"); // TODO hardcoden? of behouden want is zo meer generiek?
 
         // register to be notified whenever the user changes their preferences
         //  relating to background data use - so that we can respect the current
@@ -587,9 +590,9 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     /*
      *   callback - called when we receive a message from the server
      */
-    public void publishArrived(String topic, byte[] payloadbytes, int qos, boolean retained) {
+    public void publishArrived (String topic, byte[] payloadbytes, int qos, boolean retained) {
 
-        Log.w("mqtt", "------------------------- publishArrived !!!");
+
 
 
         // we protect against the phone switching off while we're doing this
@@ -606,11 +609,26 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         //   strings - anything that can be sent as bytes is valid
         String messageBody = new String(payloadbytes);
 
+        Log.w("mqtt", "------------------------- publishArrived !!! messageBody: " + messageBody);
+
+
         //
         //  for times when the app's Activity UI is not running, the Service
         //   will need to safely store the data that it receives
-        if (addReceivedMessageToStore(topic, messageBody)) {
+        addReceivedMessageToStore(topic, messageBody);
+
+        // UITGEZET: if (addReceivedMessageToStore(topic, messageBody)) {
             // this is a new message - a value we haven't seen before
+
+            // !! WE KOMEN DUS ENKEL HIER ALS HET GEKREGEN BERICHT ANDERS IS DAN HET VOORGAAND.
+            // DIT IS GOED: WANT ALS DE STREAM AL BV. ENABLED WAS EN KREGEN TERUG ENABLED, MOETEN WE NIET DIRECT STARTEN HE WANT DE STREAM LIEP AL!
+            if(topic.equalsIgnoreCase("accelstream/state") && messageBody.equalsIgnoreCase("enable")){
+                enableAccelStream();
+            } else if (topic.equalsIgnoreCase("accelstream/state") && messageBody.equalsIgnoreCase("disable")){
+                disableAccelStream();
+            }
+
+
 
             //
             // inform the app (for times when the Activity UI is running) of the
@@ -621,7 +639,8 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             // inform the user (for times when the Activity UI isn't running)
             //   that there is new data available
             notifyUser("New data received", topic, messageBody);
-        }
+
+        // UITGEZET: }
 
         // receiving this message will have kept the connection alive for us, so
         //  we take advantage of this to postpone the next scheduled ping
@@ -630,6 +649,23 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         // we're finished - if the phone is switched off, it's okay for the CPU
         //  to sleep now
         wl.release();
+    }
+
+    // ----------- KOPIE OOK TE VINDEN IN THREEDOLLARGESTUREFRAGMENT.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
+    private void enableAccelStream(){
+
+
+        Log.w("mqtt", "------------------------- arrived in enableAccelStream");
+
+
+        PebbleDictionary dict = new PebbleDictionary();
+        dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
+        PebbleKit.sendDataToPebble(getApplicationContext(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+    }
+    private void disableAccelStream(){
+        PebbleDictionary dict = new PebbleDictionary();
+        dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
+        PebbleKit.sendDataToPebble(getApplicationContext(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
     }
 
     /************************************************************************/
@@ -691,6 +727,9 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             // we are connected
             connectionStatus = MQTTConnectionStatus.CONNECTED;
 
+
+            Log.w("mqtt", "------------------------- CONNECTION SUCCESS");
+
             // we need to wake up the phone's CPU frequently enough so that the
             //  keep alive messages can be sent
             // we schedule the first one of these now
@@ -698,6 +737,11 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
             return true;
         } catch (MqttException e) {
+
+
+            Log.w("mqtt", "------------------------- CONNECTION FAILED");
+
+
             // something went wrong!
 
             connectionStatus = MQTTConnectionStatus.NOTCONNECTED_UNKNOWNREASON;

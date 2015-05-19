@@ -175,7 +175,7 @@ public class PebbleGestureRecognitionFragment extends Fragment {
         yView = (TextView) returnedView.findViewById(R.id.y_view);
         zView = (TextView) returnedView.findViewById(R.id.z_view);
         rateView = (TextView) returnedView.findViewById(R.id.rate_view);
-        startButton = (Button) returnedView.findViewById(R.id.start_button);
+        startButton = (Button) returnedView.findViewById(R.id.toggle_accel_stream);
         startButton.setOnClickListener(new View.OnClickListener() {
 
             @Override

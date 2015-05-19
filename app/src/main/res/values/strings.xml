@@ -3,10 +3,9 @@
     <string name="app_name">Android App Thesis Yen</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
     <string name="foobar">foobar</string>
 
-    <string name="button_master_detail_activity">(Sample overview/detail)</string>
+    <string name="button_master_detail_activity">GESTURE RECOGNIZER</string>
 
     <string name="pebble_not_found">Pebble not found</string>
     <string name="pebble_found">Pebble found!</string>

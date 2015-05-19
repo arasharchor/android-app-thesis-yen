@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
@@ -20,10 +21,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.yen.androidappthesisyen.R;
+import com.yen.androidappthesisyen.mqtt.MQTTService;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -88,7 +91,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
             yView,
             zView,
             rateView;
-    private Button startButton;
+    private ToggleButton toggleAccelStream;
 
     private PebbleKit.PebbleDataReceiver receiver;
 
@@ -349,8 +352,12 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                             // fetch data
 
 
+                            SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
+                            String IPAddress = settings.getString("ip_address", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+
+
                             // TODO met of zonder slash?
-                            String stringURL = "http://192.168.5.152:8080/RESTWithJAXB/rest/handlegesture/invoer";
+                            String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
                             // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
 
 
@@ -621,18 +628,25 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         yView = (TextView) returnedView.findViewById(R.id.y_view);
         zView = (TextView) returnedView.findViewById(R.id.z_view);
         rateView = (TextView) returnedView.findViewById(R.id.rate_view);
-        startButton = (Button) returnedView.findViewById(R.id.start_button);
-        startButton.setOnClickListener(new View.OnClickListener() {
-
+        toggleAccelStream = (ToggleButton) returnedView.findViewById(R.id.toggle_accel_stream);
+        toggleAccelStream.setChecked(false);
+        toggleAccelStream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PebbleDictionary dict = new PebbleDictionary();
-                dict.addInt32(0, 0);
-                // TODO stond getApplicationContext() maar is dit beter?
-                PebbleKit.sendDataToPebble(getActivity(), uuid, dict);
-            }
 
+                if (toggleAccelStream.isChecked()) {
+                    Log.w(LOG_TAG, "CALLING enableAccelStream");
+                    enableAccelStream();
+
+                } else {
+                    Log.w(LOG_TAG, "CALLING disableAccelStream");
+                    disableAccelStream();
+                }
+
+            }
         });
+
+
 
 
         // voor THREE DOLLAR gestures
@@ -696,6 +710,19 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
         return returnedView;
+    }
+
+
+    // ----------- KOPIE OOK TE VINDEN IN MQTTSERVICE.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
+    private void enableAccelStream(){
+        PebbleDictionary dict = new PebbleDictionary();
+        dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
+        PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+    }
+    private void disableAccelStream(){
+        PebbleDictionary dict = new PebbleDictionary();
+        dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
+        PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
     }
 
     @Override
@@ -999,11 +1026,14 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
     @Override
     public void onDestroy() {
-//        super.onDestroy();
+
+
+
 
         if (DEBUG) Log.w("onDestroy", "killing this here app!");
         mSensorManager.unregisterListener(sensorListener);
         // this.myGestureLibrary.onApplicationStop();
+
         super.onDestroy();
     }
 
