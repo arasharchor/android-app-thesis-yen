@@ -141,14 +141,18 @@
         <activity
             android:name=".ThreeDollarGestureRecognizer.ThreeDollarGestureActivity"
             android:label="@string/title_activity_three_dollar_gesture"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="landscape">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yen.androidappthesisyen.MainActivity" />
         </activity>
         <activity
             android:name=".ThreeDollarGestureRecognizer.DBManagerUIActivity"
-            android:label="dbmanager" >
+            android:label="dbmanager"
+            android:configChanges="orientation"
+            android:screenOrientation="landscape">
         </activity>
 
         <service

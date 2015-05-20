@@ -54,12 +54,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.UUID;
 
-// FOR SENDING GESTURES TO LINUX SERVER
-// The Client sessions package
-// The Base package for representing JSON-RPC 2.0 messages
-// The JSON Smart package for JSON encoding/decoding (optional)
-// For creating URLs
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,7 +64,9 @@ import java.util.UUID;
 public class ThreeDollarGestureFragment extends Fragment implements DialogInterface.OnClickListener {
 
 
-    private static final String LOG_TAG = ThreeDollarGestureFragment.class.getName();
+//    private static final String LOG_TAG = ThreeDollarGestureFragment.class.getName();
+    // was relatief lang dus nu:
+    private static final String LOG_TAG = "GESTURE SPOTTING";
 
 //    private OnFragmentInteractionListener mListener;
 
@@ -120,7 +116,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     private boolean RECORD_GESTURE = false;
 
     // ff public
-    public boolean DEBUG = true;
+    public boolean DEBUG = false; // stond default op TRUE
     private boolean VERBOSE = false;
 
 
@@ -144,6 +140,13 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
     // private MENUITEMS menuitems;
 
+
+
+
+
+
+
+
     public void show_alert_box() {
 
         /*
@@ -165,6 +168,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                 .setMessage("Recognized Gesture: " + this.detected_gid)
                 .setPositiveButton("OK", null)
                 .show();
+
+        // TODO dit dus disablen want niet nodig maar TEST OF HET NIET BREAKT.
         // turn on the acc sensor
         mSensorManager.registerListener(sensorListener,
                 SensorManager.SENSOR_ACCELEROMETER,
@@ -221,9 +226,9 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         }
 
         public void onAccuracyChanged(int sensor, int accuracy) {
-            // TODO Auto-generated method stub
 
         }
+
     };
 
 
@@ -231,7 +236,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     public void sendAccelDataToFragment(float[] values) {
 
         //Retrieve the values from the float array values which contains sensor data
-        // TODO wrom met hoofdletter?
+        // TODO wrom met hoofdletter? is een wrapper class voor de primitieve klasse float.
+        // MAAR verderop gebruik je precies toch gewone float dus mag het hier ook gewone float zijn? TO TEST.
         Float dataX = values[0];
 
         Float dataY = values[1];
@@ -256,18 +262,152 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         tv2.setText(dataY.toString());
         tv3.setText(dataZ.toString());
 
-        if (RECORD_GESTURE) {
 
-            float[] traceItem = {dataX.floatValue(),
-                    dataY.floatValue(),
-                    dataZ.floatValue()};
-            if (recordingGestureTrace != null) {
-                recordingGestureTrace.add(traceItem);
+
+
+
+
+        // ------
+        // hier bepalen welke data behoort tot een gesture en welke niet.
+        // door vinden start en stop via checken van thresholds ofzo.
+        // en dan moet ergens startRecordingGesture() aangeroepen woren wanneer zo'n start werd gevonden, en stop... bij vinden van een stop.
+
+
+
+        Boolean nieuwSysteem = true; // ==================================================================
+
+        if(nieuwSysteem){
+            findBoundariesGesture(values);
+        } else {
+
+
+            // ======================================================================================================================================================
+            // TODO hierboven wordt alle gekregen accel data gewoon getoond.
+            // en HIERONDER wordt in IF lus de gekregen accel data bepaald die in een TRACE moet om een GESTURE te vormen.
+            // dus wrsl aanpassen van CODE DAT BOOLEAN RECORD_GESTURE aanpast wat dat moet nu gebeuren automatisch (in RECOGNIZE phase tenminste).
+            if (RECORD_GESTURE) {
+
+                float[] traceItem = {dataX.floatValue(),
+                        dataY.floatValue(),
+                        dataZ.floatValue()};
+                if (recordingGestureTrace != null) {
+                    recordingGestureTrace.add(traceItem);
+                }
+
             }
-
 
         }
 
+
+
+    }
+
+
+    // TODO verzet deze blok code terug naar boven wann het is gefinetuned.
+    // for AUTOMATIC detection boundaries gestures (= GESTURE SPOTTING):
+    // TODO hernoem naar iets duidelijker:
+    public enum RecordMode {
+        MOTION_DETECTION, PUSH_TO_GESTURE
+    }
+    RecordMode recordMode = RecordMode.MOTION_DETECTION;
+    boolean isRecording = false;
+    ArrayList<float[]> gestureValues = new ArrayList<float[]>();
+    float THRESHOLD = 1050; // default 2
+    int stepsSinceNoMovement; // TODO default op 0 zetten of niet?
+    final int MIN_GESTURE_SIZE = 5; // default 8
+    final int MIN_STEPS_SINCE_NO_MOVEMENT = 8; // default 10
+
+
+
+    private void findBoundariesGesture(float[] values) {
+
+
+//        float[] values = { sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2] };
+
+        Log.w(LOG_TAG, "X " + values[0] + " Y " + values[1] + " Z " + values[2]);
+
+
+        switch (recordMode) {
+            case MOTION_DETECTION: // WE KOMEN ALTIJD HIER. IS DIT GOED? IS recordmode overbodig want de originele app past dat precies ook niet meer toe?
+
+                // Log.w(LOG_TAG, "============================ arrived in CASE MOTION_DETECTION");
+
+                if (isRecording) { // TODO initializen maar WAAR? (UPDATE: op FALSE in begin) of niet nodig deze if check?
+
+                    gestureValues.add(values);
+                    if (calcVectorNorm(values) < THRESHOLD) {
+
+                        Log.w(LOG_TAG, "========================= gesture NIET meer gedetecteerd ============= stepsSinceNoMovement++");
+                        stepsSinceNoMovement++;
+                    } else {
+
+                        Log.w(LOG_TAG, "===================== NOG STEEDS IN GESTURE ======= stepsSinceNoMovement = 0");
+                        stepsSinceNoMovement = 0;
+                    }
+
+                } else if (calcVectorNorm(values) >= THRESHOLD) { // TODO een andere threshold hiervoor nemen dan diegene dat hierboven wordt gebruikt?
+
+                    Log.w(LOG_TAG, "========================================================== STARTEN met recorden gesture");
+
+                    isRecording = true;
+                    stepsSinceNoMovement = 0;
+                    gestureValues = new ArrayList<float[]>();
+                    gestureValues.add(values);
+                }
+
+
+
+                if (stepsSinceNoMovement == MIN_STEPS_SINCE_NO_MOVEMENT) { // TODO =========================================================================================== iets anders dan 10 nemen? ofja 10 wrsl goed genoeg: als te hoog is moet de user te lang stilstaan met Pebble.
+
+                    Log.w(LOG_TAG, "============================ detectie MOGELIJKE gesture ");
+
+                    int length = gestureValues.size() - MIN_STEPS_SINCE_NO_MOVEMENT;
+                    if (length > MIN_GESTURE_SIZE) { // TODO ====================================================================== MIN_GESTURE_SIZE wrsl verhogen?
+//                         listener.onGestureRecorded(gestureValues.subList(0, gestureValues.size() - MIN_STEPS_SINCE_NO_MOVEMENT));
+                        // FYI ArrayList<float[]> gestureValues;
+
+                        Log.w(LOG_TAG, "============= het was IDD een gesture =============== GESTOPT MET RECORDEN GESTURE EN DE GESTURE SIZE IS GROTER DAN MINIMUM. size = " + length);
+                        // TODO de gesture is nu gedaan en de geldige waardes zitten in index 0 tem index gestureValues.size() - MIN_STEPS_SINCE_NO_MOVEMENT
+
+
+
+
+
+
+                        recordingGestureTrace = new ArrayList<float[]>(250);
+                        // opvullen met de juiste accel data.
+                        // maken kopie van subList van subList geeft VIEW terug en niet iets dat je kan casten naar ArrayList.
+                        recordingGestureTrace = new ArrayList<>(gestureValues.subList(0, gestureValues.size() - MIN_STEPS_SINCE_NO_MOVEMENT));
+
+
+                        doRemainingTasksAfterRecording();
+
+                    }
+
+                    Log.w(LOG_TAG, "============================ starten TERUG VAN NUL.");
+                    gestureValues = new ArrayList<float[]>(); // TODO stond eerst = null; maar dit wrsl veiliger?
+                    stepsSinceNoMovement = 0;
+                    isRecording = false;
+                }
+                break;
+
+
+            case PUSH_TO_GESTURE: // TODO is dit nu nodig of niet? wrsl niet?
+
+                // Log.w(LOG_TAG, "============================ arrived in CASE PUSH_TO_GESTURE");
+
+                if (isRecording) {
+                    gestureValues.add(values);
+                }
+                break;
+        }
+
+    }
+
+    private float calcVectorNorm(float[] values) {
+        // TODO wijzig de deprecated code. UPDATE DONE.
+        float norm = (float) Math.sqrt(values[0] * values[0] + values[1] * values[1] + values[2] * values[2]) - 9.9f;
+        return norm;
     }
 
 
@@ -293,7 +433,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 		 *  usually called after onTouchListener, ACTION_UP / CANCEL
 		 */
 
-        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
+
         if (DEBUG) {
             Log.w("stopRecordingGesture", "Stopping Gesture Recording");
         }
@@ -307,21 +447,163 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         // traces = recordingGestureTrace.toArray(traces);
 
 
+
+
+
+        Boolean nieuwSysteem = true;
+
+
+        /*if (nieuwSysteem){*/
+            doRemainingTasksAfterRecording();
+        /*} else {
+            TextView statusText = (TextView) getView().findViewById(R.id.statusText);
+
+            // clear the existing trace
+            switch (state) {
+
+                case STATE_LEARN:
+                    // recordingGestureTrace = null;
+                    // note that the arraylist is being copied
+                    statusText.setText("Saving gesture to DB...");
+                    Gesture ng = new Gesture(recordingGestureIDString, new ArrayList<float[]>(recordingGestureTrace));
+
+                    // add gesture to library but prepare with recognizer settings first
+                    myGestureLibrary.addGesture(ng.gestureID, this.myGestureRecognizer.prepare_gesture_for_library(ng), false);
+                    if (DEBUG)
+                        Log.w("stopRecordingGesture", "Recorded Gesture ID " + recordingGestureIDString + " Gesture Trace Length:" + recordingGestureTrace.size());
+                    statusText.setText("Press button to train gesture.");
+                    break;
+
+                case STATE_RECOGNIZE:
+                    statusText.setText("Recognizing gesture...");
+
+                    // TODO mag weg?
+                    // stop accelerometer
+                    mSensorManager.unregisterListener(sensorListener);
+
+                    // BUGFIX VIA https://code.google.com/p/three-dollar-gesture-recognizer/issues/detail?id=1
+                    final Gesture candidate = new Gesture(null, new ArrayList<float[]>(recordingGestureTrace));
+
+
+                    // save a reference to activity for this context
+                    Thread t = new Thread() {
+                        public void run() {
+
+                            if (DEBUG)
+                                Log.w("stopRecGest-recogThread", "Attempting Gesture Recognition Trace-Length: " + recordingGestureTrace.size());
+                            String gid = myGestureRecognizer.recognize_gesture(candidate);
+                            if (DEBUG)
+                                Log.w("stopRecGest-recogThread", "===== \n" + "Recognized Gesture: " + gid + "\n===");
+                            // set gid as currently detected gid
+                            detected_gid = gid;
+
+
+                            // show the alert
+                            alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
+
+
+                            // ---- START EIGEN TOEVOEGING
+                            // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
+                            // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
+
+
+                            ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                            if (networkInfo != null && networkInfo.isConnected()) {
+
+                                // fetch data
+
+
+                                SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
+                                String IPAddress = settings.getString("ip_address", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                                Log.w(LOG_TAG, "saved IP is " + IPAddress);
+
+                                // TODO met of zonder slash?
+                                String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
+                                // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
+
+
+                                // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
+//                            new AsyncPOSTGestureToServer().execute(stringURL, gid);
+
+
+                                // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
+                                // UPDATE: EIGEN CODE WERKT NU :D
+                                int httpResult = POSTGestureToServer(stringURL, gid);
+                                // DIT DUS NIET MEER NODIG:
+//                            nieuweTestcode(stringURL, gid);
+
+
+                            } else {
+                                // Arriving here if no internet connection.
+
+                            }
+
+
+                            // ---- STOP EIGEN TOEVOEGING
+
+
+
+
+                        }
+                    };
+                    t.start();
+
+                    // TEST LOCATIE ASYNCTASK
+                    // UPDATE: werkt wrsl niet OMDAT DETECTED_GID hier nog de VORIGE waarde bevat
+                    // omdat de THREAD nog aan het runnen is terwijl men HIER komt!
+//                Log.w(LOG_TAG, "DETECTED GID: " + detected_gid);
+//                new AsyncPOSTGestureToServer().execute(stringURL, detected_gid);
+
+
+                    if (DEBUG) Log.w("stopRecordingGesture", "STATE_RECOGNIZE --> thread dispatched");
+                    break;
+
+
+
+                case STATE_LIBRARY:
+                    break;
+                default:
+                    break;
+            }
+            recordingGestureTrace.clear();
+
+
+        }*/
+
+
+
+
+
+
+
+    }
+
+    private void doRemainingTasksAfterRecording() {
+
+
+        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
+
         // clear the existing trace
         switch (state) {
+
             case STATE_LEARN:
                 // recordingGestureTrace = null;
                 // note that the arraylist is being copied
                 statusText.setText("Saving gesture to DB...");
                 Gesture ng = new Gesture(recordingGestureIDString, new ArrayList<float[]>(recordingGestureTrace));
+
                 // add gesture to library but prepare with recognizer settings first
                 myGestureLibrary.addGesture(ng.gestureID, this.myGestureRecognizer.prepare_gesture_for_library(ng), false);
                 if (DEBUG)
                     Log.w("stopRecordingGesture", "Recorded Gesture ID " + recordingGestureIDString + " Gesture Trace Length:" + recordingGestureTrace.size());
                 statusText.setText("Press button to train gesture.");
                 break;
+
             case STATE_RECOGNIZE:
                 statusText.setText("Recognizing gesture...");
+
+                // TODO mag weg?
                 // stop accelerometer
                 mSensorManager.unregisterListener(sensorListener);
 
@@ -332,17 +614,23 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                 // save a reference to activity for this context
                 Thread t = new Thread() {
                     public void run() {
+
                         if (DEBUG)
-                            Log.w("stopRecordGest-recogThread", "Attempting Gesture Recognition Trace-Length: " + recordingGestureTrace.size());
+                            Log.w("stopRecGest-recogThread", "Attempting Gesture Recognition Trace-Length: " + recordingGestureTrace.size());
                         String gid = myGestureRecognizer.recognize_gesture(candidate);
                         if (DEBUG)
-                            Log.w("stopRecordGest-recogThread", "===== \n" + "Recognized Gesture: " + gid + "\n===");
+                            Log.w("stopRecGest-recogThread", "===== \n" + "Recognized Gesture: " + gid + "\n===");
                         // set gid as currently detected gid
                         detected_gid = gid;
 
 
+                        // show the alert
+                        alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
+
+
                         // ---- START EIGEN TOEVOEGING
                         // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
+                        // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
 
 
                         ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -354,7 +642,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
                             SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
                             String IPAddress = settings.getString("ip_address", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
-
+                            Log.w(LOG_TAG, "saved IP is " + IPAddress);
 
                             // TODO met of zonder slash?
                             String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
@@ -380,8 +668,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
                         // ---- STOP EIGEN TOEVOEGING
 
-                        // show the alert
-                        alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
+
                     }
                 };
                 t.start();
@@ -395,6 +682,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
                 if (DEBUG) Log.w("stopRecordingGesture", "STATE_RECOGNIZE --> thread dispatched");
                 break;
+
+
             case STATE_LIBRARY:
                 break;
             default:
@@ -405,6 +694,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     }
 
 
+    // TODO mag weg want nooit gebruikt of?
     private void nieuweTestcode(String stringURL, String stringGesture) {
 
 
@@ -435,7 +725,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
     }
 
-
+    // TODO mag weg want nooit gebruikt of?
     private class AsyncPOSTGestureToServer extends AsyncTask<String, Void, Integer> {
 
         @Override
@@ -481,8 +771,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
             httpcon.setRequestMethod("POST");
             httpcon.setUseCaches(false);
             // TODO EVENTUEEL MEE SPELEN:
-            httpcon.setConnectTimeout(60000); // stond op 10000
-            httpcon.setReadTimeout(60000); // stond op 10000
+            httpcon.setConnectTimeout(30000); // stond op 10000
+            httpcon.setReadTimeout(30000); // stond op 10000
 
 
             // TODO is testen: (dan moet JSON object hier gemaakt worden ipv verderop)
@@ -492,6 +782,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
             httpcon.connect();
 
+            Log.w(LOG_TAG, "arrived after .connect()");
 
             // JSON
             JSONObject jsonObject = new JSONObject();
@@ -603,12 +894,19 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
         // create gesture library
 
-        myGestureLibrary = new GestureLibrary("GESTURES", getActivity());
+
+        // TODO je hebt hier TRY CATCH rond gezet want gaf error over SQL en close(): to fix.
+        try {
+            myGestureLibrary = new GestureLibrary("GESTURES", getActivity());
+        } catch (Exception ex){
+
+        }
+
         myGestureRecognizer = new gesturerec3d(myGestureLibrary, 50);
 
-
+        // TODO mag weg maar test of NIETS BREAKT.
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-
+        // TODO mag weg maar test of NIETS BREAKT.
         mSensorManager.registerListener(sensorListener,
                 SensorManager.SENSOR_ACCELEROMETER,
                 SensorManager.SENSOR_DELAY_FASTEST
@@ -697,7 +995,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     					}
     					else
     					{
-    						Log.w("onClic", "NotInFocus");
+    						Log.w("onClick", "NotInFocus");
     					}*/
 
                                           }
@@ -725,6 +1023,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
     }
 
+
+
     @Override
     public void onClick(DialogInterface dialog, int which) {
 
@@ -744,11 +1044,17 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
     }
 
+
+
     public void stateChanged() {
         TextView statusText = (TextView) getView().findViewById(R.id.statusText);
 
         if (DEBUG) Log.w("stateChanged", "current State is: " + this.state.toString());
+
+
+
         switch (this.state) {
+
             case STATE_LEARN:
                 // show dialog with which the user can enter the gesture id
 
@@ -787,9 +1093,11 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
                 break;
+
             case STATE_RECOGNIZE:
                 statusText.setText("Gesture recognition mode");
                 break;
+
             case STATE_LIBRARY:
                 break;
             default:
@@ -802,11 +1110,14 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         if (DEBUG) {
             Log.w("onActivityResult", "Code: " + requestCode + " resultCode " + resultCode/*+ " data " + data.getDataString()*/);
         }
+
         // change state and map to enum value
         this.state = com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.App.STATES.values()[resultCode];
-        //update activitie's state
+        //update activity's state
         this.stateChanged();
     }
+
+
 
     @Override
     public void onResume() {
@@ -816,7 +1127,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         // voor (o.a.) PEBBLE ACCEL STREAM
         getToggleStatesAndEnableServices();
 
-
+        // TODO mag dus weg maar check dat NIETS BREAKT.
         // voor THREE DOLLAR gestures
         mSensorManager.registerListener(sensorListener,
                 SensorManager.SENSOR_ACCELEROMETER,
@@ -833,6 +1144,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 //        }
 
     }
+
+
 
     private void startPebbleDataStream() {
 
@@ -946,9 +1259,9 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
         }
 
+
         // TODO of beter IN if lus?
         PebbleKit.startAppOnPebble(getActivity(), uuid);
-
     }
 
 
@@ -956,7 +1269,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     public void onPause() {
         super.onPause();
 
-
+        // TODO mag dit wel pauzeren of niet?
         // voor PEBBLE ACCEL STREAM
         disableAllServices();
     }
@@ -1030,7 +1343,9 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
 
-        if (DEBUG) Log.w("onDestroy", "killing this here app!");
+        if (DEBUG) Log.w("onDestroy", "ThreeDollarGestureFragment destroyed.");
+
+        // TODO mag dus weg?
         mSensorManager.unregisterListener(sensorListener);
         // this.myGestureLibrary.onApplicationStop();
 

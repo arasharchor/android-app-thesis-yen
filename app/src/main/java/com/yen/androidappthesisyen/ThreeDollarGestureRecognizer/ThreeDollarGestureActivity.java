@@ -245,9 +245,6 @@ public class ThreeDollarGestureActivity extends Activity {
 
         super.onDestroy();
     }
-
-
-
     /*private void showIPUserDetectorDialog() {
 
     }
@@ -255,6 +252,8 @@ public class ThreeDollarGestureActivity extends Activity {
     private void showIPGestureHandlerDialog() {
 
     }*/
+
+
 
 
     /**
