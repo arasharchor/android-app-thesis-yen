@@ -39,7 +39,8 @@ public class ThreeDollarGestureActivity extends Activity {
         // MOET HIER NIET WANT STAAT AL STANDAARD INGEVULD MET EERDERE WAARDE. EN MOEST ER NOG GEEN WAARDE ZIJN WORDT ER EEN DEFAULT GEGEVEN.
         /*SharedPreferences settings = getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("ip_address", "192.168.1.1");
+        editor.putString("ip_address_1", "192.168.1.1");
+        editor.putString("ip_address_2", "192.168.1.2");
         editor.commit();*/
 
 
@@ -70,9 +71,13 @@ public class ThreeDollarGestureActivity extends Activity {
                 2,
                 "Gesture Library");
         menu.add(3,
-                App.MENUITEMS.ITEM_INSERT_IP.ordinal(),
+                App.MENUITEMS.ITEM_INSERT_IP_1.ordinal(),
                 3,
-                "Insert IP Address");
+                "Insert IP Address 1");
+        menu.add(4,
+                App.MENUITEMS.ITEM_INSERT_IP_2.ordinal(),
+                4,
+                "Insert IP Address 2");
         /*menu.add(3,
                 App.MENUITEMS.ITEM_IP_USER_DETECTOR.ordinal(),
                 3,
@@ -135,9 +140,13 @@ public class ThreeDollarGestureActivity extends Activity {
             Intent i = new Intent(this.getApplicationContext(), DBManagerUIActivity.class);
             startActivityForResult(i, 0);
 
-        } else if (value == App.MENUITEMS.ITEM_INSERT_IP.ordinal()) {
+        } else if (value == App.MENUITEMS.ITEM_INSERT_IP_1.ordinal()) {
 
-            showIPDialog();
+            showIPDialog(1);
+
+        } else if (value == App.MENUITEMS.ITEM_INSERT_IP_2.ordinal()) {
+
+            showIPDialog(2);
 
         }
         /*else if (value == App.MENUITEMS.ITEM_IP_USER_DETECTOR.ordinal()) {
@@ -155,10 +164,10 @@ public class ThreeDollarGestureActivity extends Activity {
 
     }
 
-    private void showIPDialog() {
+    private void showIPDialog(final int enumerator) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Location of User Detector and Gesture Handler");
-        builder.setMessage("Insert the current IPv4 address");
+        builder.setMessage("Insert the current IPv4 address " + enumerator);
 
         // TODO dit toepassen? WEL ALS WE BV. 2x EDITTEXT WENSEN ALS USER VERSCHILLENDE IPs ZOU KUNNEN INGEVEN.
 //        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -196,7 +205,7 @@ public class ThreeDollarGestureActivity extends Activity {
                             // TODO SERVICE MOET NU GEHERSTART WORDEN - OF BEDENK ANDERE WERKWIJZE ZODAT SERVICE NOG NIET IS GESTART VOORALEER JUISTE IP IN SYSTEEM ZIT.
                             SharedPreferences settingsUserDetector = getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
                             SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
-                            editorUserDetector.putString("ip_address_broker", value);
+                            editorUserDetector.putString("ip_address_broker_" + enumerator, value);
                             // editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
                             editorUserDetector.commit();
                         }
@@ -216,7 +225,7 @@ public class ThreeDollarGestureActivity extends Activity {
                         if(matcher.matches()){
                             SharedPreferences settingsGestureHandler = getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
                             SharedPreferences.Editor editorGestureHandler = settingsGestureHandler.edit();
-                            editorGestureHandler.putString("ip_address", value);
+                            editorGestureHandler.putString("ip_address_" + enumerator, value);
                             editorGestureHandler.commit();
                         }
 
@@ -232,6 +241,7 @@ public class ThreeDollarGestureActivity extends Activity {
                         dialog.dismiss();
                     }
                 });
+
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -239,11 +249,10 @@ public class ThreeDollarGestureActivity extends Activity {
     @Override
     protected void onDestroy() {
 
-
-
         Log.w("debugging", "three dollar gesture ACTIVITY DESTROYED");
 
         super.onDestroy();
+
     }
     /*private void showIPUserDetectorDialog() {
 

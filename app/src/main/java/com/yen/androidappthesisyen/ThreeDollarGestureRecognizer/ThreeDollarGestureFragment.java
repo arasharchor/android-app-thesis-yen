@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -88,6 +89,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
             zView,
             rateView;
     private ToggleButton toggleAccelStream;
+    private CheckBox checkboxGestureSpotting;
 
     private PebbleKit.PebbleDataReceiver receiver;
 
@@ -274,9 +276,13 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
 
-        Boolean nieuwSysteem = true; // ==================================================================
+        // Boolean useGestureSpotting = false; // ==================================================================
 
-        if(nieuwSysteem){
+        SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_spotting", Context.MODE_PRIVATE);
+        Boolean useGestureSpotting = settings.getBoolean("use", true);
+
+
+        if(useGestureSpotting){
             findBoundariesGesture(values);
         } else {
 
@@ -625,7 +631,20 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
                         // show the alert
-                        alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
+                        if(!detected_gid.equalsIgnoreCase("unknown")){
+                            alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
+                        }
+
+
+
+                        // Sending feedback to the user:
+                        // Detected a gesture - but could be a false positive! - will send a short vibration.
+                        // Didn't detect a gesture will send 2 short vibrations.
+                        if (!gid.equalsIgnoreCase("unknown") && !gid.equalsIgnoreCase("unknown gesture")){ // TODO "unknown gesture" ook of "unknown" voldoende?
+                            doShortPebbleVibration();
+                        } else {
+                            doTwoShortPebbleVibrations();
+                        }
 
 
                         // ---- START EIGEN TOEVOEGING
@@ -691,6 +710,18 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         }
         recordingGestureTrace.clear();
 
+    }
+
+    private void doShortPebbleVibration() {
+        PebbleDictionary dict = new PebbleDictionary();
+        dict.addInt32(3, 0);
+        PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+    }
+
+    private void doTwoShortPebbleVibrations() {
+        PebbleDictionary dict = new PebbleDictionary();
+        dict.addInt32(4, 0);
+        PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
     }
 
 
@@ -944,6 +975,20 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
             }
         });
 
+
+        checkboxGestureSpotting = (CheckBox) returnedView.findViewById(R.id.checkBoxGestureSpotting);
+        SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_spotting", Context.MODE_PRIVATE);
+        Boolean useGestureSpotting = settings.getBoolean("use", true);
+        checkboxGestureSpotting.setChecked(useGestureSpotting);
+        checkboxGestureSpotting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                SharedPreferences.Editor editor = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_spotting", Context.MODE_PRIVATE).edit();
+                editor.putBoolean("use", checkboxGestureSpotting.isChecked());
+                editor.commit();
+            }
+        });
 
 
 

@@ -100,7 +100,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     }
 
     // MQTT constants
-    public static final int MAX_MQTT_CLIENTID_LENGTH = 22;
+    public static final int MAX_MQTT_CLIENTID_LENGTH = 22; // TODO mag dit hoger?
 
     /************************************************************************/
     /*    VARIABLES used to maintain state                                  */
@@ -120,16 +120,21 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
     // taken from preferences
     //    host name of the server we're receiving push notifications from
-    private String brokerHostName = "";
+    private String brokerHostName_1 = "";
+    // TOEGEVOEGD:
+    private String brokerHostName_2 = "";
+
     // taken from preferences
     //    topic we want to receive messages about
     //    can include wildcards - e.g.  '#' matches anything
-    private String topicName = "";
+    private String topicNameAccelStream = "";
+    private String topicNameGesturePusher = "";
 
 
     // defaults - this sample uses very basic defaults for it's interactions
     //   with message brokers
     private int brokerPortNumber = 1883;
+    // TODO port 1883 zal bij elke broker gebruikt worden dus moet geen extra?
     private MqttPersistence usePersistence = null;
     private boolean cleanStart = false;
     private int[] qualitiesOfService = {2}; // was {0};
@@ -197,8 +202,10 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         //   this is not the only way to do this - for example, you could use
         //   the Intent that starts the Service to pass on configuration values
         SharedPreferences settings = getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
-        brokerHostName = settings.getString("ip_address_broker", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
-        topicName = settings.getString("topic", "accelstream/state"); // TODO hardcoden? of behouden want is zo meer generiek?
+        brokerHostName_1 = settings.getString("ip_address_broker_1", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+        brokerHostName_2 = settings.getString("ip_address_broker_2", "192.168.1.2"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+        topicNameAccelStream = settings.getString("topic", "accelstream/state"); // TODO hardcoden? of behouden want is zo meer generiek?
+        topicNameGesturePusher = settings.getString("topic", "gesturepusher/#"); // TODO hardcoden? of behouden want is zo meer generiek?
 
         // register to be notified whenever the user changes their preferences
         //  relating to background data use - so that we can respect the current
@@ -208,7 +215,11 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 new IntentFilter(ConnectivityManager.ACTION_BACKGROUND_DATA_SETTING_CHANGED));
 
         // define the connection to the broker
-        defineConnectionToBroker(brokerHostName);
+        defineConnectionToBroker(brokerHostName_1);
+        // TODO ----------------
+        // werkt het om hier direct 2 connecties naar verschil. brokers te definieren?
+        defineConnectionToBroker(brokerHostName_2);
+
     }
 
 
@@ -318,6 +329,9 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                     //  even just with one subscription, we could receive
                     //  messages for multiple topics
                     subscribeToTopic(topicName);
+                    // TODO dus hier nog zo'n subscribeToTopic toevoegen!
+                    // OFWEL topicnaam aanpassen zodat onder 1 hoofdcategorie alle nodige topics zitten en dan via wildcard werken.
+
                 }
             } else {
                 // we can't do anything now because we don't have a working

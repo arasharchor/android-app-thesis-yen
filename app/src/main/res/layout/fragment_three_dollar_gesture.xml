@@ -112,5 +112,15 @@
 
     </LinearLayout>
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Use gesture spotting."
+        android:id="@+id/checkBoxGestureSpotting"
+        android:layout_alignTop="@+id/toggle_accel_stream"
+        android:layout_toRightOf="@+id/toggle_accel_stream"
+        android:layout_toEndOf="@+id/toggle_accel_stream"
+         />
+        <!-- android:checked="true" -->
 
 </RelativeLayout>
