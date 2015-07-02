@@ -96,8 +96,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // TODO juiste plek om het hier te zetten?
         /*SharedPreferences settings = getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("ip_address_broker", "192.168.1.1");
-        editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
+        editor.putString("ip_address_broker_1", "192.168.1.1");
+        editor.putString("ip_address_broker_2", "192.168.1.2");
+        editor.putString("topic_accelstream",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
+        editor.putString("topics_gesturepusher",  "gesturepusher/#"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
         editor.commit();
         Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na editor.commit()");*/
 
@@ -150,6 +152,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             // ...
         }
     }
+
     @Override
     protected void onDestroy()
     {

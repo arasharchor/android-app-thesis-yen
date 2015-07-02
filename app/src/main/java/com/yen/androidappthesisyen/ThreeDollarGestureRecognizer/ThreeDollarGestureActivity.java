@@ -210,16 +210,23 @@ public class ThreeDollarGestureActivity extends Activity {
                             editorUserDetector.commit();
                         }
 
-                        // TODO doen we dit in alle gevallen? of moet er soms NIET gestopt worden na klikken op "save" bij bepaalde values?
-                        // WE STOPPEN EERST DE SERVICE EN HERSTARTEN DAN. ZO KAN NIEUW IP DIRECT TOEGEPAST WORDEN :D
-                        Intent svcOld = new Intent(getApplicationContext(), MQTTService.class);
-                        stopService(svcOld);
 
-                        // Dit BUITEN de IF lus: zelfs als er geen tekst werd ingevuld, wordt service gestart: die gebruikt dan het eerder opgeslagen IP.
-                        // STARTING THE SERVICE NOW THAT THE IP ADDRESS OF THE BROKER IS KNOWN
-                        // TODO getApplicationContext()is hier wrsl WEL OK want service best niet gelinkt aan een bepaalde activity?
-                        Intent svcNew = new Intent(getApplicationContext(), MQTTService.class);
-                        startService(svcNew);
+
+                        // we gaan ENKEL herstarten als IP 1 en IP 2 werden ingevuld. Na invullen IP 2 (en niet al bij IP 1) wordt service geherstart.
+                        if(enumerator == 2){
+                            // TODO doen we dit in alle gevallen? of moet er soms NIET gestopt worden na klikken op "save" bij bepaalde values?
+                            // WE STOPPEN EERST DE SERVICE EN HERSTARTEN DAN. ZO KAN NIEUW IP DIRECT TOEGEPAST WORDEN :D
+                            Intent svcOld = new Intent(getApplicationContext(), MQTTService.class);
+                            stopService(svcOld);
+
+                            // Dit BUITEN de IF lus: zelfs als er geen tekst werd ingevuld, wordt service gestart: die gebruikt dan het eerder opgeslagen IP.
+                            // STARTING THE SERVICE NOW THAT THE IP ADDRESS OF THE BROKER IS KNOWN
+                            // TODO getApplicationContext()is hier wrsl WEL OK want service best niet gelinkt aan een bepaalde activity?
+                            Intent svcNew = new Intent(getApplicationContext(), MQTTService.class);
+                            startService(svcNew);
+                        }
+
+
 
 
                         if(matcher.matches()){

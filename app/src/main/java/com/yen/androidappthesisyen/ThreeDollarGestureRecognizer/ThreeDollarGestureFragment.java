@@ -27,7 +27,6 @@ import android.widget.ToggleButton;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.yen.androidappthesisyen.R;
-import com.yen.androidappthesisyen.mqtt.MQTTService;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -65,7 +64,7 @@ import java.util.UUID;
 public class ThreeDollarGestureFragment extends Fragment implements DialogInterface.OnClickListener {
 
 
-//    private static final String LOG_TAG = ThreeDollarGestureFragment.class.getName();
+    //    private static final String LOG_TAG = ThreeDollarGestureFragment.class.getName();
     // was relatief lang dus nu:
     private static final String LOG_TAG = "GESTURE SPOTTING";
 
@@ -141,12 +140,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
     // private MENUITEMS menuitems;
-
-
-
-
-
-
 
 
     public void show_alert_box() {
@@ -265,15 +258,10 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         tv3.setText(dataZ.toString());
 
 
-
-
-
-
         // ------
         // hier bepalen welke data behoort tot een gesture en welke niet.
         // door vinden start en stop via checken van thresholds ofzo.
         // en dan moet ergens startRecordingGesture() aangeroepen woren wanneer zo'n start werd gevonden, en stop... bij vinden van een stop.
-
 
 
         // Boolean useGestureSpotting = false; // ==================================================================
@@ -282,7 +270,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         Boolean useGestureSpotting = settings.getBoolean("use", true);
 
 
-        if(useGestureSpotting){
+        if (useGestureSpotting) {
             findBoundariesGesture(values);
         } else {
 
@@ -305,7 +293,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         }
 
 
-
     }
 
 
@@ -315,6 +302,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     public enum RecordMode {
         MOTION_DETECTION, PUSH_TO_GESTURE
     }
+
     RecordMode recordMode = RecordMode.MOTION_DETECTION;
     boolean isRecording = false;
     ArrayList<float[]> gestureValues = new ArrayList<float[]>();
@@ -322,7 +310,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     int stepsSinceNoMovement; // TODO default op 0 zetten of niet?
     final int MIN_GESTURE_SIZE = 5; // default 8
     final int MIN_STEPS_SINCE_NO_MOVEMENT = 8; // default 10
-
 
 
     private void findBoundariesGesture(float[] values) {
@@ -362,7 +349,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                 }
 
 
-
                 if (stepsSinceNoMovement == MIN_STEPS_SINCE_NO_MOVEMENT) { // TODO =========================================================================================== iets anders dan 10 nemen? ofja 10 wrsl goed genoeg: als te hoog is moet de user te lang stilstaan met Pebble.
 
                     Log.w(LOG_TAG, "============================ detectie MOGELIJKE gesture ");
@@ -374,10 +360,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
                         Log.w(LOG_TAG, "============= het was IDD een gesture =============== GESTOPT MET RECORDEN GESTURE EN DE GESTURE SIZE IS GROTER DAN MINIMUM. size = " + length);
                         // TODO de gesture is nu gedaan en de geldige waardes zitten in index 0 tem index gestureValues.size() - MIN_STEPS_SINCE_NO_MOVEMENT
-
-
-
-
 
 
                         recordingGestureTrace = new ArrayList<float[]>(250);
@@ -453,14 +435,11 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         // traces = recordingGestureTrace.toArray(traces);
 
 
-
-
-
         Boolean nieuwSysteem = true;
 
 
         /*if (nieuwSysteem){*/
-            doRemainingTasksAfterRecording();
+        doRemainingTasksAfterRecording();
         /*} else {
             TextView statusText = (TextView) getView().findViewById(R.id.statusText);
 
@@ -578,11 +557,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         }*/
 
 
-
-
-
-
-
     }
 
     private void doRemainingTasksAfterRecording() {
@@ -631,61 +605,74 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
                         // show the alert
-                        if(!detected_gid.equalsIgnoreCase("unknown")){
+                        if (!detected_gid.equalsIgnoreCase("unknown")) {
                             alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
                         }
 
 
-
-                        // Sending feedback to the user:
-                        // Detected a gesture - but could be a false positive! - will send a short vibration.
-                        // Didn't detect a gesture will send 2 short vibrations.
-                        if (!gid.equalsIgnoreCase("unknown") && !gid.equalsIgnoreCase("unknown gesture")){ // TODO "unknown gesture" ook of "unknown" voldoende?
-                            doShortPebbleVibration();
-                        } else {
-                            doTwoShortPebbleVibrations();
-                        }
+                        SharedPreferences systemIDsettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_accel_stream", Context.MODE_PRIVATE);
+                        // checken YEN-ASUS - als test want:
+                        // TODO dit is tijdelijk: moet eigenlijk de systemID ophalen uit SharedPreferences ofzo, waarbij state op TRUE staat, en zien of voor die systemID de gesture supported is.
+                        Boolean isAccelStreamStateEnabled = systemIDsettings.getBoolean("yen-asus", false);
+                        if (isAccelStreamStateEnabled) {
 
 
-                        // ---- START EIGEN TOEVOEGING
-                        // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
-                        // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
+                            // Sending feedback to the user:
+                            // Detected a gesture - but could be a false positive! - will send a short vibration.
+                            // Didn't detect a gesture will send 2 short vibrations.
+//                            if (!gid.equalsIgnoreCase("unknown") && !gid.equalsIgnoreCase("unknown gesture")) { // TODO "unknown gesture" ook of "unknown" voldoende?
+                            // TODO is tijdelijk: moet supported gestures voor de systemID halen uit SharedPref ofzo:
+                            if (gid.equalsIgnoreCase("up") || gid.equalsIgnoreCase("down")) {
+                                doShortPebbleVibration(); // 1x als gesture supported is
+                            } else if(!gid.equalsIgnoreCase("unknown") && !gid.equalsIgnoreCase("unknown gesture")) {
+                                doTwoShortPebbleVibrations(); // 2x als het een UNsupported gesture is maar NIET unknown.
+                            }
 
 
-                        ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                        if (networkInfo != null && networkInfo.isConnected()) {
-
-                            // fetch data
+                            // ---- START EIGEN TOEVOEGING
+                            // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
+                            // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
 
 
-                            SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
-                            String IPAddress = settings.getString("ip_address", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
-                            Log.w(LOG_TAG, "saved IP is " + IPAddress);
+                            ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                            if (networkInfo != null && networkInfo.isConnected()) {
 
-                            // TODO met of zonder slash?
-                            String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
-                            // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
+                                // fetch data
 
 
-                            // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
+                                SharedPreferences gestureHandlersettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
+                                String IPAddress = gestureHandlersettings.getString("ip_address", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                                Log.w(LOG_TAG, "saved IP is " + IPAddress);
+
+                                // TODO met of zonder slash?
+                                String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
+                                // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
+
+
+                                // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
 //                            new AsyncPOSTGestureToServer().execute(stringURL, gid);
 
 
-                            // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
-                            // UPDATE: EIGEN CODE WERKT NU :D
-                            int httpResult = POSTGestureToServer(stringURL, gid);
-                            // DIT DUS NIET MEER NODIG:
+                                // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
+                                // UPDATE: EIGEN CODE WERKT NU :D
+                                int httpResult = POSTGestureToServer(stringURL, gid);
+                                // DIT DUS NIET MEER NODIG:
 //                            nieuweTestcode(stringURL, gid);
 
 
+                            } else {
+                                // Arriving here if no internet connection.
+
+                            }
+
+
+                            // ---- STOP EIGEN TOEVOEGING
+
+
                         } else {
-                            // Arriving here if no internet connection.
-
+                            // Do nothing.
                         }
-
-
-                        // ---- STOP EIGEN TOEVOEGING
 
 
                     }
@@ -914,7 +901,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         // voor THREE DOLLAR gestures
         // acc sensor update rate
         /*
-		TextView statusText = (TextView) findViewById(R.id.statusText);
+        TextView statusText = (TextView) findViewById(R.id.statusText);
 		statusText.setText("Press button to train gesture");*/
 
         // create database test code
@@ -929,7 +916,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         // TODO je hebt hier TRY CATCH rond gezet want gaf error over SQL en close(): to fix.
         try {
             myGestureLibrary = new GestureLibrary("GESTURES", getActivity());
-        } catch (Exception ex){
+        } catch (Exception ex) {
 
         }
 
@@ -941,7 +928,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         mSensorManager.registerListener(sensorListener,
                 SensorManager.SENSOR_ACCELEROMETER,
                 SensorManager.SENSOR_DELAY_FASTEST
-    	    	/*SensorManager.SENSOR_DELAY_GAME*/);
+                /*SensorManager.SENSOR_DELAY_GAME*/);
 
     }
 
@@ -977,8 +964,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
         checkboxGestureSpotting = (CheckBox) returnedView.findViewById(R.id.checkBoxGestureSpotting);
-        SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_spotting", Context.MODE_PRIVATE);
-        Boolean useGestureSpotting = settings.getBoolean("use", true);
+        SharedPreferences gestureSpottingSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_spotting", Context.MODE_PRIVATE);
+        Boolean useGestureSpotting = gestureSpottingSettings.getBoolean("use", true);
         checkboxGestureSpotting.setChecked(useGestureSpotting);
         checkboxGestureSpotting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -989,7 +976,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                 editor.commit();
             }
         });
-
 
 
         // voor THREE DOLLAR gestures
@@ -1057,17 +1043,31 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
     // ----------- KOPIE OOK TE VINDEN IN MQTTSERVICE.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
-    private void enableAccelStream(){
+    private void enableAccelStream() {
+
+        String systemID = "triggered-by-user";
+        SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_accel_stream", Context.MODE_PRIVATE);
+        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
+        accelStreamEditor.putBoolean(systemID, true);
+        accelStreamEditor.commit();
+
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
     }
-    private void disableAccelStream(){
+
+    private void disableAccelStream() {
+
+        String systemID = "triggered-by-user";
+        SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_accel_stream", Context.MODE_PRIVATE);
+        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
+        accelStreamEditor.putBoolean(systemID, false);
+        accelStreamEditor.commit();
+
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
     }
-
 
 
     @Override
@@ -1090,12 +1090,10 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     }
 
 
-
     public void stateChanged() {
         TextView statusText = (TextView) getView().findViewById(R.id.statusText);
 
         if (DEBUG) Log.w("stateChanged", "current State is: " + this.state.toString());
-
 
 
         switch (this.state) {
@@ -1163,7 +1161,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     }
 
 
-
     @Override
     public void onResume() {
         super.onResume();
@@ -1189,7 +1186,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 //        }
 
     }
-
 
 
     private void startPebbleDataStream() {
@@ -1384,8 +1380,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
     @Override
     public void onDestroy() {
-
-
 
 
         if (DEBUG) Log.w("onDestroy", "ThreeDollarGestureFragment destroyed.");
