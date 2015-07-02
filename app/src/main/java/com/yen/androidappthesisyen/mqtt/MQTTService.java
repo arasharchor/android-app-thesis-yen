@@ -18,6 +18,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.getpebble.android.kit.PebbleKit;
@@ -32,13 +33,17 @@ import com.ibm.mqtt.MqttSimpleCallback;
 import com.yen.androidappthesisyen.MainActivity;
 import com.yen.androidappthesisyen.R;
 
+import org.json.JSONObject;
+
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -57,9 +62,58 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     // TODO
 //    momenteel is de hashmap nog opgeslaan in het MQTTSERVICE OBJECT gewoon: bij orientatieaanpassing of HEROPSTART SERVICE zal het verdwijnen!
 //    HEROPSTART SERVICE gebeurt ook als een broker een nieuwe IP heeft en dat moet ingegeven worden!
-    private Map<String, Set<String>> mapSystemIDToSupportedGestures; // TODO gaan we dit bijhouden via SharedPreferences ofzo of niet? is wrsl niet nodig? OF TOCH WEL WANT KAN ER DAN AAN UIT ANDERE ACTIVITY/FRAGMENT
-//   OVERBODIG want werken direct met SharedPreferences private Map<String, Boolean> mapSystemIDToIsAccelStreamEnabled; // TODO gaan we dit bijhouden via SharedPreferences ofzo of niet? is wrsl niet nodig?
+    // OVERBODIG WNT NU IN SHAREDPREFERENCES: private Map<String, Set<String>> mapSystemIDToSupportedGestures; // TODO gaan we dit bijhouden via SharedPreferences ofzo of niet? is wrsl niet nodig? OF TOCH WEL WANT KAN ER DAN AAN UIT ANDERE ACTIVITY/FRAGMENT
+    // key = system ID - value = comma separated list of supported gestures for the specific systemID
+    // STAAT OOK IN 3Dgesturefragment dus wijzingen BIJ ALLEBEI DOORVOEREN
+    private void addSupportedGesture(String systemID, String gestureToBeAdded){
 
+        Map<String,String> savedMap = getMapSupportedGestures();
+        String concatenatedGestures = savedMap.get(systemID);
+
+        String[] arrayGestures = concatenatedGestures.split(";");
+        Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
+        // adding new gesture
+        setGestures.add(gestureToBeAdded);
+        // recreate concatenated string from new set
+        String newConcatenatedString = TextUtils.join(";", setGestures);
+
+        savedMap.put(systemID, newConcatenatedString);
+
+
+        SharedPreferences pSharedPref = getApplicationContext().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
+        if (pSharedPref != null){
+            JSONObject jsonObject = new JSONObject(savedMap);
+            String jsonString = jsonObject.toString();
+            SharedPreferences.Editor editor = pSharedPref.edit();
+            editor.remove("my_map").commit();
+            editor.putString("my_map", jsonString);
+            editor.commit();
+        }
+    }
+    // STAAT OOK IN 3Dgesturefragment dus wijzingen BIJ ALLEBEI DOORVOEREN
+    private Map<String,String> getMapSupportedGestures(){
+
+        Map<String,String> outputMap = new HashMap<String,String>();
+
+        SharedPreferences pSharedPref = getApplicationContext().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
+
+        try{
+            if (pSharedPref != null){
+                String jsonString = pSharedPref.getString("my_map", (new JSONObject()).toString());
+                JSONObject jsonObject = new JSONObject(jsonString);
+                Iterator<String> keysItr = jsonObject.keys();
+                while(keysItr.hasNext()) {
+                    String key = keysItr.next();
+                    String value = (String) jsonObject.get(key); // a value = comma separated list of supported gestures for the specific systemID
+                    outputMap.put(key, value);
+                }
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return outputMap;
+    }
 
 
     // DEFAULT:
@@ -212,10 +266,10 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     public void onCreate() {
         super.onCreate();
 
-
-        if(mapSystemIDToSupportedGestures == null){
-            mapSystemIDToSupportedGestures = new HashMap<>();
-        }
+// OVERBODIG WNT NU VIA SHAREDPREFERENCES:
+//        if(mapSystemIDToSupportedGestures == null){
+//            mapSystemIDToSupportedGestures = new HashMap<>();
+//        }
 
 
         // reset status variable to initial state
@@ -845,7 +899,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
         // !! WE KOMEN DUS ENKEL HIER ALS HET GEKREGEN BERICHT ANDERS IS DAN HET VOORGAAND.
         // DIT IS GOED: WANT ALS DE STREAM AL BV. ENABLED WAS EN KREGEN TERUG ENABLED, MOETEN WE NIET DIRECT STARTEN HE WANT DE STREAM LIEP AL!
-        String[] splitArray = messageBody.split("/");
+        String[] splitArray = messageBody.split(";");
         String systemID = splitArray[0]; // TODO ======= dus ergens toepassen?
         Log.w("mqtt", "============ SYSTEMID " + systemID);
         if (topic.equalsIgnoreCase("accelstream/state") && messageBody.endsWith("enable")) {
@@ -859,16 +913,16 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             // TODO dit ook in map opslaan? of is gans deze enable en disable bij gesturepusher OVERBODIG?
             Log.w("mqtt", "======================== kreeg TOPIC gesturepusher/state en MESSAGE disable ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("up")) {
-            mapSystemIDToSupportedGestures.get(systemID).add("up");
+            addSupportedGesture(systemID, "up");
             Log.w("mqtt", "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE up ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("down")) {
-            mapSystemIDToSupportedGestures.get(systemID).add("down");
+            addSupportedGesture(systemID, "down");
             Log.w("mqtt", "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE down ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("left")) {
-            mapSystemIDToSupportedGestures.get(systemID).add("left");
+            addSupportedGesture(systemID, "left");
             Log.w("mqtt", "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE left ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("right")) {
-            mapSystemIDToSupportedGestures.get(systemID).add("right");
+            addSupportedGesture(systemID, "right");
             Log.w("mqtt", "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE right ========================");
         }
 
@@ -896,10 +950,10 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     // ----------- KOPIE OOK TE VINDEN IN THREEDOLLARGESTUREFRAGMENT.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
     private void enableAccelStream(String systemID) {
 
-//      OVERBODIG  mapSystemIDToIsAccelStreamEnabled.put(systemID, true);
-        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_to_accel_stream", Context.MODE_PRIVATE);
+        // Only 1 system at a time can detect the user's face, so only 1 system can have the accel stream enabled. Hence we only allow space for 1 saved systemID.
+        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
         SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putBoolean(systemID, true);
+        accelStreamEditor.putString("enabledSystem", systemID);
         accelStreamEditor.commit();
 
         Log.w("mqtt", "------------------------- arrived in enableAccelStream");
@@ -912,9 +966,9 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     private void disableAccelStream(String systemID) {
 
 //      OVERBODIG  mapSystemIDToIsAccelStreamEnabled.put(systemID, false);
-        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_to_accel_stream", Context.MODE_PRIVATE);
+        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
         SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putBoolean(systemID, false);
+        accelStreamEditor.putString("enabledSystem", "none");
         accelStreamEditor.commit();
 
         PebbleDictionary dict = new PebbleDictionary();

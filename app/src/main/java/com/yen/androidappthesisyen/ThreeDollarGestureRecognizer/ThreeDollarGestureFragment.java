@@ -13,6 +13,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -52,6 +53,12 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -610,69 +617,102 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                         }
 
 
-                        SharedPreferences systemIDsettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_accel_stream", Context.MODE_PRIVATE);
-                        // checken YEN-ASUS - als test want:
-                        // TODO dit is tijdelijk: moet eigenlijk de systemID ophalen uit SharedPreferences ofzo, waarbij state op TRUE staat, en zien of voor die systemID de gesture supported is.
-                        Boolean isAccelStreamStateEnabled = systemIDsettings.getBoolean("yen-asus", false);
-                        if (isAccelStreamStateEnabled) {
+                        if (detected_gid.equalsIgnoreCase("unknown")) { // TODO nodig of niet? && gid.equalsIgnoreCase("unknown gesture")
+
+                            doTwoShortPebbleVibrations();
+
+                        } else {
 
 
-                            // Sending feedback to the user:
-                            // Detected a gesture - but could be a false positive! - will send a short vibration.
-                            // Didn't detect a gesture will send 2 short vibrations.
-//                            if (!gid.equalsIgnoreCase("unknown") && !gid.equalsIgnoreCase("unknown gesture")) { // TODO "unknown gesture" ook of "unknown" voldoende?
-                            // TODO is tijdelijk: moet supported gestures voor de systemID halen uit SharedPref ofzo:
-                            if (gid.equalsIgnoreCase("up") || gid.equalsIgnoreCase("down")) {
-                                doShortPebbleVibration(); // 1x als gesture supported is
-                            } else if(!gid.equalsIgnoreCase("unknown") && !gid.equalsIgnoreCase("unknown gesture")) {
-                                doTwoShortPebbleVibrations(); // 2x als het een UNsupported gesture is maar NIET unknown.
+
+                            // Check for which system the accel data stream is currently running. This should always be only 1 system at a time because the user's face can only get detected by 1 system at the time.
+                            SharedPreferences systemIDsettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
+                            String enabledSystem = systemIDsettings.getString("enabledSystem", "none");
+
+
+                            // Get the list of systems which support the recognized gesture.
+                            Map<String, String> savedMap = getMapSupportedGestures();
+                            ArrayList<String> supportedSystems = new ArrayList<String>();
+
+                            for (Map.Entry<String, String> entry : savedMap.entrySet()) {
+                                String key = entry.getKey(); // key = systemID
+                                String value = entry.getValue(); // value = supported gestures
+                                String[] arrayGestures = value.split(";");
+
+                                for (String gesture : arrayGestures) {
+                                    if (gesture.equalsIgnoreCase(detected_gid)) {
+                                        supportedSystems.add(key);
+                                    }
+                                }
                             }
 
 
-                            // ---- START EIGEN TOEVOEGING
-                            // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
-                            // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
+                            Boolean isMatchFound = false;
+                            if (supportedSystems.contains(enabledSystem)) {
+                                isMatchFound = true;
+                            }
 
 
-                            ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                            if (networkInfo != null && networkInfo.isConnected()) {
-
-                                // fetch data
+                            if (isMatchFound) {
 
 
-                                SharedPreferences gestureHandlersettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
-                                String IPAddress = gestureHandlersettings.getString("ip_address", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
-                                Log.w(LOG_TAG, "saved IP is " + IPAddress);
-
-                                // TODO met of zonder slash?
-                                String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
-                                // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
+                                // Sending feedback to the user:
+                                // If a gesture detected + supported by the currently used system: do 1x short vibration.
+                                // This detected gesture can still be a false positive, though.
+                                doShortPebbleVibration();
 
 
-                                // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
+                                // ---- START EIGEN TOEVOEGING
+                                // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
+                                // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
+
+
+                                ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                                if (networkInfo != null && networkInfo.isConnected()) {
+
+                                    // fetch data
+
+
+                                    SharedPreferences gestureHandlersettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
+                                    String IPAddress = gestureHandlersettings.getString("ip_address", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                                    Log.w(LOG_TAG, "saved IP is " + IPAddress);
+
+                                    // TODO met of zonder slash?
+                                    String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
+                                    // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
+
+
+                                    // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
 //                            new AsyncPOSTGestureToServer().execute(stringURL, gid);
 
 
-                                // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
-                                // UPDATE: EIGEN CODE WERKT NU :D
-                                int httpResult = POSTGestureToServer(stringURL, gid);
-                                // DIT DUS NIET MEER NODIG:
+                                    // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
+                                    // UPDATE: EIGEN CODE WERKT NU :D
+                                    int httpResult = POSTGestureToServer(stringURL, gid);
+                                    // DIT DUS NIET MEER NODIG:
 //                            nieuweTestcode(stringURL, gid);
 
 
-                            } else {
-                                // Arriving here if no internet connection.
+                                } else {
+                                    // Arriving here if no internet connection.
 
+                                }
+
+
+                                // ---- STOP EIGEN TOEVOEGING
+
+
+                            } else {
+                                // Do nothing.
                             }
 
 
-                            // ---- STOP EIGEN TOEVOEGING
 
-
-                        } else {
-                            // Do nothing.
                         }
+
+
+
 
 
                     }
@@ -1020,7 +1060,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                                           public void onClick(View v) {
                                               // clicked
                                               //Log.w("onClick", "Clicked");
-    					/*if (mainButton.isFocused())
+                        /*if (mainButton.isFocused())
     					{
     						Log.w("onClick", "InFocus");
     					}
@@ -1046,9 +1086,9 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     private void enableAccelStream() {
 
         String systemID = "triggered-by-user";
-        SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_accel_stream", Context.MODE_PRIVATE);
+        SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
         SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putBoolean(systemID, true);
+        accelStreamEditor.putString("enabledSystem", systemID);
         accelStreamEditor.commit();
 
         PebbleDictionary dict = new PebbleDictionary();
@@ -1059,9 +1099,9 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     private void disableAccelStream() {
 
         String systemID = "triggered-by-user";
-        SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_accel_stream", Context.MODE_PRIVATE);
+        SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
         SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putBoolean(systemID, false);
+        accelStreamEditor.putString("enabledSystem", systemID);
         accelStreamEditor.commit();
 
         PebbleDictionary dict = new PebbleDictionary();
@@ -1429,5 +1469,59 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 //        // TODO: Update argument type and name
 //        public void onFragmentInteraction(Uri uri);
 //    }
+
+
+    // key = system ID - value = comma separated list of supported gestures for the specific systemID
+    // STAAT OOK IN MQTTService dus wijzingen BIJ ALLEBEI DOORVOEREN
+    private void addSupportedGesture(String systemID, String gestureToBeAdded) {
+
+        Map<String, String> savedMap = getMapSupportedGestures();
+        String concatenatedGestures = savedMap.get(systemID);
+
+        String[] arrayGestures = concatenatedGestures.split(";");
+        Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
+        // adding new gesture
+        setGestures.add(gestureToBeAdded);
+        // recreate concatenated string from new set
+        String newConcatenatedString = TextUtils.join(";", setGestures);
+
+        savedMap.put(systemID, newConcatenatedString);
+
+
+        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
+        if (pSharedPref != null) {
+            JSONObject jsonObject = new JSONObject(savedMap);
+            String jsonString = jsonObject.toString();
+            SharedPreferences.Editor editor = pSharedPref.edit();
+            editor.remove("my_map").commit();
+            editor.putString("my_map", jsonString);
+            editor.commit();
+        }
+    }
+
+    // STAAT OOK IN MQTTService dus wijzingen BIJ ALLEBEI DOORVOEREN
+    private Map<String, String> getMapSupportedGestures() {
+
+        Map<String, String> outputMap = new HashMap<String, String>();
+
+        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
+
+        try {
+            if (pSharedPref != null) {
+                String jsonString = pSharedPref.getString("my_map", (new JSONObject()).toString());
+                JSONObject jsonObject = new JSONObject(jsonString);
+                Iterator<String> keysItr = jsonObject.keys();
+                while (keysItr.hasNext()) {
+                    String key = keysItr.next();
+                    String value = (String) jsonObject.get(key); // a value = comma separated list of supported gestures for the specific systemID
+                    outputMap.put(key, value);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return outputMap;
+    }
 
 }
