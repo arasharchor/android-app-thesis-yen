@@ -611,18 +611,20 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                         detected_gid = gid;
 
 
+                        // TODO "  && !detected_gid.equalsIgnoreCase("not recognized!") " ook in IF steken?
+                        // of dat net niet om te zien wann er NOG GEEN GESTURES in DB zitten?
+                        // maar dat wrsl op betere manier tonen dan via dialog na uitvoeren gebaar?
                         // show the alert
-                        if (!detected_gid.equalsIgnoreCase("unknown")) {
+                        if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
                             alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
                         }
 
 
-                        if (detected_gid.equalsIgnoreCase("unknown")) { // TODO nodig of niet? && gid.equalsIgnoreCase("unknown gesture")
+                        if (detected_gid.equalsIgnoreCase("unknown") || detected_gid.equalsIgnoreCase("unknown gesture")) { // TODO nodig of niet? && gid.equalsIgnoreCase("unknown gesture")
 
                             doTwoShortPebbleVibrations();
 
                         } else {
-
 
 
                             // Check for which system the accel data stream is currently running. This should always be only 1 system at a time because the user's face can only get detected by 1 system at the time.
@@ -673,9 +675,22 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
                                     // fetch data
 
-
+                                    // TODO je moet op basis van de systemID de overeenkomstige enumerator weten, zodat je hier de enumerator kunt concateren.
+                                    // momenteel hardcodeer je nog de link tussen de systemID (tot nu toe enkel yen-asus en yen-medion) naar de enumerators (tot nu toe enkel 1 en 2)
+                                    // OFWEL direct een mapping tussen systemID en IP adres gesture handler opslaan, maar WRSL BEST MET ENUMERATOR WERKEN OMDAT JE OVERAL IN JE SHAREDPREF ZO WERKT!
                                     SharedPreferences gestureHandlersettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
-                                    String IPAddress = gestureHandlersettings.getString("ip_address", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                                    String IPAddress = "192.168.1.1";
+                                    if (enabledSystem.equalsIgnoreCase("yen-asus")) {
+                                        // TODO momenteel nog hardgecodeerde mapping yen-asus naar enum 1
+                                        IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                                    } else if (enabledSystem.equalsIgnoreCase("yen-medion")) {
+                                        // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
+                                        IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                                    } else {
+                                        Log.w("mqtt", "SystemID unknown so no mapped IP address for Gesture Handler found");
+                                    }
+
+
                                     Log.w(LOG_TAG, "saved IP is " + IPAddress);
 
                                     // TODO met of zonder slash?
@@ -708,11 +723,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                             }
 
 
-
                         }
-
-
-
 
 
                     }
@@ -1061,7 +1072,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                                               // clicked
                                               //Log.w("onClick", "Clicked");
                         /*if (mainButton.isFocused())
-    					{
+                        {
     						Log.w("onClick", "InFocus");
     					}
     					else
@@ -1476,14 +1487,37 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     private void addSupportedGesture(String systemID, String gestureToBeAdded) {
 
         Map<String, String> savedMap = getMapSupportedGestures();
-        String concatenatedGestures = savedMap.get(systemID);
+        if (savedMap == null) {
+            Log.w("mqtt", "SAVEDMAP IS NULL");
+        }
 
-        String[] arrayGestures = concatenatedGestures.split(";");
-        Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
-        // adding new gesture
-        setGestures.add(gestureToBeAdded);
-        // recreate concatenated string from new set
-        String newConcatenatedString = TextUtils.join(";", setGestures);
+
+        String concatenatedGestures = savedMap.get(systemID);
+//        if(concatenatedGestures == null){
+//            Log.w("mqtt", "concatenatedGestures IS NULL");
+//        }
+
+        String newConcatenatedString = "";
+
+        if (concatenatedGestures != null) {
+
+            String[] arrayGestures = concatenatedGestures.split(";");
+            Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
+            // adding new gesture
+            setGestures.add(gestureToBeAdded);
+            // recreate concatenated string from new set
+            newConcatenatedString = TextUtils.join(";", setGestures);
+
+            Log.w("mqtt", "newConcatenatedString " + newConcatenatedString);
+
+        } else {
+
+            // TODO zien of niet met ";" direct moet.
+            newConcatenatedString = gestureToBeAdded;
+
+            Log.w("mqtt", "newConcatenatedString " + newConcatenatedString);
+        }
+
 
         savedMap.put(systemID, newConcatenatedString);
 

@@ -68,14 +68,39 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     private void addSupportedGesture(String systemID, String gestureToBeAdded){
 
         Map<String,String> savedMap = getMapSupportedGestures();
-        String concatenatedGestures = savedMap.get(systemID);
+        if(savedMap == null){
+            Log.w("mqtt", "SAVEDMAP IS NULL");
+        }
 
-        String[] arrayGestures = concatenatedGestures.split(";");
-        Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
-        // adding new gesture
-        setGestures.add(gestureToBeAdded);
-        // recreate concatenated string from new set
-        String newConcatenatedString = TextUtils.join(";", setGestures);
+
+
+        String concatenatedGestures = savedMap.get(systemID);
+//        if(concatenatedGestures == null){
+//            Log.w("mqtt", "concatenatedGestures IS NULL");
+//        }
+
+        String newConcatenatedString = "";
+
+        if(concatenatedGestures != null){
+
+            String[] arrayGestures = concatenatedGestures.split(";");
+            Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
+            // adding new gesture
+            setGestures.add(gestureToBeAdded);
+            // recreate concatenated string from new set
+            newConcatenatedString = TextUtils.join(";", setGestures);
+
+            Log.w("mqtt", "newConcatenatedString " + newConcatenatedString);
+
+        } else {
+
+            // TODO zien of niet met ";" direct moet.
+            newConcatenatedString = gestureToBeAdded;
+
+            Log.w("mqtt", "newConcatenatedString " + newConcatenatedString);
+        }
+
+
 
         savedMap.put(systemID, newConcatenatedString);
 
