@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
+import com.yen.androidappthesisyen.tiltdirectionrecognizer.PebbleAccelPacket;
+import com.yen.androidappthesisyen.tiltdirectionrecognizer.PebbleGestureModel;
 
 import java.util.UUID;
 
@@ -410,8 +412,8 @@ public class PebbleGestureRecognitionFragment extends Fragment {
                     // ------ TEST - voor SIMPELE gesture detection
                     // TODO plek van deze code is veranderen!
                     // TODO alsook de para's
-                    PebbleAccelPacket pebbleAccelPacket = new PebbleAccelPacket(latest_data[0], latest_data[1], latest_data[2]);
-                    test.update(pebbleAccelPacket);
+//                    PebbleAccelPacket pebbleAccelPacket = new PebbleAccelPacket(latest_data[0], latest_data[1], latest_data[2]);
+//                    test.update(pebbleAccelPacket);
 
                     // ------ TEST - voor SIMPELE gesture detection
 

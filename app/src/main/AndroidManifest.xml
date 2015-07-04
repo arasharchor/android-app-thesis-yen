@@ -76,7 +76,7 @@
                 android:value="splitActionBarWhenNarrow" />
         </activity>
         <activity
-            android:name=".PebbleAccelStreamActivity"
+            android:name=".tiltdirectionrecognizer.PebbleAccelStreamActivity"
             android:label="@string/title_activity_pebble_accel_stream"
             android:parentActivityName=".MainActivity" >
             <meta-data

@@ -28,6 +28,8 @@ import android.widget.ToggleButton;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.yen.androidappthesisyen.R;
+import com.yen.androidappthesisyen.tiltdirectionrecognizer.PebbleGestureModel;
+import com.yen.androidappthesisyen.tiltdirectionrecognizer.TiltGestureRecognizer;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -73,7 +75,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
     //    private static final String LOG_TAG = ThreeDollarGestureFragment.class.getName();
     // was relatief lang dus nu:
-    private static final String LOG_TAG = "GESTURE SPOTTING";
+    private static final String LOG_TAG = "ADVANCED RECOGNIZER";
 
 //    private OnFragmentInteractionListener mListener;
 
@@ -114,6 +116,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     // Gesture Library and Recognizer
     private GestureLibrary myGestureLibrary = null;
     private GestureRecognizer myGestureRecognizer = null;
+    // voor TILT GESTURE RECOGNITION
+    private TiltGestureRecognizer theTiltGestureRecognizer = null;
 
     private ArrayList<float[]> recordingGestureTrace = null;
     private String recordingGestureIDString = "default";
@@ -324,7 +328,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 //        float[] values = { sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2] };
 
-        Log.w(LOG_TAG, "X " + values[0] + " Y " + values[1] + " Z " + values[2]);
+        // ===================================================================================================== Log.w(LOG_TAG, "X " + values[0] + " Y " + values[1] + " Z " + values[2]);
 
 
         switch (recordMode) {
@@ -971,7 +975,20 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
         }
 
+
         myGestureRecognizer = new gesturerec3d(myGestureLibrary, 50);
+
+        /**
+         * Object that manages Pebble wrist movement gestures.
+         * The user should extend their wrist with the fist pointing directly out from the chest as if to punch, with the watch's face pointing upwards
+         *
+         * @param threshold            Value from 0 to 4000 above which an action on an axis will be triggered
+         * @param durationMilliseconds Minimum time between gestures in milliseconds
+         * @param modeConstant         Mode constant from this class for FLICK or TILT operation
+         */
+        // TODO finetuning
+        theTiltGestureRecognizer = new TiltGestureRecognizer(600, 500, PebbleGestureModel.MODE_TILT);
+
 
         // TODO mag weg maar test of NIETS BREAKT.
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
@@ -1125,7 +1142,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     public void onClick(DialogInterface dialog, int which) {
 
         /*
-		 * android.content.DialogInterface.OnClickListener callback
+         * android.content.DialogInterface.OnClickListener callback
 		 *
 		 */
         if (dialog == this.learning_dialog) {
@@ -1277,13 +1294,26 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                     }
 
 
-                    // ------ TEST - voor THREE DOLLAR gesture detection
+                    // TILT GESTURE DETECTION
+                    // TODO is testen met float[] ipv int[]. want andere recognizer past float toe.
+                    // UPDATE: maar hierboven is de data vanuit een int[] gehaald dusja.
+                    int[] intArray = {latest_data[0], latest_data[1], latest_data[2]};
+                    Boolean[] results = theTiltGestureRecognizer.update(intArray);
+
+                    // If NO tilt gesture was detected, we pass the accel data to the more advanced recognizer.
+                    if (results[0] == false && results[1] == false) {
+
+                        // ------ TEST - voor THREE DOLLAR gesture detection
 // TODO we werken nu met INTs maar de gesture recognizer werkt eigenlijk met FLOATs
 //                    is het nuttig om met FLOATs te werken? to test...
-                    float[] floatArray = {latest_data[0], latest_data[1], latest_data[2]};
-                    sendAccelDataToFragment(floatArray);
+                        float[] floatArray = {latest_data[0], latest_data[1], latest_data[2]};
+                        sendAccelDataToFragment(floatArray);
 
-                    // ------ TEST - voor THREE DOLLAR gesture detection
+                        // ------ TEST - voor THREE DOLLAR gesture detection
+
+                    }
+
+
 
 
 
@@ -1303,13 +1333,6 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                     // ------ TEST - voor MOEILIJKERE gesture detection*/
 
 
-                    /*// ------ TEST - voor SIMPELE gesture detection
-                    // TODO plek van deze code is veranderen!
-                    // TODO alsook de para's
-                    PebbleAccelPacket pebbleAccelPacket = new PebbleAccelPacket(latest_data[0], latest_data[1], latest_data[2]);
-                    test.update(pebbleAccelPacket);
-
-                    // ------ TEST - voor SIMPELE gesture detection*/
 
 
                     //Show

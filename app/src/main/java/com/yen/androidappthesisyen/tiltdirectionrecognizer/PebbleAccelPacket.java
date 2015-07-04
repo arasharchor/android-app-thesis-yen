@@ -1,8 +1,24 @@
-package com.yen.androidappthesisyen;
+package com.yen.androidappthesisyen.tiltdirectionrecognizer;
 
 /**
  * SOURCE: Partially based on https://gist.github.com/C-D-Lewis/ba1349bb0ebdee76b0cf#file-pebbleaccelpacket-java
  */
+
+
+
+
+
+
+// IS OUD EN MAG WEG
+
+
+
+
+
+
+
+
+
 public class PebbleAccelPacket {
 
     // TODO private maken? maar bij Android performance guide stond dat getters/setters overbodig was dus wrsl zo laten?

@@ -1,10 +1,43 @@
-package com.yen.androidappthesisyen;
+package com.yen.androidappthesisyen.tiltdirectionrecognizer;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+
+import com.yen.androidappthesisyen.R;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// IS OUD EN MAG WEG
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 public class PebbleAccelStreamActivity extends Activity {

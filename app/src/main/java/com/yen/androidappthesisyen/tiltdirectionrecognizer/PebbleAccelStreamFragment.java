@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen;
+package com.yen.androidappthesisyen.tiltdirectionrecognizer;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -18,11 +18,39 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GraphViewSeries;
 import com.jjoe64.graphview.LineGraphView;
+import com.yen.androidappthesisyen.R;
 
 import java.util.UUID;
 
 
 /* SOURCE: partially based on https://github.com/C-D-Lewis/accelstream-android */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// IS OUD EN MAG WEG
+
+
+
+
+
+
+
+
+
 
 
 /**
@@ -64,8 +92,9 @@ public class PebbleAccelStreamFragment extends Fragment {
 
 
     // UUID van originele accel_stream:
-//    private UUID uuid = UUID.fromString("2893b0c4-2bca-4c83-a33a-0ef6ba6c8b17");
-    private UUID uuid = UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4");
+    private UUID uuid = UUID.fromString("2893b0c4-2bca-4c83-a33a-0ef6ba6c8b17");
+    // IS MIJN EIGEN PEBBLE APP THESIS YEN: private UUID uuid = UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4");
+    // EN ZOU HIERMEE OOK MOETEN WERKEN WNT MIJN CODE IS OP DEZE CODE VAN LEWIS GEBASEERD/OVERGENOMEN.
 
     private Handler handler = new Handler();
 
@@ -146,8 +175,16 @@ public class PebbleAccelStreamFragment extends Fragment {
         PebbleKit.startAppOnPebble(getActivity(), uuid);
 
 
+        /**
+         * Object that manages Pebble wrist movement gestures.
+         * The user should extend their wrist with the fist pointing directly out from the chest as if to punch, with the watch's face pointing upwards
+         *
+         * @param threshold            Value from 0 to 4000 above which an action on an axis will be triggered
+         * @param durationMilliseconds Minimum time between gestures in milliseconds
+         * @param modeConstant         Mode constant from this class for FLICK or TILT operation
+         */
         // TODO modes
-        test = new PebbleGestureModelImplementation(700, 500, PebbleGestureModel.MODE_FLICK);
+        test = new PebbleGestureModelImplementation(600, 500, PebbleGestureModel.MODE_TILT);
 
 
     }
@@ -265,8 +302,8 @@ public class PebbleAccelStreamFragment extends Fragment {
                     // ------ TEST
                     // TODO plek van deze code is veranderen!
                     // TODO alsook de para's
-                    PebbleAccelPacket pebbleAccelPacket = new PebbleAccelPacket(latest_data[0], latest_data[1], latest_data[2]);
-                    test.update(pebbleAccelPacket);
+//                    PebbleAccelPacket pebbleAccelPacket = new PebbleAccelPacket(latest_data[0], latest_data[1], latest_data[2]);
+//                    test.update(pebbleAccelPacket);
 
                     // ------ TEST
 

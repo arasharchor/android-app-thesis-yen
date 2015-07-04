@@ -9,11 +9,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +19,7 @@ import android.view.WindowManager;
 
 import com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.ThreeDollarGestureActivity;
 import com.yen.androidappthesisyen.mqtt.MQTTService;
+import com.yen.androidappthesisyen.tiltdirectionrecognizer.PebbleAccelStreamActivity;
 
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
