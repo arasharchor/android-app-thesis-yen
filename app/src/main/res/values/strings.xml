@@ -94,5 +94,9 @@
 
     <!-- voor THREE DOLLAR gesture detection -->
     <string name="hello">Hello World, Acceleration!</string>
-    <string name="Button01_str">Press! </string>
+    <string name="Button01_str">Hold to record gesture</string>
+
+
+
+    <string name="recognized_gestures">Recognized Gestures</string>
 </resources>

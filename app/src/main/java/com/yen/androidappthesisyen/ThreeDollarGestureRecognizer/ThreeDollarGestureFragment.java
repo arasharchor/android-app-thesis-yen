@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -328,7 +329,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 //        float[] values = { sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2] };
 
-        // ===================================================================================================== Log.w(LOG_TAG, "X " + values[0] + " Y " + values[1] + " Z " + values[2]);
+        Log.w(LOG_TAG, "X " + values[0] + " Y " + values[1] + " Z " + values[2]);
 
 
         switch (recordMode) {
@@ -615,13 +616,29 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                         detected_gid = gid;
 
 
+                        // TODO eventueel gebruiken: if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
+                        // Updating Gestures ScrollView
+                        final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_gestures);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                outputWindow.append(detected_gid + "\n");
+                                ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+
+                            }
+                        });
+
+
+
+
                         // TODO "  && !detected_gid.equalsIgnoreCase("not recognized!") " ook in IF steken?
                         // of dat net niet om te zien wann er NOG GEEN GESTURES in DB zitten?
                         // maar dat wrsl op betere manier tonen dan via dialog na uitvoeren gebaar?
                         // show the alert
-                        if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
+                        /*if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
                             alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
-                        }
+                        }*/
 
 
                         if (detected_gid.equalsIgnoreCase("unknown") || detected_gid.equalsIgnoreCase("unknown gesture")) { // TODO nodig of niet? && gid.equalsIgnoreCase("unknown gesture")
@@ -631,100 +648,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                         } else {
 
 
-                            // Check for which system the accel data stream is currently running. This should always be only 1 system at a time because the user's face can only get detected by 1 system at the time.
-                            SharedPreferences systemIDsettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
-                            String enabledSystem = systemIDsettings.getString("enabledSystem", "none");
-
-
-                            // Get the list of systems which support the recognized gesture.
-                            Map<String, String> savedMap = getMapSupportedGestures();
-                            ArrayList<String> supportedSystems = new ArrayList<String>();
-
-                            for (Map.Entry<String, String> entry : savedMap.entrySet()) {
-                                String key = entry.getKey(); // key = systemID
-                                String value = entry.getValue(); // value = supported gestures
-                                String[] arrayGestures = value.split(";");
-
-                                for (String gesture : arrayGestures) {
-                                    if (gesture.equalsIgnoreCase(detected_gid)) {
-                                        supportedSystems.add(key);
-                                    }
-                                }
-                            }
-
-
-                            Boolean isMatchFound = false;
-                            if (supportedSystems.contains(enabledSystem)) {
-                                isMatchFound = true;
-                            }
-
-
-                            if (isMatchFound) {
-
-
-                                // Sending feedback to the user:
-                                // If a gesture detected + supported by the currently used system: do 1x short vibration.
-                                // This detected gesture can still be a false positive, though.
-                                doShortPebbleVibration();
-
-
-                                // ---- START EIGEN TOEVOEGING
-                                // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
-                                // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
-
-
-                                ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                                if (networkInfo != null && networkInfo.isConnected()) {
-
-                                    // fetch data
-
-                                    // TODO je moet op basis van de systemID de overeenkomstige enumerator weten, zodat je hier de enumerator kunt concateren.
-                                    // momenteel hardcodeer je nog de link tussen de systemID (tot nu toe enkel yen-asus en yen-medion) naar de enumerators (tot nu toe enkel 1 en 2)
-                                    // OFWEL direct een mapping tussen systemID en IP adres gesture handler opslaan, maar WRSL BEST MET ENUMERATOR WERKEN OMDAT JE OVERAL IN JE SHAREDPREF ZO WERKT!
-                                    SharedPreferences gestureHandlersettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
-                                    String IPAddress = "192.168.1.1";
-                                    if (enabledSystem.equalsIgnoreCase("yen-asus")) {
-                                        // TODO momenteel nog hardgecodeerde mapping yen-asus naar enum 1
-                                        IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
-                                    } else if (enabledSystem.equalsIgnoreCase("yen-medion")) {
-                                        // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
-                                        IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
-                                    } else {
-                                        Log.w("mqtt", "SystemID unknown so no mapped IP address for Gesture Handler found");
-                                    }
-
-
-                                    Log.w(LOG_TAG, "saved IP is " + IPAddress);
-
-                                    // TODO met of zonder slash?
-                                    String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
-                                    // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
-
-
-                                    // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
-//                            new AsyncPOSTGestureToServer().execute(stringURL, gid);
-
-
-                                    // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
-                                    // UPDATE: EIGEN CODE WERKT NU :D
-                                    int httpResult = POSTGestureToServer(stringURL, gid);
-                                    // DIT DUS NIET MEER NODIG:
-//                            nieuweTestcode(stringURL, gid);
-
-
-                                } else {
-                                    // Arriving here if no internet connection.
-
-                                }
-
-
-                                // ---- STOP EIGEN TOEVOEGING
-
-
-                            } else {
-                                // Do nothing.
-                            }
+                            sendGestureIfMatchFound(detected_gid);
 
 
                         }
@@ -754,17 +678,140 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
     }
 
+    public void sendGestureIfMatchFound(final String recognizedGesture) {
+
+        Log.w(LOG_TAG, "START of sendGestureIfMatchFound - GESTURE " + recognizedGesture);
+
+        // Check for which system the accel data stream is currently running. This should always be only 1 system at a time because the user's face can only get detected by 1 system at the time.
+        SharedPreferences systemIDsettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
+        String enabledSystem = systemIDsettings.getString("enabledSystem", "none");
+        Log.w(LOG_TAG, "enabledSystem " + enabledSystem);
+
+        // Get the list of systems which support the recognized gesture.
+        Map<String, String> savedMap = getMapSupportedGestures();
+        ArrayList<String> supportedSystems = new ArrayList<String>();
+
+        for (Map.Entry<String, String> entry : savedMap.entrySet()) {
+            String key = entry.getKey(); // key = systemID
+            String value = entry.getValue(); // value = supported gestures
+            String[] arrayGestures = value.split(";");
+
+            for (String gesture : arrayGestures) {
+                if (gesture.equalsIgnoreCase(recognizedGesture)) {
+                    supportedSystems.add(key);
+                }
+            }
+        }
+
+
+        Boolean isMatchFound = false;
+        if (supportedSystems.contains(enabledSystem)) {
+            isMatchFound = true;
+        }
+        Log.w(LOG_TAG, "isMatchFound " + isMatchFound);
+
+
+        if (isMatchFound) {
+
+
+            // Sending feedback to the user:
+            // If a gesture detected + supported by the currently used system: do 1x short vibration.
+            // This detected gesture can still be a false positive, though.
+            doShortPebbleVibration();
+
+
+            // ---- START EIGEN TOEVOEGING
+            // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
+            // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
+
+
+            ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+
+                // fetch data
+
+                // TODO je moet op basis van de systemID de overeenkomstige enumerator weten, zodat je hier de enumerator kunt concateren.
+                // momenteel hardcodeer je nog de link tussen de systemID (tot nu toe enkel yen-asus en yen-medion) naar de enumerators (tot nu toe enkel 1 en 2)
+                // OFWEL direct een mapping tussen systemID en IP adres gesture handler opslaan, maar WRSL BEST MET ENUMERATOR WERKEN OMDAT JE OVERAL IN JE SHAREDPREF ZO WERKT!
+                SharedPreferences gestureHandlersettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
+                String IPAddress = "192.168.1.1";
+                if (enabledSystem.equalsIgnoreCase("yen-asus")) {
+                    // TODO momenteel nog hardgecodeerde mapping yen-asus naar enum 1
+                    IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                } else if (enabledSystem.equalsIgnoreCase("yen-medion")) {
+                    // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
+                    IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                } else {
+                    Log.w("mqtt", "SystemID unknown so no mapped IP address for Gesture Handler found");
+                }
+
+
+                Log.w(LOG_TAG, "saved IP is " + IPAddress);
+
+                // TODO met of zonder slash?
+                final String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
+                // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
+
+
+                // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
+//                            new AsyncPOSTGestureToServer().execute(stringURL, gid);
+
+
+                // Network actions not allowed on main thread (= UI thread) so starting a new thread.
+                Thread t = new Thread() {
+                    public void run() {
+
+                        // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
+                        // UPDATE: EIGEN CODE WERKT NU :D
+                        int httpResult = POSTGestureToServer(stringURL, recognizedGesture);
+
+                    }
+                };
+                t.start();
+
+
+
+                // DIT DUS NIET MEER NODIG:
+//                            nieuweTestcode(stringURL, gid);
+
+
+
+            } else {
+                // Arriving here if no internet connection.
+
+            }
+
+
+            // ---- STOP EIGEN TOEVOEGING
+
+
+        } else {
+            // Do nothing.
+        }
+
+
+        Log.w(LOG_TAG, "END of sendGestureIfMatchFound");
+
+    }
+
+
+
     private void doShortPebbleVibration() {
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(3, 0);
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
     }
 
+
+
     private void doTwoShortPebbleVibrations() {
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(4, 0);
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
     }
+
+
 
 
     // TODO mag weg want nooit gebruikt of?
@@ -824,6 +871,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
     private int POSTGestureToServer(String stringURL, String stringGesture) {
+
+
 
 
         HttpURLConnection httpcon = null;
@@ -987,7 +1036,8 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
          * @param modeConstant         Mode constant from this class for FLICK or TILT operation
          */
         // TODO finetuning
-        theTiltGestureRecognizer = new TiltGestureRecognizer(600, 500, PebbleGestureModel.MODE_TILT);
+        theTiltGestureRecognizer = new TiltGestureRecognizer(this, 700, 1000, PebbleGestureModel.MODE_TILT);
+
 
 
         // TODO mag weg maar test of NIETS BREAKT.
@@ -1104,6 +1154,13 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
 
         );
+
+
+        // We also place it here, since in case there is already text in the ScrollView when arriving there, we immediately scroll.
+        ((ScrollView) returnedView.findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+
+
+
 
 
         return returnedView;
@@ -1294,11 +1351,26 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                     }
 
 
-                    // TILT GESTURE DETECTION
-                    // TODO is testen met float[] ipv int[]. want andere recognizer past float toe.
-                    // UPDATE: maar hierboven is de data vanuit een int[] gehaald dusja.
-                    int[] intArray = {latest_data[0], latest_data[1], latest_data[2]};
-                    Boolean[] results = theTiltGestureRecognizer.update(intArray);
+
+                    // We only allow tilt gesture detection in the RECOGNIZE PHASE. We don't need it in the LEARN PHASE since the system doesn't need to learn the up/down/left/right tilt gestures.
+                    // Since there is no clear difference between different persons exercising these 4 gestures.
+                    Boolean[] results = {false, false};
+                    if(state == App.STATES.STATE_RECOGNIZE){
+
+                        // TILT GESTURE DETECTION
+                        // TODO is testen met float[] ipv int[]. want andere recognizer past float toe.
+                        // UPDATE: maar hierboven is de data vanuit een int[] gehaald dusja.
+                        int[] intArray = {latest_data[0], latest_data[1], latest_data[2]};
+                        results = theTiltGestureRecognizer.update(intArray);
+
+                    } else {
+                        // We are in the LEARN STATE or LIBRARY STATE
+
+                        results[0] = false;
+                        results[1] = false;
+                    }
+
+
 
                     // If NO tilt gesture was detected, we pass the accel data to the more advanced recognizer.
                     if (results[0] == false && results[1] == false) {

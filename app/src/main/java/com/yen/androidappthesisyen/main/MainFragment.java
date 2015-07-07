@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen;
+package com.yen.androidappthesisyen.main;
 
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
@@ -24,6 +24,8 @@ import android.widget.ToggleButton;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
+import com.yen.androidappthesisyen.AccelData;
+import com.yen.androidappthesisyen.R;
 
 import java.util.ArrayList;
 import java.util.List;

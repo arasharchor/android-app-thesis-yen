@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen;
+package com.yen.androidappthesisyen.main;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -17,6 +17,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.yen.androidappthesisyen.CursorListActivity;
+import com.yen.androidappthesisyen.PebbleGestureRecognitionActivity;
+import com.yen.androidappthesisyen.PebblePointerActivity;
+import com.yen.androidappthesisyen.R;
 import com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.ThreeDollarGestureActivity;
 import com.yen.androidappthesisyen.mqtt.MQTTService;
 import com.yen.androidappthesisyen.tiltdirectionrecognizer.PebbleAccelStreamActivity;

@@ -30,7 +30,7 @@ import com.ibm.mqtt.MqttNotConnectedException;
 import com.ibm.mqtt.MqttPersistence;
 import com.ibm.mqtt.MqttPersistenceException;
 import com.ibm.mqtt.MqttSimpleCallback;
-import com.yen.androidappthesisyen.MainActivity;
+import com.yen.androidappthesisyen.main.MainActivity;
 import com.yen.androidappthesisyen.R;
 
 import org.json.JSONObject;

@@ -103,7 +103,7 @@
             android:height="150px"
             android:width="200px"
             android:layout_marginTop="100px"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:textSize="30px" />
 
 
@@ -121,6 +121,26 @@
         android:layout_toRightOf="@+id/toggle_accel_stream"
         android:layout_toEndOf="@+id/toggle_accel_stream"
          />
-        <!-- android:checked="true" -->
+
+    <ScrollView
+        android:id="@+id/scrollView_gestures"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border_ui"
+        android:padding="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/checkBoxGestureSpotting"
+        android:layout_toRightOf="@+id/checkBoxGestureSpotting"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/textView_gestures"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/recognized_gestures" />
+    </ScrollView>
+    <!-- android:checked="true" -->
 
 </RelativeLayout>
