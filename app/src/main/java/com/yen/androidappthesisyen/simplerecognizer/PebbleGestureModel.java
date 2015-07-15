@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen.tiltdirectionrecognizer;
+package com.yen.androidappthesisyen.simplerecognizer;
 
 /**
  * SOURCE: Partially based on https://gist.github.com/C-D-Lewis/ba1349bb0ebdee76b0cf#file-pebblegesturemodel-java

@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen.tiltdirectionrecognizer;
+package com.yen.androidappthesisyen.simplerecognizer;
 
 import android.util.Log;
 import android.view.View;
@@ -6,7 +6,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.yen.androidappthesisyen.R;
-import com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.ThreeDollarGestureFragment;
+import com.yen.androidappthesisyen.advancedrecognizer.AdvancedFragment;
 
 /**
  * Created by Yen on 4/07/2015.
@@ -18,7 +18,7 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
 
     private static final String LOG_TAG = "SIMPLE TILT RECOGNIZER";
 
-    private ThreeDollarGestureFragment theThreeDollarGestureFragment = null;
+    private AdvancedFragment theAdvancedFragment = null;
 
     /**
      * Object that manages Pebble wrist movement gestures.
@@ -28,11 +28,11 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
      * @param durationMilliseconds Minimum time between gestures in milliseconds
      * @param modeConstant         Mode constant from this class for FLICK or TILT operation
      */
-    public TiltGestureRecognizer(ThreeDollarGestureFragment theThreeDollarGestureFragment, int threshold, long durationMilliseconds, int modeConstant) {
+    public TiltGestureRecognizer(AdvancedFragment theAdvancedFragment, int threshold, long durationMilliseconds, int modeConstant) {
         super(threshold, durationMilliseconds, modeConstant);
 
-        this.theThreeDollarGestureFragment = theThreeDollarGestureFragment;
-        if(this.theThreeDollarGestureFragment == null){
+        this.theAdvancedFragment = theAdvancedFragment;
+        if(this.theAdvancedFragment == null){
             Log.w(LOG_TAG, "IS NOG NULL");
         }
 
@@ -42,11 +42,11 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
     public void onWristLeft() {
 
         // Although the following line of code gets duplicated int the following methods, we can't initialize it once in the constructor, since at that time, the View hasn't yet been fully initialized.
-        TextView gestureWindow = (TextView) theThreeDollarGestureFragment.getView().findViewById(R.id.textView_gestures);
+        TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
         gestureWindow.append("wrist LEFT <--" + "\n");
-        ((ScrollView) theThreeDollarGestureFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+        ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
 
-        theThreeDollarGestureFragment.sendGestureIfMatchFound("left");
+        theAdvancedFragment.sendGestureIfMatchFound("left");
 
         Log.w(LOG_TAG, "wrist LEFT <--");
     }
@@ -54,11 +54,11 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
     @Override
     public void onWristRight() {
 
-        TextView gestureWindow = (TextView) theThreeDollarGestureFragment.getView().findViewById(R.id.textView_gestures);
+        TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
         gestureWindow.append("wrist RIGHT -->" + "\n");
-        ((ScrollView) theThreeDollarGestureFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+        ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
 
-        theThreeDollarGestureFragment.sendGestureIfMatchFound("right");
+        theAdvancedFragment.sendGestureIfMatchFound("right");
 
         Log.w(LOG_TAG, "wrist RIGHT -->");
     }
@@ -66,11 +66,11 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
     @Override
     public void onWristUp() {
 
-        TextView gestureWindow = (TextView) theThreeDollarGestureFragment.getView().findViewById(R.id.textView_gestures);
+        TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
         gestureWindow.append("wrist UP ^^" + "\n");
-        ((ScrollView) theThreeDollarGestureFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+        ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
 
-        theThreeDollarGestureFragment.sendGestureIfMatchFound("up");
+        theAdvancedFragment.sendGestureIfMatchFound("up");
 
         Log.w(LOG_TAG, "wrist UP ^^");
     }
@@ -78,11 +78,11 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
     @Override
     public void onWristDown() {
 
-        TextView gestureWindow = (TextView) theThreeDollarGestureFragment.getView().findViewById(R.id.textView_gestures);
+        TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
         gestureWindow.append("wrist DOWN __" + "\n");
-        ((ScrollView) theThreeDollarGestureFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+        ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
 
-        theThreeDollarGestureFragment.sendGestureIfMatchFound("down");
+        theAdvancedFragment.sendGestureIfMatchFound("down");
 
         Log.w(LOG_TAG, "wrist DOWN __");
     }

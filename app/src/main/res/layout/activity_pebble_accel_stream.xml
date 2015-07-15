@@ -3,5 +3,5 @@
     android:id="@+id/container_activity_pebble_accel_stream"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yen.androidappthesisyen.tiltdirectionrecognizer.PebbleAccelStreamActivity"
+    tools:context="com.yen.androidappthesisyen.simplerecognizer.PebbleAccelStreamActivity"
     tools:ignore="MergeRootFrame" />

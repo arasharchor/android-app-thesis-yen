@@ -3,5 +3,5 @@
     android:id="@+id/container_three_dollar_gesture_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.ThreeDollarGestureActivity"
+    tools:context="com.yen.androidappthesisyen.advancedrecognizer.AdvancedActivity"
     tools:ignore="MergeRootFrame" />

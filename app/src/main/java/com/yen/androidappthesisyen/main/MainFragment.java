@@ -3,12 +3,10 @@ package com.yen.androidappthesisyen.main;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Process;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,8 +21,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.getpebble.android.kit.PebbleKit;
-import com.getpebble.android.kit.util.PebbleDictionary;
-import com.yen.androidappthesisyen.AccelData;
 import com.yen.androidappthesisyen.R;
 
 import java.util.ArrayList;
@@ -807,67 +803,69 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
     private void startPebbleCommunicationTest() {
 
 
+        // TODO uitgeschakeld omdat niet meer nodig is
+
         // FOR DISPLAYING WHICH PEBBLE BUTTON (UP/SELECT/DOWN) WAS PRESSED.
-        if (myPebbleDataReceiver == null) {
-
-
-            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-            // Without "getResources()." it also seems to work, but better to USE IT!
-            outputWindow.append("--- " + getResources().getString(R.string.start_communication_test) + " ---" + "\n");
-            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-
-            // public static abstract class PebbleKit.PebbleDataReceiver
-            // extends android.content.BroadcastReceiver
-            myPebbleDataReceiver = new PebbleKit.PebbleDataReceiver(WATCHAPP_UUID) {
-
-                // in tutorial: public void receiveData(Context context, int transactionId, PebbleDictionary data)
-                @Override
-                public void receiveData(Context context, int transactionId, PebbleDictionary pebbleTuples) {
-
-                    // ACK het bericht
-                    PebbleKit.sendAckToPebble(context, transactionId);
-
-                    // check of de key bestaat
-                    // getUnsignedInteger BESTAAT NIET MEER?
-                    if (pebbleTuples.getUnsignedIntegerAsLong(KEY_BUTTON_EVENT) != null) {
-                        int button = pebbleTuples.getUnsignedIntegerAsLong(KEY_BUTTON_EVENT).intValue();
-
-                        switch (button) {
-                            case BUTTON_EVENT_UP:
-                                outputWindow.append(getResources().getString(R.string.pebble_button_up_pressed));
-                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-                                break;
-                            case BUTTON_EVENT_DOWN:
-                                outputWindow.append(getResources().getString(R.string.pebble_button_down_pressed));
-                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-                                break;
-                            case BUTTON_EVENT_SELECT:
-                                outputWindow.append(getResources().getString(R.string.pebble_button_select_pressed));
-                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-                                break;
-                        }
-
-                    }
-
-
-                    //Make the watch vibrate
-                    PebbleDictionary dict = new PebbleDictionary();
-                    dict.addInt32(KEY_VIBRATION, 0);
-                    PebbleKit.sendDataToPebble(context, WATCHAPP_UUID, dict);
-
-
-                }
-            };
-
-            // first parameter was 'this' (for type CONTEXT)
-            PebbleKit.registerReceivedDataHandler(getActivity(), myPebbleDataReceiver);
-
-
-        }
-
-        // of IN if lus?
-        PebbleKit.startAppOnPebble(getActivity(), WATCHAPP_UUID);
+//        if (myPebbleDataReceiver == null) {
+//
+//
+//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+//            // Without "getResources()." it also seems to work, but better to USE IT!
+//            outputWindow.append("--- " + getResources().getString(R.string.start_communication_test) + " ---" + "\n");
+//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+//
+//
+//            // public static abstract class PebbleKit.PebbleDataReceiver
+//            // extends android.content.BroadcastReceiver
+//            myPebbleDataReceiver = new PebbleKit.PebbleDataReceiver(WATCHAPP_UID) {
+//
+//                // in tutorial: public void receiveData(Context context, int transactionId, PebbleDictionary data)
+//                @Override
+//                public void receiveData(Context context, int transactionId, PebbleDictionary pebbleTuples) {
+//
+//                    // ACK het bericht
+//                    PebbleKit.sendAckToPebble(context, transactionId);
+//
+//                    // check of de key bestaat
+//                    // getUnsignedInteger BESTAAT NIET MEER?
+//                    if (pebbleTuples.getUnsignedIntegerAsLong(KEY_BUTTON_EVENT) != null) {
+//                        int button = pebbleTuples.getUnsignedIntegerAsLong(KEY_BUTTON_EVENT).intValue();
+//
+//                        switch (button) {
+//                            case BUTTON_EVENT_UP:
+//                                outputWindow.append(getResources().getString(R.string.pebble_button_up_pressed));
+//                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+//                                break;
+//                            case BUTTON_EVENT_DOWN:
+//                                outputWindow.append(getResources().getString(R.string.pebble_button_down_pressed));
+//                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+//                                break;
+//                            case BUTTON_EVENT_SELECT:
+//                                outputWindow.append(getResources().getString(R.string.pebble_button_select_pressed));
+//                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+//                                break;
+//                        }
+//
+//                    }
+//
+//
+//                    //Make the watch vibrate
+//                    PebbleDictionary dict = new PebbleDictionary();
+//                    dict.addInt32(KEY_VIBRATION, 0);
+//                    PebbleKit.sendDataToPebble(context, WATCHAPP_UUID, dict);
+//
+//
+//                }
+//            };
+//
+//            // first parameter was 'this' (for type CONTEXT)
+//            PebbleKit.registerReceivedDataHandler(getActivity(), myPebbleDataReceiver);
+//
+//
+//        }
+//
+//        // of IN if lus?
+//        PebbleKit.startAppOnPebble(getActivity(), WATCHAPP_UUID);
 
     }
 
@@ -875,161 +873,170 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
     private void stopPebbleCommunicationTest() {
 
 
+
+        // TODO uitgeschakeld omdat niet meer nodig is
+
+
+
         /* http://developer.getpebble.com/docs/android/com/getpebble/android/kit/PebbleKit/
         A convenience function to assist in programmatically registering a broadcast receiver for the 'CONNECTED' intent. To avoid leaking memory, activities registering BroadcastReceivers must unregister them in the Activity's Activity.onPause() method.
          */
 
         // Checking for null is recommended.
-        if (myPebbleDataReceiver != null) {
-
-
-            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-            outputWindow.append("--- " + getResources().getString(R.string.stop_communication_test) + " ---" + "\n");
-            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-
-            // TODO zien of deze try/catch werkt voor fixen: Caused by: java.lang.IllegalArgumentException: Receiver not registered: com.yen.myfirstapp.MainActivity$1@40fc03c0
-            try {
-
-//                unregisterReceiver(myPebbleDataReceiver);
-                // Changed to following since we are in a FRAGMENT; not an ACTIVITY.
-                getActivity().unregisterReceiver(myPebbleDataReceiver);
-
-
-                // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
-                myPebbleDataReceiver = null;
-
-
-            } catch (IllegalArgumentException ex) {
-
-
-                // TODO niets doen gewoon?
-
-
-                // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
-                myPebbleDataReceiver = null;
-            }
-
-        }
-
-
-        // IN if?
-        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
+//        if (myPebbleDataReceiver != null) {
+//
+//
+//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+//            outputWindow.append("--- " + getResources().getString(R.string.stop_communication_test) + " ---" + "\n");
+//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+//
+//
+//            // TODO zien of deze try/catch werkt voor fixen: Caused by: java.lang.IllegalArgumentException: Receiver not registered: com.yen.myfirstapp.MainActivity$1@40fc03c0
+//            try {
+//
+////                unregisterReceiver(myPebbleDataReceiver);
+//                // Changed to following since we are in a FRAGMENT; not an ACTIVITY.
+//                getActivity().unregisterReceiver(myPebbleDataReceiver);
+//
+//
+//                // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
+//                myPebbleDataReceiver = null;
+//
+//
+//            } catch (IllegalArgumentException ex) {
+//
+//
+//                // TODO niets doen gewoon?
+//
+//
+//                // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
+//                myPebbleDataReceiver = null;
+//            }
+//
+//        }
+//
+//
+//        // IN if?
+//        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
 
     }
 
 
     private void startPebbleDataLogging() {
 
+
+        // TODO mag wrsl weg!
+
+
         // voor PEBBLE DATA LOGGING
-        if (myPebbleDataLOGReceiver == null) {
-
-
-            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-            // Without "getResources()." it also seems to work, but better to USE IT!
-            outputWindow.append("--- " + getResources().getString(R.string.start_pebble_data_logging) + " ---" + "\n");
-            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-
-            // MEER INFO https://developer.android.com/reference/android/os/Handler.html
-            // + https://developer.android.com/training/multiple-threads/communicate-ui.html
-
-
-        /*ZORGT VOOR DELAYS (skipped frames) IN EMULATOR DUS DIT NIET GEBRUIKEN.
-        TUTORIAL GEBRUIKT OOK BOVENSTAANDE FINAL IMPLEMENTATIE.
-        if(handler == null){
-            handler = new Handler();
-        }
-        */
-
-
-            myPebbleDataLOGReceiver = new PebbleKit.PebbleDataLogReceiver(WATCHAPP_UUID) {
-
-                @Override
-                public void receiveData(Context context, UUID logUuid, Long timestamp, Long tag, byte[] data) {
-                    // Important note: If your Java IDE places a call to super() by default, this will cause an UnsupportedOperationException to be thrown.
-                    // Remove this line to avoid the Exception.
-                    // super.receiveData(context, logUuid, timestamp, tag, data);
-
-
-                    if (tag.intValue() == DATA_LOG_ACCEL_DATA_TAG) {
-
-                        // TODO klopt dit systeem nog?
-                        // misaligned data, just drop it
-                        if (data.length % 15 != 0 || data.length < 15) {
-                            Log.w("DATA LOGGING", "Misaligned data while data logging");
-                            return;
-                        }
-
-
-                        List<AccelData> accelDataList = AccelData.fromDataArray(data);
-
-
-//                        resultBuilder.append("size van list accelDataList:" + accelDataList.size() + "\n");
-                        // size gaf 1 MAAR ZAL DIT NIET ALTIJD ZO ZIJN
-                        // OMDAT WE INGESTELD HADDEN MAAR 1 SAMPLE PER KEER TE STUREN?
-                        // maar best houden voor als we samples verhogen.
-
-
-                        /* Use Enhanced For Loop Syntax
-                        * two() is fastest for devices without a JIT, and indistinguishable from one() for devices with a JIT. It uses the enhanced for loop syntax introduced in version 1.5 of the Java programming language.
-
-So, you should use the enhanced for loop by default, but consider a hand-written counted loop for performance-critical ArrayList iteration. */
-                        for (final AccelData accelItem : accelDataList) {
-//                            try {
-
-//                                resultBuilder.append(accel.toJson().toString(2));
-//                            resultBuilder.append(accelItem.getOneLineString() + "\n");
-
-
-                            /* Gebruik van POST: uitleg zie code @ https://developer.android.com/guide/components/processes-and-threads.html */
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                    // TODO test of nuttig/nadelig.
-                                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-
-//                                    outputWindow.setText(resultBuilder.toString());
-//                                    outputWindow.append(resultBuilder.toString());
-                                    outputWindow.append(accelItem.getOneLineString() + "\n");
-                                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-                                }
-                            });
+//        if (myPebbleDataLOGReceiver == null) {
 //
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-                        }
-
-
-                    }
-                }
-
-                @Override
-                public void onFinishSession(Context context, UUID logUuid, Long timestamp, Long tag) {
-                    super.onFinishSession(context, logUuid, timestamp, tag);
-
-                    // Session is finished, use the data!
-
-                    // logView.setText("Sending data log FINISHED. " + resultBuilder.toString());
-//                    outputWindow.setText("Sending data log FINISHED.");
-
-                    outputWindow.append("--- " + getResources().getString(R.string.sending_data_log_finished) + " ---" + "\n");
-                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-                }
-            };
-
-            PebbleKit.registerDataLogReceiver(getActivity(), myPebbleDataLOGReceiver);
-
-
-            // TODO TEST: PebbleKit.requestDataLogsForApp(this, WATCHAPP_UUID);
-            // A convenience function to emit an intent to pebble.apk to request the data logs for a particular app.
-
-        }
-
-        // IN if lus?
-        PebbleKit.startAppOnPebble(getActivity(), WATCHAPP_UUID);
+//
+//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+//            // Without "getResources()." it also seems to work, but better to USE IT!
+//            outputWindow.append("--- " + getResources().getString(R.string.start_pebble_data_logging) + " ---" + "\n");
+//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+//
+//
+//            // MEER INFO https://developer.android.com/reference/android/os/Handler.html
+//            // + https://developer.android.com/training/multiple-threads/communicate-ui.html
+//
+//
+//        /*ZORGT VOOR DELAYS (skipped frames) IN EMULATOR DUS DIT NIET GEBRUIKEN.
+//        TUTORIAL GEBRUIKT OOK BOVENSTAANDE FINAL IMPLEMENTATIE.
+//        if(handler == null){
+//            handler = new Handler();
+//        }
+//        */
+//
+//
+//            myPebbleDataLOGReceiver = new PebbleKit.PebbleDataLogReceiver(WATCHAPP_UUID) {
+//
+//                @Override
+//                public void receiveData(Context context, UUID logUuid, Long timestamp, Long tag, byte[] data) {
+//                    // Important note: If your Java IDE places a call to super() by default, this will cause an UnsupportedOperationException to be thrown.
+//                    // Remove this line to avoid the Exception.
+//                    // super.receiveData(context, logUuid, timestamp, tag, data);
+//
+//
+//                    if (tag.intValue() == DATA_LOG_ACCEL_DATA_TAG) {
+//
+//                        // TODO klopt dit systeem nog?
+//                        // misaligned data, just drop it
+//                        if (data.length % 15 != 0 || data.length < 15) {
+//                            Log.w("DATA LOGGING", "Misaligned data while data logging");
+//                            return;
+//                        }
+//
+//
+//                        List<AccelData> accelDataList = AccelData.fromDataArray(data);
+//
+//
+////                        resultBuilder.append("size van list accelDataList:" + accelDataList.size() + "\n");
+//                        // size gaf 1 MAAR ZAL DIT NIET ALTIJD ZO ZIJN
+//                        // OMDAT WE INGESTELD HADDEN MAAR 1 SAMPLE PER KEER TE STUREN?
+//                        // maar best houden voor als we samples verhogen.
+//
+//
+//                        /* Use Enhanced For Loop Syntax
+//                        * two() is fastest for devices without a JIT, and indistinguishable from one() for devices with a JIT. It uses the enhanced for loop syntax introduced in version 1.5 of the Java programming language.
+//
+//So, you should use the enhanced for loop by default, but consider a hand-written counted loop for performance-critical ArrayList iteration. */
+//                        for (final AccelData accelItem : accelDataList) {
+////                            try {
+//
+////                                resultBuilder.append(accel.toJson().toString(2));
+////                            resultBuilder.append(accelItem.getOneLineString() + "\n");
+//
+//
+//                            /* Gebruik van POST: uitleg zie code @ https://developer.android.com/guide/components/processes-and-threads.html */
+//                            handler.post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//
+//                                    // TODO test of nuttig/nadelig.
+//                                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+//
+////                                    outputWindow.setText(resultBuilder.toString());
+////                                    outputWindow.append(resultBuilder.toString());
+//                                    outputWindow.append(accelItem.getOneLineString() + "\n");
+//                                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+//                                }
+//                            });
+////
+////                            } catch (JSONException e) {
+////                                e.printStackTrace();
+////                            }
+//                        }
+//
+//
+//                    }
+//                }
+//
+//                @Override
+//                public void onFinishSession(Context context, UUID logUuid, Long timestamp, Long tag) {
+//                    super.onFinishSession(context, logUuid, timestamp, tag);
+//
+//                    // Session is finished, use the data!
+//
+//                    // logView.setText("Sending data log FINISHED. " + resultBuilder.toString());
+////                    outputWindow.setText("Sending data log FINISHED.");
+//
+//                    outputWindow.append("--- " + getResources().getString(R.string.sending_data_log_finished) + " ---" + "\n");
+//                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+//                }
+//            };
+//
+//            PebbleKit.registerDataLogReceiver(getActivity(), myPebbleDataLOGReceiver);
+//
+//
+//            // TODO TEST: PebbleKit.requestDataLogsForApp(this, WATCHAPP_UUID);
+//            // A convenience function to emit an intent to pebble.apk to request the data logs for a particular app.
+//
+//        }
+//
+//        // IN if lus?
+//        PebbleKit.startAppOnPebble(getActivity(), WATCHAPP_UUID);
 
 
     }
@@ -1037,34 +1044,36 @@ So, you should use the enhanced for loop by default, but consider a hand-written
 
     private void stopPebbleDataLogging() {
 
+        // TODO mag wrsl weg!
+
         // Finally, as with any Receivers registered with PebbleKit,
         // remember to unregister your receiver when the user leaves the app:
-        if (myPebbleDataLOGReceiver != null) {
-
-
-            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-            // Without "getResources()." it also seems to work, but better to USE IT!
-            outputWindow.append("--- " + getResources().getString(R.string.stop_pebble_data_logging) + " ---" + "\n");
-            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-
-            try {
-
-                getActivity().unregisterReceiver(myPebbleDataLOGReceiver);
-
-                myPebbleDataLOGReceiver = null;
-
-            } catch (IllegalArgumentException ex) {
-                // TODO niets doen gewoon?
-
-
-                myPebbleDataLOGReceiver = null;
-            }
-        }
-
-
-        // IN if?
-        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
+//        if (myPebbleDataLOGReceiver != null) {
+//
+//
+//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+//            // Without "getResources()." it also seems to work, but better to USE IT!
+//            outputWindow.append("--- " + getResources().getString(R.string.stop_pebble_data_logging) + " ---" + "\n");
+//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+//
+//
+//            try {
+//
+//                getActivity().unregisterReceiver(myPebbleDataLOGReceiver);
+//
+//                myPebbleDataLOGReceiver = null;
+//
+//            } catch (IllegalArgumentException ex) {
+//                // TODO niets doen gewoon?
+//
+//
+//                myPebbleDataLOGReceiver = null;
+//            }
+//        }
+//
+//
+//        // IN if?
+//        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
 
     }
 

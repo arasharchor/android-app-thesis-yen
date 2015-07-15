@@ -1,29 +1,28 @@
 <resources>
 
-    <string name="app_name">Pebble Companion App</string>
+    <string name="app_name">Gesture Recognizer for Pebble™</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="foobar">foobar</string>
 
     <string name="button_master_detail_activity">GESTURE RECOGNIZER</string>
-
-    <string name="pebble_not_found">Pebble not found</string>
-    <string name="pebble_found">Pebble found!</string>
+    <string name="pebble_not_found">Pebble™ not found</string>
+    <string name="pebble_found">Pebble™ found!</string>
     <string name="acceldata_stream">Accel Data Stream</string>
     <string name="acceldata_datalogging">Accel Data DataLogging</string>
-    <string name="generic_not_found">[Generic] not found</string>
-    <string name="generic_found">[Generic] found!</string>
-    <string name="generic_toggle">generic toggle</string>
-    <string name="label_acceldata_stream">Accelerometer Data Stream</string>
-    <string name="label_acceldata_datalogging">Accelerometer Data Logging</string>
-    <string name="label_generic_sensor_streaming">[Generic] sensor streaming</string>
+    <string name="generic_not_found">Action Device not found</string>
+    <string name="generic_found">Action Device found!</string>
+    <string name="generic_toggle">Action Device toggle</string>
+    <string name="label_toggle_2">Toggle 2</string>
+    <string name="label_toggle_3">Toggle 3</string>
+    <string name="label_generic_sensor_streaming">Action Device sensor streaming</string>
 
     <string name="title_masterdetailitem_list">MasterDetailItems</string>
     <string name="title_masterdetailitem_detail">MasterDetailItem Detail</string>
 
     <string name="action_label_refresh">Refresh</string>
-    <string name="action_label_button_1">Button 1</string>
-    <string name="action_label_button_2">Pebble Pointer Activity</string>
+    <string name="action_label_button_1">Action Button 1</string>
+    <string name="action_label_button_2">Action Button 2</string>
     <string name="action_label_setting_1">Setting 1</string>
     <string name="action_label_set_1_opt_1">Set 1 Opt 1</string>
     <string name="action_label_set_1_opt_2">Set 1 Opt 2</string>
@@ -35,25 +34,24 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_cursor_list">CursorListActivity</string>
-    <string name="label_tab_2">Sample list Activity</string>
     <string name="output_window">Output Window\n</string>
-    <string name="communication_test">Communication Test</string>
-    <string name="toggle_communication_test">Communication Test</string>
+    <string name="label_toggle_1">Toggle 1</string>
+    <string name="toggle_1">Toggle 1</string>
     <string name="start_communication_test">START COMMUNICATION TEST</string>
     <string name="stop_communication_test">STOP COMMUNICATION TEST</string>
-    <string name="pebble_button_up_pressed">Pebble button UP pressed.</string>
-    <string name="pebble_button_down_pressed">Pebble button DOWN pressed.</string>
-    <string name="pebble_button_select_pressed">Pebble button SELECT pressed.</string>
-    <string name="connect_pebble">Connect Pebble</string>
+    <string name="pebble_button_up_pressed">Pebble™ button UP pressed.</string>
+    <string name="pebble_button_down_pressed">Pebble™ button DOWN pressed.</string>
+    <string name="pebble_button_select_pressed">Pebble™ button SELECT pressed.</string>
+    <string name="connect_pebble">Connect Pebble™</string>
     <string name="pebble_companion_app_not_found">Pebbe Companion App not found. Redirecting to App Store.</string>
-    <string name="pebble_companion_app_found">Pebble Companion App found. Now opening.</string>
-    <string name="connect_your_pebble">Connect your Pebble through the Pebble Companion App.</string>
-    <string name="download_and_retry">Download the Pebble Companion App and retry.</string>
-    <string name="start_pebble_data_logging">START PEBBLE DATA LOGGING</string>
-    <string name="stop_pebble_data_logging">STOP PEBBLE DATA LOGGING</string>
+    <string name="pebble_companion_app_found">Official Pebble™ Companion App found. Now opening.</string>
+    <string name="connect_your_pebble">Connect your Pebble™ through the official Pebble™ Companion App.</string>
+    <string name="download_and_retry">Download the official Pebble™ Companion App and retry.</string>
+    <string name="start_pebble_data_logging">START PEBBLE™ DATA LOGGING</string>
+    <string name="stop_pebble_data_logging">STOP PEBBLE™ DATA LOGGING</string>
     <string name="sending_data_log_finished">Sending data log FINISHED</string>
     <string name="icon_content_description">Mobile Device</string>
-    <string name="connect_generic">Connect [generic]</string>
+    <string name="connect_generic">Connect Action Device</string>
     <string name="BT">Bluetooth</string>
     <string name="toggle_BT">Bluetooth toggle</string>
     <string name="start_BT">Enabled Bluetooth</string>
@@ -66,13 +64,12 @@
     <string name="BT_is_enabled">Bluetooth is enabled</string>
     <string name="BT_is_disabled">Bluetooth is disabled</string>
     <string name="BT_discoverable">Discoverable (2 min)</string>
-    <string name="title_activity_pebble_accel_stream">Pebble Acceleration Data Stream</string>
+    <string name="title_activity_pebble_accel_stream">Pebble™ Acceleration Data Stream</string>
     <string name="no_data">NO DATA</string>
     <string name="start">START</string>
-    <string name="label_pebble_accelerometer_history">Pebble Accelerometer History</string>
-    <string name="label_tab_3">Pebble Accel Data Stream</string>
-    <string name="title_activity_pebble_pointer">Pebble Pointer Activity</string>
-
+    <string name="label_tab_2">Connect</string>
+    <string name="label_tab_3">Train</string>
+    <string name="label_tab_4">Recognize</string>
 
     <!-- voor PEBBLE DATA STREAM -->
     <string name="x_axis_title">x-axis</string>
@@ -82,12 +79,11 @@
     <string name="dynamic_plot">Dynamic Plot</string>
 
 
-    <!-- voor COMPLEXE gesture detection -->
-    <string name="title_activity_pebble_gestures">Pebble Gestures Activity</string>
-    <string name="label_tab_4">Pebble Gesture Recognition</string>
-    <string name="title_activity_pebble_gesture_recognition">Pebble Gesture Recognition</string>
-    <!--<string name="app_name">Gesture Trainer</string>-->
-    <string name="title_activity_pebble_gesture_overview">Pebble Gesture Overview</string>
+
+
+
+
+    <string name="title_activity_pebble_gesture_overview">Pebble™ Gesture Overview</string>
     <string name="edit_gestures">Edit Gestures</string>
     <string name="title_activity_three_dollar_gesture">Gesture Recognizer</string>
 
@@ -97,6 +93,6 @@
     <string name="Button01_str">Hold to record gesture</string>
 
 
-
     <string name="recognized_gestures">Recognized Gestures</string>
+    <string name="WiFi">Wi-Fi</string>
 </resources>

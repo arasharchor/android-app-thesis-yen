@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen.dummy;
+package com.yen.androidappthesisyen.eventueelnognuttig;
 
 import java.util.ArrayList;
 import java.util.HashMap;

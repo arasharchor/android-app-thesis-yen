@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen;
+package com.yen.androidappthesisyen.eventueelnognuttig;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.yen.androidappthesisyen.dummy.DummyContent;
+import com.yen.androidappthesisyen.R;
 
 /**
  * A fragment representing a single MasterDetailItem detail screen.

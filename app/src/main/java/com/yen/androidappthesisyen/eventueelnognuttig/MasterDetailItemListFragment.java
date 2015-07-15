@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen;
+package com.yen.androidappthesisyen.eventueelnognuttig;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import com.yen.androidappthesisyen.dummy.DummyContent;
 
 /**
  * A list fragment representing a list of MasterDetailItems. This fragment

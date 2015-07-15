@@ -9,7 +9,6 @@
     tools:context="com.yen.androidappthesisyen.main.MainFragment"
     android:id="@+id/relative_layout_main_fragment">
 
-
     <!-- the use of “android:layout_span” to span view in 2 cells, and “android:layout_column” to display the view in specified column. -->
 
 
@@ -22,25 +21,17 @@
 
     <!-- TODO change fill_parent to match_parent since it's the same but NEWER -->
 
+
+    <!--TODO deze button mag wrsl weg-->
     <!--style="?android:attr/buttonStyleSmall"-->
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="toMasterDetailActivity"
-        android:text="@string/button_master_detail_activity"
-        android:layout_alignParentTop="true"
-        android:layout_alignRight="@+id/horizontalScrollView_main_fragment"
-        android:layout_alignEnd="@+id/horizontalScrollView_main_fragment" />
 
     <!-- COULD BE USEFUL FOR SOME BUTTONS: style="?android:attr/borderlessButtonStyle"-->
-
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView_main_fragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/button"
+        android:layout_below="@+id/toggle_BT"
         android:background="@drawable/border_ui"
         android:padding="16dp"
         android:layout_marginTop="16dp"
@@ -107,21 +98,21 @@
                         android:id="@+id/label_communication_test"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/communication_test"
+                        android:text="@string/label_toggle_1"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <ToggleButton
                         android:id="@+id/toggle_communication_test"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/toggle_communication_test"
+                        android:text="@string/toggle_1"
                         android:enabled="false" />
 
                     <TextView
                         android:id="@+id/label_acceldata_stream"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/label_acceldata_stream"
+                        android:text="@string/label_toggle_2"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <ToggleButton
@@ -135,7 +126,7 @@
                         android:id="@+id/label_acceldata_datalogging"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/label_acceldata_datalogging"
+                        android:text="@string/label_toggle_3"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <ToggleButton
@@ -248,7 +239,7 @@
         android:text="@string/BT"
         android:id="@+id/textView_BT"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_alignBottom="@+id/button"
+        android:layout_alignBottom="@+id/toggle_BT"
         android:layout_alignLeft="@+id/horizontalScrollView_main_fragment"
         android:layout_alignStart="@+id/horizontalScrollView_main_fragment"
         android:textStyle="bold" />
@@ -259,10 +250,12 @@
         android:layout_height="wrap_content"
         android:text="@string/toggle_BT"
         android:id="@+id/toggle_BT"
-        android:layout_above="@+id/horizontalScrollView_main_fragment"
+        android:enabled="false"
+        android:layout_marginLeft="39dp"
+        android:layout_marginStart="39dp"
+        android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/textView_BT"
-        android:layout_toEndOf="@+id/textView_BT"
-        android:enabled="false" />
+        android:layout_toEndOf="@+id/textView_BT" />
 
     <!-- This button is BY DEFAULT DISABLED, because the DEFAULT STATE for toggle_BT is also DISABLED. -->
     <Button
@@ -270,10 +263,27 @@
         android:layout_height="wrap_content"
         android:text="@string/BT_discoverable"
         android:id="@+id/button_BT_discoverable"
-        android:layout_alignBottom="@+id/toggle_BT"
+        android:enabled="false"
+        android:layout_alignTop="@+id/toggle_BT"
         android:layout_toRightOf="@+id/toggle_BT"
-        android:layout_toEndOf="@+id/toggle_BT"
-        android:enabled="false" />
+        android:layout_toEndOf="@+id/toggle_BT" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/WiFi"
+        android:id="@+id/textView"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold"
+        android:layout_alignTop="@+id/textView_BT"
+        android:layout_alignLeft="@+id/scrollView_output_window"
+        android:layout_alignStart="@+id/scrollView_output_window" />
+
+
+
+
+
+
     <!-- android:onClick="" bij BUTTON laat toe om methode in FRAGMENT te specifiëren.
     Maar bij TOGGLEBUTTON kan je enkel methode uit ACTIVITY kiezen?!
      Dus als je in FRAGMENT je behavior code wilt plaatsen, blijf je werken met: programmatorisch listener toevoegen bij maken fragment. -->

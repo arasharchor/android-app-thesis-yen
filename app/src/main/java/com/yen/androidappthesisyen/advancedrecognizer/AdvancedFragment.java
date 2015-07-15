@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen.ThreeDollarGestureRecognizer;
+package com.yen.androidappthesisyen.advancedrecognizer;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -29,8 +28,8 @@ import android.widget.ToggleButton;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.yen.androidappthesisyen.R;
-import com.yen.androidappthesisyen.tiltdirectionrecognizer.PebbleGestureModel;
-import com.yen.androidappthesisyen.tiltdirectionrecognizer.TiltGestureRecognizer;
+import com.yen.androidappthesisyen.simplerecognizer.PebbleGestureModel;
+import com.yen.androidappthesisyen.simplerecognizer.TiltGestureRecognizer;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -68,13 +67,13 @@ import java.util.UUID;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ThreeDollarGestureFragment.OnFragmentInteractionListener} interface
+ * {@link AdvancedFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class ThreeDollarGestureFragment extends Fragment implements DialogInterface.OnClickListener {
+public class AdvancedFragment extends Fragment implements DialogInterface.OnClickListener {
 
 
-    //    private static final String LOG_TAG = ThreeDollarGestureFragment.class.getName();
+    //    private static final String LOG_TAG = AdvancedFragment.class.getName();
     // was relatief lang dus nu:
     private static final String LOG_TAG = "ADVANCED RECOGNIZER";
 
@@ -148,7 +147,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     };
 
     // ff public
-    public com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.App.STATES state = com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.App.STATES.STATE_LEARN;
+    public com.yen.androidappthesisyen.advancedrecognizer.App.STATES state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.STATE_LEARN;
 
 
     // private MENUITEMS menuitems;
@@ -178,65 +177,64 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
         // TODO dit dus disablen want niet nodig maar TEST OF HET NIET BREAKT.
         // turn on the acc sensor
-        mSensorManager.registerListener(sensorListener,
-                SensorManager.SENSOR_ACCELEROMETER,
-                SensorManager.SENSOR_DELAY_GAME);
+//        mSensorManager.registerListener(sensorListener, SensorManager.SENSOR_ACCELEROMETER, SensorManager.SENSOR_DELAY_GAME);
 
     }
 
 
+    // TODO niet meer nodig wrsl.
     // TODO lol easy fix maarja...
-    @SuppressWarnings("deprecation")
-    private final SensorListener sensorListener = new SensorListener() {
-
-        public void onSensorChanged(int sensor, float[] values) {
-
-            // TODO TEST in comments gezet want gebruiken ZELF GEMAAKTE methode die we aanroepen
-
-            /*//Retrieve the values from the float array values which contains sensor data
-            Float dataX = values[SensorManager.DATA_X];
-
-            Float dataY = values[SensorManager.DATA_Y];
-
-            Float dataZ = values[SensorManager.DATA_Z];
-
-            //	Context c = getApplicationContext();
-
-            //Now we got the values and we can use it as we want
-            if (VERBOSE) {
-                Log.w("X - Value, " + dataX, "");
-
-                Log.w("Y - Value, " + dataY, "");
-
-                Log.w("Z - Value, " + dataZ, "");
-            }
-            TextView tv1 = (TextView) getView().findViewById(R.id.accX);
-            TextView tv2 = (TextView) getView().findViewById(R.id.accY);
-            TextView tv3 = (TextView) getView().findViewById(R.id.accZ);
-
-            tv1.setText(dataX.toString());
-            tv2.setText(dataY.toString());
-            tv3.setText(dataZ.toString());
-
-            if (RECORD_GESTURE) {
-
-                float[] traceItem = {dataX.floatValue(),
-                        dataY.floatValue(),
-                        dataZ.floatValue()};
-                if (recordingGestureTrace != null) {
-                    recordingGestureTrace.add(traceItem);
-                }
-
-
-            }*/
-
-        }
-
-        public void onAccuracyChanged(int sensor, int accuracy) {
-
-        }
-
-    };
+//    @SuppressWarnings("deprecation")
+//    private final SensorListener sensorListener = new SensorListener() {
+//
+//        public void onSensorChanged(int sensor, float[] values) {
+//
+//            // TODO TEST in comments gezet want gebruiken ZELF GEMAAKTE methode die we aanroepen
+//
+//            /*//Retrieve the values from the float array values which contains sensor data
+//            Float dataX = values[SensorManager.DATA_X];
+//
+//            Float dataY = values[SensorManager.DATA_Y];
+//
+//            Float dataZ = values[SensorManager.DATA_Z];
+//
+//            //	Context c = getApplicationContext();
+//
+//            //Now we got the values and we can use it as we want
+//            if (VERBOSE) {
+//                Log.w("X - Value, " + dataX, "");
+//
+//                Log.w("Y - Value, " + dataY, "");
+//
+//                Log.w("Z - Value, " + dataZ, "");
+//            }
+//            TextView tv1 = (TextView) getView().findViewById(R.id.accX);
+//            TextView tv2 = (TextView) getView().findViewById(R.id.accY);
+//            TextView tv3 = (TextView) getView().findViewById(R.id.accZ);
+//
+//            tv1.setText(dataX.toString());
+//            tv2.setText(dataY.toString());
+//            tv3.setText(dataZ.toString());
+//
+//            if (RECORD_GESTURE) {
+//
+//                float[] traceItem = {dataX.floatValue(),
+//                        dataY.floatValue(),
+//                        dataZ.floatValue()};
+//                if (recordingGestureTrace != null) {
+//                    recordingGestureTrace.add(traceItem);
+//                }
+//
+//
+//            }*/
+//
+//        }
+//
+//        public void onAccuracyChanged(int sensor, int accuracy) {
+//
+//        }
+//
+//    };
 
 
     // TODO TEST zelf gemaakt
@@ -253,21 +251,16 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
         //	Context c = getApplicationContext();
 
-        //Now we got the values and we can use it as we want
-        if (VERBOSE) {
-            Log.w("X - Value, " + dataX, "");
 
-            Log.w("Y - Value, " + dataY, "");
 
-            Log.w("Z - Value, " + dataZ, "");
-        }
-        TextView tv1 = (TextView) getView().findViewById(R.id.accX);
-        TextView tv2 = (TextView) getView().findViewById(R.id.accY);
-        TextView tv3 = (TextView) getView().findViewById(R.id.accZ);
-
-        tv1.setText(dataX.toString());
-        tv2.setText(dataY.toString());
-        tv3.setText(dataZ.toString());
+        // TODO mag weg:
+//        TextView tv1 = (TextView) getView().findViewById(R.id.accX);
+//        TextView tv2 = (TextView) getView().findViewById(R.id.accY);
+//        TextView tv3 = (TextView) getView().findViewById(R.id.accZ);
+//
+//        tv1.setText(dataX.toString());
+//        tv2.setText(dataY.toString());
+//        tv3.setText(dataZ.toString());
 
 
         // ------
@@ -597,7 +590,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
                 // TODO mag weg?
                 // stop accelerometer
-                mSensorManager.unregisterListener(sensorListener);
+//                mSensorManager.unregisterListener(sensorListener);
 
                 // BUGFIX VIA https://code.google.com/p/three-dollar-gesture-recognizer/issues/detail?id=1
                 final Gesture candidate = new Gesture(null, new ArrayList<float[]>(recordingGestureTrace));
@@ -745,7 +738,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
                     // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
                     IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
                 } else {
-                    Log.w("mqtt", "SystemID unknown so no mapped IP address for Gesture Handler found");
+                    Log.w("pushnotificationlistener", "SystemID unknown so no mapped IP address for Gesture Handler found");
                 }
 
 
@@ -987,7 +980,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     }
 
 
-    public ThreeDollarGestureFragment() {
+    public AdvancedFragment() {
         // Required empty public constructor
     }
 
@@ -1045,10 +1038,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         // TODO mag weg maar test of NIETS BREAKT.
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         // TODO mag weg maar test of NIETS BREAKT.
-        mSensorManager.registerListener(sensorListener,
-                SensorManager.SENSOR_ACCELEROMETER,
-                SensorManager.SENSOR_DELAY_FASTEST
-                /*SensorManager.SENSOR_DELAY_GAME*/);
+//        mSensorManager.registerListener(sensorListener, SensorManager.SENSOR_ACCELEROMETER, SensorManager.SENSOR_DELAY_FASTEST/*SensorManager.SENSOR_DELAY_GAME*/);
 
     }
 
@@ -1282,7 +1272,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
         }
 
         // change state and map to enum value
-        this.state = com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.App.STATES.values()[resultCode];
+        this.state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.values()[resultCode];
         //update activity's state
         this.stateChanged();
     }
@@ -1298,9 +1288,7 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
         // TODO mag dus weg maar check dat NIETS BREAKT.
         // voor THREE DOLLAR gestures
-        mSensorManager.registerListener(sensorListener,
-                SensorManager.SENSOR_ACCELEROMETER,
-                SensorManager.SENSOR_DELAY_GAME);
+//        mSensorManager.registerListener(sensorListener, SensorManager.SENSOR_ACCELEROMETER, SensorManager.SENSOR_DELAY_GAME);
     }
 
 
@@ -1530,10 +1518,10 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
     public void onDestroy() {
 
 
-        if (DEBUG) Log.w("onDestroy", "ThreeDollarGestureFragment destroyed.");
+        if (DEBUG) Log.w("onDestroy", "AdvancedFragment destroyed.");
 
         // TODO mag dus weg?
-        mSensorManager.unregisterListener(sensorListener);
+//        mSensorManager.unregisterListener(sensorListener);
         // this.myGestureLibrary.onApplicationStop();
 
         super.onDestroy();
@@ -1585,13 +1573,13 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
         Map<String, String> savedMap = getMapSupportedGestures();
         if (savedMap == null) {
-            Log.w("mqtt", "SAVEDMAP IS NULL");
+            Log.w("pushnotificationlistener", "SAVEDMAP IS NULL");
         }
 
 
         String concatenatedGestures = savedMap.get(systemID);
 //        if(concatenatedGestures == null){
-//            Log.w("mqtt", "concatenatedGestures IS NULL");
+//            Log.w("pushnotificationlistener", "concatenatedGestures IS NULL");
 //        }
 
         String newConcatenatedString = "";
@@ -1605,14 +1593,14 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
             // recreate concatenated string from new set
             newConcatenatedString = TextUtils.join(";", setGestures);
 
-            Log.w("mqtt", "newConcatenatedString " + newConcatenatedString);
+            Log.w("pushnotificationlistener", "newConcatenatedString " + newConcatenatedString);
 
         } else {
 
             // TODO zien of niet met ";" direct moet.
             newConcatenatedString = gestureToBeAdded;
 
-            Log.w("mqtt", "newConcatenatedString " + newConcatenatedString);
+            Log.w("pushnotificationlistener", "newConcatenatedString " + newConcatenatedString);
         }
 
 

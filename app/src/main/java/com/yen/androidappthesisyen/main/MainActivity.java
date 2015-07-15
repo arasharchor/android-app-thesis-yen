@@ -14,16 +14,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
 
-import com.yen.androidappthesisyen.CursorListActivity;
-import com.yen.androidappthesisyen.PebbleGestureRecognitionActivity;
-import com.yen.androidappthesisyen.PebblePointerActivity;
 import com.yen.androidappthesisyen.R;
-import com.yen.androidappthesisyen.ThreeDollarGestureRecognizer.ThreeDollarGestureActivity;
-import com.yen.androidappthesisyen.mqtt.MQTTService;
-import com.yen.androidappthesisyen.tiltdirectionrecognizer.PebbleAccelStreamActivity;
+import com.yen.androidappthesisyen.advancedrecognizer.AdvancedActivity;
+import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
@@ -40,6 +35,33 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     /* FOR MQTT SERVICE */
     private StatusUpdateReceiver statusUpdateIntentReceiver;
     private MQTTMessageReceiver  messageIntentReceiver;
+
+
+
+    // TODO verzet volgende code (tot onCreate()) terug verder naar beneden.
+    // Following 3 methods are due to "implements ActionBar.TabListener"
+    // TODO tabs are probably meant to CHANGE THE LAYOUT (change activity or fragment) while the BUTTONS on the left of the OVERFLOW BUTTON are probably for ACTIONS on the current layout
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+        // TODO dit aangewezen manier voor vinden juiste tab?
+        // Don't check == 0 because that tab 0 is SELECTED by DEFAULT when starting the app.
+        // So tab 0 corresponds with the MainActivity!
+        if (tab.getPosition() == 1) {
+            toSecondTabActivity();
+        } else if (tab.getPosition() == 2) {
+            toGestureRecognizerActivity();
+        }
+
+    }
+
+
+    private void toSecondTabActivity() {
+        // TODO eventueel nieuwe tab nog gebruiken voor iets
+//        Intent intent = new Intent(this, PebbleAccelStreamActivity.class);
+//        startActivity(intent);
+    }
+
+
 
 
     @Override
@@ -78,13 +100,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // TODO hoort dit niet in onCreateOptionsMenu ? UPDATE is goed volgens tutorial @ https://developer.android.com/training/implementing-navigation/lateral.html#tabs
         // TODO inflate the tab layout by using XML files instead of coding it here.
         // set up tabs nav
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i <= 3; i++) {
             // Only recently gotten deprecated: since Android 5.0
-            if (i == 2) {
+            if (i == 1) {
                 theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_2).setTabListener(this));
-            } else if (i == 3) {
+            } else if (i == 2) {
                 theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_3).setTabListener(this));
-            } else if (i == 4) {
+            } else if (i == 3) {
                 theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_4).setTabListener(this));
             } else {
                 theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
@@ -238,7 +260,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
 
         if (intent != null) {
-            firstButton.setTitle("Pebble Companion App");
+            firstButton.setTitle("Official Pebble™ Companion App");
             firstButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -252,7 +274,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         } else {
             // TODO translate
-            firstButton.setTitle("Install Pebble Companion App");
+            firstButton.setTitle("Install official Pebble™ Companion App");
             firstButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -329,7 +351,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
             case R.id.action_button_2:
 
-                toPebblePointerActivity();
+                toThirdActionButtonActivity();
 
                 /*showHomeUp = !showHomeUp;
                 item.setChecked(showHomeUp);
@@ -375,10 +397,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     }
 
-    private void toPebblePointerActivity() {
+    private void toThirdActionButtonActivity() {
 
-        Intent intent = new Intent(this, PebblePointerActivity.class);
-        startActivity(intent);
+        // TODO action button eventueel nog gebruiken
+//        Intent intent = new Intent(this, PebblePointerActivity.class);
+//        startActivity(intent);
 
     }
 
@@ -437,45 +460,20 @@ Note: When your activity is paused, the Activity instance is kept resident in me
     /*TODO perhaps: You can also declare the click event handler programmatically rather than in an XML layout. This might be necessary if you instantiate the Button at runtime or you need to declare the click behavior in a Fragment subclass.
      https://developer.android.com/guide/topics/ui/controls/button.html
       So put the following code in the FRAGMENT since it's the FRAGMENT that builds the GUI; not the ACTIVITY in our case. */
-    public void toMasterDetailActivity(View view) {
-//        Intent intent = new Intent(this, MasterDetailItemListActivity.class);
-        Intent intent = new Intent(this, ThreeDollarGestureActivity.class);
+    // TODO ----------- er stond public void toGestureRecognizerActivity(View view) { maar die parameter precies nooit gebruikt?
+    public void toGestureRecognizerActivity() {
+        Intent intent = new Intent(this, AdvancedActivity.class);
         startActivity(intent);
     }
 
+    // TODO enkel nog nodig als we uiteindelijk CursorListActivity gebruiken.
+//    public void toCursorListActivity() {
+//        Intent intent = new Intent(this, CursorListActivity.class);
+//        startActivity(intent);
+//    }
 
-    public void toCursorListActivity() {
-        Intent intent = new Intent(this, CursorListActivity.class);
-        startActivity(intent);
-    }
 
 
-    // Following 3 methods are due to "implements ActionBar.TabListener"
-    // TODO tabs are probably meant to CHANGE THE LAYOUT (change activity or fragment) while the BUTTONS on the left of the OVERFLOW BUTTON are probably for ACTIONS on the current layout
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // TODO dit aangewezen manier voor vinden juiste tab?
-        // Don't check == 0 because that tab 0 is SELECTED by DEFAULT when starting the app.
-        // So tab 0 corresponds with the MainActivity!
-        if (tab.getPosition() == 1) {
-            toCursorListActivity();
-        } else if (tab.getPosition() == 2) {
-            toPebbleAccelStreamActivity();
-        } else if (tab.getPosition() == 3) {
-            toPebbleGestureRecognitionActivity();
-        }
-
-    }
-
-    private void toPebbleGestureRecognitionActivity() {
-        Intent intent = new Intent(this, PebbleGestureRecognitionActivity.class);
-        startActivity(intent);
-    }
-
-    private void toPebbleAccelStreamActivity() {
-        Intent intent = new Intent(this, PebbleAccelStreamActivity.class);
-        startActivity(intent);
-    }
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {

@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen;
+package com.yen.androidappthesisyen.eventueelnognuttig;
 
 import android.util.Log;
 
@@ -17,6 +17,7 @@ import java.util.TimeZone;
 
 
 public class AccelData {
+
     private static final String TAG = AccelData.class.getSimpleName();
 
     final private int x;

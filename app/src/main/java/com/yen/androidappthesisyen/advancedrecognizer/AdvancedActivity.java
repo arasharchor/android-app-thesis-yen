@@ -1,4 +1,4 @@
-package com.yen.androidappthesisyen.ThreeDollarGestureRecognizer;
+package com.yen.androidappthesisyen.advancedrecognizer;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,11 +16,11 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.yen.androidappthesisyen.R;
-import com.yen.androidappthesisyen.mqtt.MQTTService;
+import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 
 import java.util.regex.Matcher;
 
-public class ThreeDollarGestureActivity extends Activity {
+public class AdvancedActivity extends Activity {
 
 
     @Override
@@ -31,7 +31,7 @@ public class ThreeDollarGestureActivity extends Activity {
 
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
-                    .add(R.id.container_three_dollar_gesture_activity, new ThreeDollarGestureFragment())
+                    .add(R.id.container_three_dollar_gesture_activity, new AdvancedFragment())
                     .commit();
         }
 
@@ -109,7 +109,7 @@ public class ThreeDollarGestureActivity extends Activity {
          * React to selection of options item
     	 */
         // stond "DEBUG"
-        if (((ThreeDollarGestureFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).DEBUG)
+        if (((AdvancedFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).DEBUG)
             Log.w("onOptionsItemSelected", "Selected: " + item.getItemId());
 
         App.MENUITEMS m;
@@ -121,20 +121,20 @@ public class ThreeDollarGestureActivity extends Activity {
         if (value == App.MENUITEMS.ITEM_LEARN.ordinal()) {
 
             // do something here
-            ((ThreeDollarGestureFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).state = App.STATES.STATE_LEARN;
-            ((ThreeDollarGestureFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).stateChanged();
+            ((AdvancedFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).state = App.STATES.STATE_LEARN;
+            ((AdvancedFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).stateChanged();
 
         } else if (value == App.MENUITEMS.ITEM_RECOGNIZE.ordinal()) {
 
             // activate recognition here
-            ((ThreeDollarGestureFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).state = App.STATES.STATE_RECOGNIZE;
-            ((ThreeDollarGestureFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).stateChanged();
+            ((AdvancedFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).state = App.STATES.STATE_RECOGNIZE;
+            ((AdvancedFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).stateChanged();
 
         } else if (value == App.MENUITEMS.ITEM_LIBRARY.ordinal()) {
 
             // library stats here
-            ((ThreeDollarGestureFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).state = App.STATES.STATE_LIBRARY;
-            ((ThreeDollarGestureFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).stateChanged();
+            ((AdvancedFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).state = App.STATES.STATE_LIBRARY;
+            ((AdvancedFragment) getFragmentManager().findFragmentById(R.id.container_three_dollar_gesture_activity)).stateChanged();
 
             // start library activity
             Intent i = new Intent(this.getApplicationContext(), DBManagerUIActivity.class);

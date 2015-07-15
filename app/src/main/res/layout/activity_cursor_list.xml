@@ -3,5 +3,5 @@
     android:id="@+id/container_cursor_list_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yen.androidappthesisyen.CursorListActivity"
+    tools:context="com.yen.androidappthesisyen.eventueelnognuttig.CursorListActivity"
     tools:ignore="MergeRootFrame" />
