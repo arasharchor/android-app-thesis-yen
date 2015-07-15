@@ -643,7 +643,9 @@ public class ThreeDollarGestureFragment extends Fragment implements DialogInterf
 
                         if (detected_gid.equalsIgnoreCase("unknown") || detected_gid.equalsIgnoreCase("unknown gesture")) { // TODO nodig of niet? && gid.equalsIgnoreCase("unknown gesture")
 
-                            doTwoShortPebbleVibrations();
+                            // Niet nodig. En hebben gemerkt dat de nu nog te krijgen "unknown gesture" berichten mogen genegeerd worden.
+                            // Het is precies niet meer het geval dat we een gesture uitvoeren en dat die niet wordt herkend.
+                            // doTwoShortPebbleVibrations();
 
                         } else {
 
