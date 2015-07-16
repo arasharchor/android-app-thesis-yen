@@ -12,12 +12,13 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
 import com.yen.androidappthesisyen.R;
-import com.yen.androidappthesisyen.advancedrecognizer.AdvancedActivity;
+import com.yen.androidappthesisyen.advancedrecognizer.AdvancedFragment;
 import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 
 
@@ -46,20 +47,107 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // TODO dit aangewezen manier voor vinden juiste tab?
         // Don't check == 0 because that tab 0 is SELECTED by DEFAULT when starting the app.
         // So tab 0 corresponds with the MainActivity!
-        if (tab.getPosition() == 1) {
-            toSecondTabActivity();
+        if (tab.getPosition() == 0) {
+            switchToMainFragment();
+        } else if (tab.getPosition() == 1) {
+            switchToAdvancedRecognizerFragment("learn");
         } else if (tab.getPosition() == 2) {
-            toGestureRecognizerActivity();
+            switchToAdvancedRecognizerFragment("recognize");
         }
 
     }
 
+    private void switchToMainFragment() {
 
+        // Create new fragment and transaction
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+
+        Fragment fragment = new MainFragment();
+        // Nu GEEN BUNDLE NODIG MET STATE want het STATE systeem geldt enkel bij de learn/recognize/library state omdat die dezelfde "ouderfragment" hebben die telkens wordt aangepast.
+        // De MainActivity en MainFragment hebben hier niets mee te zien.
+
+        // Replace whatever is in the fragment_container view with this fragment,
+// and add the transaction to the back stack if needed
+        transaction.replace(R.id.framelayout_container_main_activity, fragment);
+        /*Note: When you remove or replace a fragment and add the transaction to the back stack, the fragment that is removed is stopped (not destroyed). If the user navigates back to restore the fragment, it restarts. If you do not add the transaction to the back stack, then the fragment is destroyed when removed or replaced. To allow the user to navigate backward
+        through the fragment transactions, you must call addToBackStack() before you commit the FragmentTransaction.*/
+//        http://sapandiwakar.in/replacing-fragments/
+        transaction.addToBackStack(null);
+
+// Commit the transaction
+        transaction.commit();
+
+    }
+
+    // 16-07 mag weg
     private void toSecondTabActivity() {
         // TODO eventueel nieuwe tab nog gebruiken voor iets
 //        Intent intent = new Intent(this, PebbleAccelStreamActivity.class);
 //        startActivity(intent);
+
+        switchToAdvancedRecognizerFragment("learn");
+
     }
+
+    // TODO 16-07 VOLGENDE MAG WEG MAAR LEES NOG IS COMMENTS EERST.
+    /*TODO perhaps: You can also declare the click event handler programmatically rather than in an XML layout. This might be necessary if you instantiate the Button at runtime or you need to declare the click behavior in a Fragment subclass.
+     https://developer.android.com/guide/topics/ui/controls/button.html
+      So put the following code in the FRAGMENT since it's the FRAGMENT that builds the GUI; not the ACTIVITY in our case. */
+    // UPDATE: maar dan moet je de states van de tabs continu tussen de fragments doorgeven. Ipv nu: nu heeft de MainActivity de tab logica en zit daar dus de state.
+    // TODO ----------- er stond public void toGestureRecognizerActivity(View view) { maar die parameter precies nooit gebruikt?
+    public void toGestureRecognizerActivity() {
+//        Intent intent = new Intent(this, AdvancedActivity.class);
+//        startActivity(intent);
+        // TODO bovenstaande is oud: we BLIJVEN deze MainActivity gebruiken maar switchen gewoon van Fragment:
+
+        switchToAdvancedRecognizerFragment("recognize");
+    }
+
+    private void switchToAdvancedRecognizerFragment(String requestedState) {
+        // Create new fragment and transaction
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        // OM DATA DOOR TE GEVEN ONDER FRAGMENTS ONDERLING.
+        // In dit geval dus Bundle OK want SharedPreferences is voor ECHTE PREFERENTIES DIE LANGDURIGER BLIJVEN!
+        Fragment fragment = new AdvancedFragment();
+        Bundle bundle = new Bundle();
+        if(requestedState.equalsIgnoreCase("learn")){
+            bundle.putString("state", "learn");
+        } else if(requestedState.equalsIgnoreCase("recognize")){
+            bundle.putString("state", "recognize");
+        } else if(requestedState.equalsIgnoreCase("library")){
+            bundle.putString("state", "library");
+        } else {
+            // JA wel zetten want nu bij getString GEEN default waarde systeem (vereiste API groter dan 21)
+            bundle.putString("state", "default");
+        }
+
+        fragment.setArguments(bundle);
+
+        // Replace whatever is in the fragment_container view with this fragment,
+// and add the transaction to the back stack if needed
+        transaction.replace(R.id.framelayout_container_main_activity, fragment);
+        /*Note: When you remove or replace a fragment and add the transaction to the back stack, the fragment that is removed is stopped (not destroyed). If the user navigates back to restore the fragment, it restarts. If you do not add the transaction to the back stack, then the fragment is destroyed when removed or replaced. To allow the user to navigate backward
+        through the fragment transactions, you must call addToBackStack() before you commit the FragmentTransaction.*/
+//        http://sapandiwakar.in/replacing-fragments/
+        transaction.addToBackStack(null);
+
+// Commit the transaction
+        transaction.commit();
+
+
+    }
+
+    // TODO enkel nog nodig als we uiteindelijk CursorListActivity gebruiken.
+//    public void toCursorListActivity() {
+//        Intent intent = new Intent(this, CursorListActivity.class);
+//        startActivity(intent);
+//    }
+
+
+
+
 
 
 
@@ -76,14 +164,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // in "R.layout.activity_main" !
         if (savedInstanceState == null) {
 
-
             // DONT PLACE THIS FRAGMENT IN A GLOBAL VARIABLE. Since fragments get made and remade upon orientation changes and stuff!
             // So that variable could become NULL at some point!
             Fragment aPlaceholderFragment = new MainFragment();
             getFragmentManager().beginTransaction()
                     .add(R.id.framelayout_container_main_activity, aPlaceholderFragment)
                     .commit();
-
         }
 
         final ActionBar theActionBar = getActionBar();
@@ -92,27 +178,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         theActionBar.setDisplayHomeAsUpEnabled(false);
 
 
-        // Only recently gotten deprecated: since Android 5.0
-        theActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        // TODO perhaps work with LIST instead of TABS if you want to.
+
 
 
         // TODO hoort dit niet in onCreateOptionsMenu ? UPDATE is goed volgens tutorial @ https://developer.android.com/training/implementing-navigation/lateral.html#tabs
         // TODO inflate the tab layout by using XML files instead of coding it here.
-        // set up tabs nav
-        for (int i = 1; i <= 3; i++) {
-            // Only recently gotten deprecated: since Android 5.0
-            if (i == 1) {
-                theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_2).setTabListener(this));
-            } else if (i == 2) {
-                theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_3).setTabListener(this));
-            } else if (i == 3) {
-                theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_4).setTabListener(this));
-            } else {
-                theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
-            }
+        addNavigationTabs(theActionBar);
 
-        }
 
 
 
@@ -149,6 +221,30 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // Certain apps need to keep the screen turned on, such as games or movie apps. The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
         // From https://developer.android.com/training/scheduling/wakelock.html
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+    }
+
+
+    // TODO ALS JE HIER IETS AANPAST, OOK IN ZELFDE METHODE IN ADVANCEDACTIVITY.JAVA
+    private void addNavigationTabs(ActionBar theActionBar) {
+
+        // Only recently gotten deprecated: since Android 5.0
+        theActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        // TODO perhaps work with LIST instead of TABS if you want to.
+
+        for (int i = 1; i <= 3; i++) {
+            // Only recently gotten deprecated: since Android 5.0
+            if (i == 1) {
+                theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_2).setTabListener(this));
+            } else if (i == 2) {
+                theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_3).setTabListener(this));
+            } else if (i == 3) {
+                theActionBar.addTab(theActionBar.newTab().setText(R.string.label_tab_4).setTabListener(this));
+            } else {
+                theActionBar.addTab(theActionBar.newTab().setText("Tab " + i).setTabListener(this));
+            }
+
+        }
 
     }
 
@@ -343,6 +439,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
 
             case R.id.action_button_1:
+                Log.w(LOG_TAG, "clicked action button 1");
+
                 // TODO doe iets
                 /*useLogo = !useLogo; VANBOVEN STOND ER: private boolean useLogo = false;
                 item.setChecked(useLogo);
@@ -351,7 +449,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
             case R.id.action_button_2:
 
-                toThirdActionButtonActivity();
+                switchToAdvancedRecognizerFragment("library");
 
                 /*showHomeUp = !showHomeUp;
                 item.setChecked(showHomeUp);
@@ -397,13 +495,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     }
 
-    private void toThirdActionButtonActivity() {
 
-        // TODO action button eventueel nog gebruiken
-//        Intent intent = new Intent(this, PebblePointerActivity.class);
-//        startActivity(intent);
-
-    }
 
 
     // OLD CODE: fragment is now standalone instead of line.
@@ -457,20 +549,7 @@ Note: When your activity is paused, the Activity instance is kept resident in me
     }
 
 
-    /*TODO perhaps: You can also declare the click event handler programmatically rather than in an XML layout. This might be necessary if you instantiate the Button at runtime or you need to declare the click behavior in a Fragment subclass.
-     https://developer.android.com/guide/topics/ui/controls/button.html
-      So put the following code in the FRAGMENT since it's the FRAGMENT that builds the GUI; not the ACTIVITY in our case. */
-    // TODO ----------- er stond public void toGestureRecognizerActivity(View view) { maar die parameter precies nooit gebruikt?
-    public void toGestureRecognizerActivity() {
-        Intent intent = new Intent(this, AdvancedActivity.class);
-        startActivity(intent);
-    }
 
-    // TODO enkel nog nodig als we uiteindelijk CursorListActivity gebruiken.
-//    public void toCursorListActivity() {
-//        Intent intent = new Intent(this, CursorListActivity.class);
-//        startActivity(intent);
-//    }
 
 
 

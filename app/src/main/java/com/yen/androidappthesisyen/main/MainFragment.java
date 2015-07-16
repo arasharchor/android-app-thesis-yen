@@ -1,19 +1,27 @@
 package com.yen.androidappthesisyen.main;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -22,11 +30,14 @@ import android.widget.ToggleButton;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.yen.androidappthesisyen.R;
+import com.yen.androidappthesisyen.advancedrecognizer.App;
+import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
 
 
 /**
@@ -91,6 +102,124 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     private List<String> arrayListNamesPairedBTDevices;
 
 
+
+
+    // TODO verzet wat naar beneden.
+    private void showIPDialog(final int enumerator) {
+        // 16-07 Tot nu toe enkel 1 en 2 gebruikt als parameter "enumerator".
+//        HOE HET WERD AANGESPROKEN INDERTIJD:
+//        else if (value == App.MENUITEMS.ITEM_INSERT_IP_1.ordinal()) {
+//
+//            showIPDialog(1);
+//
+//        } else if (value == App.MENUITEMS.ITEM_INSERT_IP_2.ordinal()) {
+//
+//            showIPDialog(2);
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Location of User Detector and Gesture Handler");
+        builder.setMessage("Insert the current IPv4 address " + enumerator);
+
+        // TODO dit toepassen? WEL ALS WE BV. 2x EDITTEXT WENSEN ALS USER VERSCHILLENDE IPs ZOU KUNNEN INGEVEN.
+//        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        View view = inflater.inflate(R.layout.alert, null);
+//        final EditText ipfield = (EditText) view.findViewById(R.id.ipfield);
+
+        final EditText input = new EditText(getActivity());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER);
+
+//        builder.setView(view);
+
+        builder.setView(input);
+
+
+        builder.setPositiveButton("Save",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+                        // TODO IP User Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
+                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+
+                        String value = String.valueOf(input.getText());
+
+                        // !! Patterns.IP_ADDRESS only applies to IPv4, so it's misleading.
+                        // http://blog.danlew.net/2014/05/22/why-i-dont-use-patterns/
+                        // TODO bedenken hoe IPv6 ook kan ondersteund worden? WRSL VIA CHECKBOX dat user kan aanvinken en afhankelijk daarvan wordt andere matcher gekozen.
+                        // dus google op "android verify ipv6" ofzo
+                        Matcher matcher = Patterns.IP_ADDRESS.matcher(value);
+
+                        if(matcher.matches()){
+                            // Only when the value is not empty, the value gets saved.
+
+                            // TODO SERVICE MOET NU GEHERSTART WORDEN - OF BEDENK ANDERE WERKWIJZE ZODAT SERVICE NOG NIET IS GESTART VOORALEER JUISTE IP IN SYSTEEM ZIT.
+                            SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
+                            editorUserDetector.putString("ip_address_broker_" + enumerator, value);
+                            // editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
+                            editorUserDetector.commit();
+                        }
+
+
+
+                        // we gaan ENKEL herstarten als IP 1 en IP 2 werden ingevuld. Na invullen IP 2 (en niet al bij IP 1) wordt service geherstart.
+                        if(enumerator == 2){
+                            // TODO doen we dit in alle gevallen? of moet er soms NIET gestopt worden na klikken op "save" bij bepaalde values?
+                            // WE STOPPEN EERST DE SERVICE EN HERSTARTEN DAN. ZO KAN NIEUW IP DIRECT TOEGEPAST WORDEN :D
+                            Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
+                            getActivity().stopService(svcOld);
+
+                            // Dit BUITEN de IF lus: zelfs als er geen tekst werd ingevuld, wordt service gestart: die gebruikt dan het eerder opgeslagen IP.
+                            // STARTING THE SERVICE NOW THAT THE IP ADDRESS OF THE BROKER IS KNOWN
+                            // TODO getApplicationContext()is hier wrsl WEL OK want service best niet gelinkt aan een bepaalde activity?
+                            Intent svcNew = new Intent(getActivity().getApplicationContext(), MQTTService.class);
+                            getActivity().startService(svcNew);
+                        }
+
+
+
+
+                        if(matcher.matches()){
+                            SharedPreferences settingsGestureHandler = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editorGestureHandler = settingsGestureHandler.edit();
+                            editorGestureHandler.putString("ip_address_" + enumerator, value);
+                            editorGestureHandler.commit();
+                        }
+
+
+
+
+                        if(enumerator == 1){
+                            showIPDialog(2);
+                        }
+
+                    }
+                });
+
+        builder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        dialog.dismiss();
+
+                        if(enumerator == 1){
+                            showIPDialog(2);
+                        }
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
+
+
+
+
     public MainFragment() {
         // Required empty public constructor
     }
@@ -135,6 +264,8 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         // maar lijst LEEG als BT uit staat!
         setPairedBTDevices = BTadapter.getBondedDevices();
 
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
     }
 
@@ -393,6 +524,8 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
         Button buttonConnectPebble = (Button) returnedView.findViewById(R.id.button_connect_pebble);
         buttonConnectPebble.setOnClickListener(this);
+        Button buttonConnectGeneric = (Button) returnedView.findViewById(R.id.button_connect_generic);
+        buttonConnectGeneric.setOnClickListener(this);
 
         ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
         toggleCommunicationTest.setOnClickListener(this);
@@ -563,6 +696,12 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
                     // STOP DATA LOGGING
                     stopPebbleDataLogging();
                 }
+
+                break;
+
+            case R.id.button_connect_generic:
+
+                showIPDialog(1);
 
                 break;
 

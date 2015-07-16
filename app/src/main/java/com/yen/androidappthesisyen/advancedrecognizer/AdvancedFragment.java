@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -1040,6 +1041,9 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         // TODO mag weg maar test of NIETS BREAKT.
 //        mSensorManager.registerListener(sensorListener, SensorManager.SENSOR_ACCELEROMETER, SensorManager.SENSOR_DELAY_FASTEST/*SensorManager.SENSOR_DELAY_GAME*/);
 
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
     }
 
     @Override
@@ -1154,8 +1158,37 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
 
+        // TODO ---------------------------------------------------------------------- goede locatie hier?
+        TextView statusText = (TextView) returnedView.findViewById(R.id.statusText);
+        setCorrectStateAndView(statusText);
+
+
 
         return returnedView;
+    }
+
+    private void setCorrectStateAndView(TextView statusText) {
+
+        Bundle bundle = this.getArguments();
+        String state = bundle.getString("state");
+        if(state.equalsIgnoreCase("learn")){
+            this.state = App.STATES.STATE_LEARN;
+        } else if(state.equalsIgnoreCase("recognize")){
+            this.state = App.STATES.STATE_RECOGNIZE;
+        } else if(state.equalsIgnoreCase("library")){
+            this.state = App.STATES.STATE_LIBRARY;
+        } else if(state.equalsIgnoreCase("default")){
+            // TODO iets doen?
+        }
+
+        stateChanged(statusText); // FYI: dit doet niets concreets als het state "library" is.
+
+        if(state.equalsIgnoreCase("library")){
+            // start library activity
+            Intent i = new Intent(getActivity(), DBManagerUIActivity.class);
+            startActivityForResult(i, 0);
+        }
+
     }
 
 
@@ -1207,8 +1240,9 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     }
 
 
-    public void stateChanged() {
-        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
+    // 16-07 PARAMETER GEBRUIKT IPV INITIALISATIE HIER.
+    public void stateChanged(TextView statusText) {
+//        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
 
         if (DEBUG) Log.w("stateChanged", "current State is: " + this.state.toString());
 
@@ -1259,8 +1293,11 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                 break;
 
             case STATE_LIBRARY:
+
                 break;
+
             default:
+
                 break;
         }
     }
@@ -1274,7 +1311,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         // change state and map to enum value
         this.state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.values()[resultCode];
         //update activity's state
-        this.stateChanged();
+        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
+        this.stateChanged(statusText);
     }
 
 
