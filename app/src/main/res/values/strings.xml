@@ -5,7 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="foobar">foobar</string>
 
-    <string name="pebble_not_connected">Pebble™ not connected: use Bluetooth toggle to retry connection. If this is a first-time installation, click the Connect Pebble™ button</string>
+    <string name="pebble_not_connected">Pebble™ not connected: use Bluetooth toggle to retry connection. \nIf this is a first-time installation, click the Connect Pebble™ button</string>
     <string name="pebble_connected">Pebble™ CONNECTED</string>
     <string name="acceldata_stream">Accel Data Stream</string>
     <string name="acceldata_datalogging">Accel Data DataLogging</string>
@@ -70,6 +70,9 @@
     <string name="label_tab_3">Train</string>
     <string name="label_tab_4">Recognize</string>
 
+
+
+
     <!-- voor PEBBLE DATA STREAM -->
     <string name="x_axis_title">x-axis</string>
     <string name="y_axis_title">y-axis</string>
@@ -92,7 +95,7 @@
     <string name="Button01_str">Hold to record gesture</string>
 
 
-    <string name="recognized_gestures">Recognized Gestures</string>
+    <string name="recognized_gestures">Recognized Gestures: \n</string>
     <string name="WiFi">Wi-Fi</string>
     <string name="label_insert_ip_address">Insert IP address</string>
 </resources>

@@ -145,6 +145,14 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         return outputMap;
     }
 
+    // STAAT OOK IN ADVANCEDFRAGMENT.JAVA DUS DAAR OOK AANPASSEN
+    private String getEnabledAccelStreamDevices() {
+
+        SharedPreferences enumSetting = getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+        String enabledList = enumSetting.getString("enabledaccelstreamdevices", "");
+        return enabledList;
+    }
+
 
     // DEFAULT:
 //    public MQTTService() {
@@ -303,6 +311,9 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     public void onCreate() {
         super.onCreate();
 
+        // Clear the list, in case it wasn't cleared completely like it should.
+        clearListStreamEnabledActionDevices();
+
         SharedPreferences enumSetting = getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
         int theEnum = enumSetting.getInt("enumerator", -1);
         this.enumeratorTotal = theEnum;
@@ -382,6 +393,18 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         Log.w(LOG_TAG, "enumeratorTotal op einde onCreate" + enumeratorTotal);
         for (int i = 0; i < enumeratorTotal; i++) {
             defineConnectionToBroker(i, listBrokerHostName.get(i));
+        }
+
+    }
+
+    private void clearListStreamEnabledActionDevices() {
+
+        SharedPreferences pSharedPref = getApplicationContext().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+        if (pSharedPref != null) {
+            SharedPreferences.Editor editor = pSharedPref.edit();
+            editor.remove("enabledaccelstreamdevices").commit();
+            editor.putString("enabledaccelstreamdevices", "");
+            editor.commit();
         }
 
     }
@@ -533,6 +556,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 if (isOnline()) {
                     // we think we have an Internet connection, so try to connect
                     //  to the message broker
+                    Log.w(LOG_TAG, "connectToBroker in HANDLESTART");
                     if (connectToBroker(i)) {
                         // we subscribe to a topic - registering to receive push
                         //  notifications with a particular key
@@ -724,6 +748,153 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
         Log.w(LOG_TAG, "------------------------- SERVICE DESTROYED");
     }
+
+
+    // STAAT OOK IN ADVANCEDFRAGMENT.JAVA DUS DAAR OOK AANPASSEN
+    // KEY = "accelstreamenabled" - VALUE = comma separated list of systemIDs where stream is currently enabled.
+    private void addNewAccelStreamState(String systemID, String stateRequest) {
+
+
+        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
+
+        String newConcatenatedString = "";
+
+
+
+        if(stateRequest.equalsIgnoreCase("enable")){
+
+
+            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+
+                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+                // adding new action device systemID
+                setEnabledActionDevices.add(systemID);
+                // recreate concatenated string from new set
+                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+
+            } else {
+
+                // TODO zien of niet met ";" direct moet.
+                newConcatenatedString = systemID;
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+            }
+
+
+
+        } else if (stateRequest.equalsIgnoreCase("disable")){
+
+
+            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+
+                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+                // removing action device systemID
+                setEnabledActionDevices.remove(systemID);
+                // recreate concatenated string from new set
+                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+                // TODO ========= zeker zijn dat als set nu LEEG zou zijn, dat er geen problemen zijn, bv. dat er een ";" instaat en dat dat problemen zou geven.
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+
+            } else {
+
+                // TODO zien of niet met ";" direct moet.
+                newConcatenatedString = systemID;
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+            }
+
+
+
+        } else {
+            Log.w(LOG_TAG, "Wrong accel stream state request: not 'enable' or 'disable'");
+        }
+
+
+        SharedPreferences pSharedPref = getApplicationContext().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+        if (pSharedPref != null) {
+            SharedPreferences.Editor editor = pSharedPref.edit();
+            editor.remove("enabledaccelstreamdevices").commit();
+            editor.putString("enabledaccelstreamdevices", newConcatenatedString);
+            editor.commit();
+        }
+
+
+    }
+
+
+    // ----------- KOPIE OOK TE VINDEN IN ADVANCEDFRAGMENT.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
+    private void enableAccelStream(String systemID) {
+
+
+        /* OUDE CODE
+        // Only 1 system at a time can detect the user's face, so only 1 system can have the accel stream enabled. Hence we only allow space for 1 saved systemID.
+        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
+        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
+        accelStreamEditor.putString("enabledSystem", systemID);
+        accelStreamEditor.commit();
+        */
+
+
+        // NIEUW
+        String previousList = getEnabledAccelStreamDevices();
+        Log.w(LOG_TAG, "previousList " + previousList);
+
+        addNewAccelStreamState(systemID, "enable"); // List has now been updated.
+
+        if(previousList.equalsIgnoreCase("") || previousList.equalsIgnoreCase(";")){
+            // The previous list was empty. This means we deliberately need to send a signal to start the accel stream.
+
+            PebbleDictionary dict = new PebbleDictionary();
+            dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
+            PebbleKit.sendDataToPebble(getApplicationContext(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+
+        } else {
+            // The previous list was NOT empty. This means we don't need to send the signal to start the stream, since it's already running.
+
+        }
+
+
+    }
+
+    private void disableAccelStream(String systemID) {
+
+        /*
+//      OVERBODIG  mapSystemIDToIsAccelStreamEnabled.put(systemID, false);
+        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
+        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
+        accelStreamEditor.putString("enabledSystem", "none");
+        accelStreamEditor.commit();
+        */
+
+        // NIEUW
+        String previousList = getEnabledAccelStreamDevices();
+        Log.w(LOG_TAG, "previousList " + previousList);
+
+        addNewAccelStreamState(systemID, "disable"); // List has now been updated.
+
+        String newList = getEnabledAccelStreamDevices();
+        Log.w(LOG_TAG, "newList " + newList);
+
+        if(newList.equalsIgnoreCase("") || newList.equalsIgnoreCase(";")){
+            // The NEW list is empty. This means the just removed device was the only device where it was running. Stop the accel stream.
+
+            PebbleDictionary dict = new PebbleDictionary();
+            dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
+            PebbleKit.sendDataToPebble(getApplicationContext(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+
+        } else {
+            // The NEW list is NOT empty. This means we keep the accel stream alive. So we do nothing.
+        }
+
+
+    }
+
+
 
 
     /************************************************************************/
@@ -999,8 +1170,11 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             //   attempting to reconnect
             broadcastServiceStatus("Connection lost - reconnecting...");
 
+
+
             // try to reconnect
             for (int i = 0; i < enumeratorTotal; i++) {
+                Log.w(LOG_TAG, "connectToBroker in CONNECTIONLOST");
                 if (connectToBroker(i)) {
                     subscribeToTopic(i, topicNameAccelStream);
                     subscribeToTopic(i, topicNameGesturePusher);
@@ -1028,7 +1202,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
      *   callback - called when we receive a message from the server
      */
     public void publishArrived(String topic, byte[] payloadbytes, int qos, boolean retained) {
-
 
         // we protect against the phone switching off while we're doing this
         //  by requesting a wake lock - we request the minimum possible wake
@@ -1105,34 +1278,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         wl.release();
     }
 
-    // ----------- KOPIE OOK TE VINDEN IN THREEDOLLARGESTUREFRAGMENT.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
-    private void enableAccelStream(String systemID) {
 
-        // Only 1 system at a time can detect the user's face, so only 1 system can have the accel stream enabled. Hence we only allow space for 1 saved systemID.
-        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
-        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putString("enabledSystem", systemID);
-        accelStreamEditor.commit();
-
-        Log.w(LOG_TAG, "------------------------- arrived in enableAccelStream");
-
-        PebbleDictionary dict = new PebbleDictionary();
-        dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
-        PebbleKit.sendDataToPebble(getApplicationContext(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
-    }
-
-    private void disableAccelStream(String systemID) {
-
-//      OVERBODIG  mapSystemIDToIsAccelStreamEnabled.put(systemID, false);
-        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
-        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putString("enabledSystem", "none");
-        accelStreamEditor.commit();
-
-        PebbleDictionary dict = new PebbleDictionary();
-        dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
-        PebbleKit.sendDataToPebble(getApplicationContext(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
-    }
 
     /************************************************************************/
     /*    METHODS - wrappers for some of the MQTT methods that we use       */
@@ -1578,7 +1724,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 // we have an internet connection - have another try at connecting
 
                 if (enumerator != -1) {
-
+                    Log.w(LOG_TAG, "connectToBroker in ONRECEIVE in class NetworkConnectionIntentReceiver");
                     if (connectToBroker(enumerator)) {
                         // we subscribe to a topic - registering to receive push
                         //  notifications with a particular key
@@ -1660,6 +1806,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
      *  a PING message to the server, then schedules another ping after an
      *  interval defined by keepAliveSeconds
      */
+
     public class PingSender extends BroadcastReceiver {
 
 
@@ -1684,6 +1831,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
                 try {
 
+
                     listMQTTClient.get(enumerator).ping();
 
                 } catch (MqttException e) {
@@ -1699,6 +1847,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                     }
 
                     // reconnect
+                    Log.w(LOG_TAG, "connectToBroker in ONRECEIVE van class PingSender");
                     if (connectToBroker(enumerator)) {
                         subscribeToTopic(enumerator, topicNameAccelStream);
                         subscribeToTopic(enumerator, topicNameGesturePusher);
@@ -1748,6 +1897,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
         }
     }
+
 
 
     /************************************************************************/

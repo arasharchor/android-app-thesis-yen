@@ -60,6 +60,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -251,7 +252,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         Float dataZ = values[2];
 
         //	Context c = getApplicationContext();
-
 
 
         // TODO mag weg:
@@ -624,8 +624,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                         });
 
 
-
-
                         // TODO "  && !detected_gid.equalsIgnoreCase("not recognized!") " ook in IF steken?
                         // of dat net niet om te zien wann er NOG GEEN GESTURES in DB zitten?
                         // maar dat wrsl op betere manier tonen dan via dialog na uitvoeren gebaar?
@@ -674,123 +672,188 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
     }
 
+
     public void sendGestureIfMatchFound(final String recognizedGesture) {
 
         Log.w(LOG_TAG, "START of sendGestureIfMatchFound - GESTURE " + recognizedGesture);
 
-        // Check for which system the accel data stream is currently running. This should always be only 1 system at a time because the user's face can only get detected by 1 system at the time.
+        final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_gestures);
+
+
+        // Check for which action devices the accel stream is currently running.
+
+        /* OUD
         SharedPreferences systemIDsettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
         String enabledSystem = systemIDsettings.getString("enabledSystem", "none");
         Log.w(LOG_TAG, "enabledSystem " + enabledSystem);
+        */
 
-        // Get the list of systems which support the recognized gesture.
-        Map<String, String> savedMap = getMapSupportedGestures();
-        ArrayList<String> supportedSystems = new ArrayList<String>();
 
-        for (Map.Entry<String, String> entry : savedMap.entrySet()) {
-            String key = entry.getKey(); // key = systemID
-            String value = entry.getValue(); // value = supported gestures
-            String[] arrayGestures = value.split(";");
+        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
 
-            for (String gesture : arrayGestures) {
-                if (gesture.equalsIgnoreCase(recognizedGesture)) {
-                    supportedSystems.add(key);
+        if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+
+            // Get set of action devices where accel stream is running.
+            String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+            Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+
+
+            // Get list of action devices which support the recognized gesture.
+            Map<String, String> savedMap = getMapSupportedGestures();
+            ArrayList<String> supportedSystems = new ArrayList<String>();
+
+
+            for (Map.Entry<String, String> entry : savedMap.entrySet()) {
+                String key = entry.getKey(); // key = systemID
+                String value = entry.getValue(); // value = supported gestures
+                String[] arrayGestures = value.split(";");
+
+                for (String gesture : arrayGestures) {
+                    if (gesture.equalsIgnoreCase(recognizedGesture)) {
+                        supportedSystems.add(key);
+                    }
                 }
             }
-        }
 
 
-        Boolean isMatchFound = false;
-        if (supportedSystems.contains(enabledSystem)) {
-            isMatchFound = true;
-        }
-        Log.w(LOG_TAG, "isMatchFound " + isMatchFound);
+            // Do cross check of action devices which accel stream is running and that support the gesture.
 
 
-        if (isMatchFound) {
+            List<String> listActionDevicesToSendTo = new ArrayList<>();
+            Log.w(LOG_TAG, "=================================== listActionDevicesToSendTo.size() " + listActionDevicesToSendTo.size());
 
-
-            // Sending feedback to the user:
-            // If a gesture detected + supported by the currently used system: do 1x short vibration.
-            // This detected gesture can still be a false positive, though.
-            doShortPebbleVibration();
-
-
-            // ---- START EIGEN TOEVOEGING
-            // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
-            // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
-
-
-            ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
-
-                // fetch data
-
-                // TODO je moet op basis van de systemID de overeenkomstige enumerator weten, zodat je hier de enumerator kunt concateren.
-                // momenteel hardcodeer je nog de link tussen de systemID (tot nu toe enkel yen-asus en yen-medion) naar de enumerators (tot nu toe enkel 1 en 2)
-                // OFWEL direct een mapping tussen systemID en IP adres gesture handler opslaan, maar WRSL BEST MET ENUMERATOR WERKEN OMDAT JE OVERAL IN JE SHAREDPREF ZO WERKT!
-                SharedPreferences gestureHandlersettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
-                String IPAddress = "192.168.1.1";
-                if (enabledSystem.equalsIgnoreCase("yen-asus")) {
-                    // TODO momenteel nog hardgecodeerde mapping yen-asus naar enum 1
-                    IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
-                } else if (enabledSystem.equalsIgnoreCase("yen-medion")) {
-                    // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
-                    IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
-                } else {
-                    Log.w("pushnotificationlistener", "SystemID unknown so no mapped IP address for Gesture Handler found");
+            for (String accelStreamRunningActionDevice : setEnabledActionDevices) {
+                if (supportedSystems.contains(accelStreamRunningActionDevice)) {
+                    listActionDevicesToSendTo.add(accelStreamRunningActionDevice);
                 }
+            }
 
 
-                Log.w(LOG_TAG, "saved IP is " + IPAddress);
-
-                // TODO met of zonder slash?
-                final String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
-                // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
+            if (listActionDevicesToSendTo.size() >= 1) {
 
 
-                // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
+                // Sending feedback to the user:
+                // If a gesture detected + supported by at least one of the currently used action devices: do 1x short vibration.
+                // This detected gesture can still be a false positive, though.
+                doShortPebbleVibration();
+
+
+                // ---- START EIGEN TOEVOEGING
+                // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
+                // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
+
+
+                ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                if (networkInfo != null && networkInfo.isConnected()) {
+
+                    // fetch data
+
+                    // TODO je moet op basis van de systemID de overeenkomstige enumerator weten, zodat je hier de enumerator kunt concateren.
+                    // momenteel hardcodeer je nog de link tussen de systemID (tot nu toe enkel yen-asus en yen-medion) naar de enumerators (tot nu toe enkel 1 en 2)
+                    // OFWEL direct een mapping tussen systemID en IP adres gesture handler opslaan, maar WRSL BEST MET ENUMERATOR WERKEN OMDAT JE OVERAL IN JE SHAREDPREF ZO WERKT!
+                    SharedPreferences gestureHandlersettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
+
+                    for (String actionDeviceToSendTo : listActionDevicesToSendTo) {
+
+                        String IPAddress = "192.168.1.1";
+                        if (actionDeviceToSendTo.equalsIgnoreCase("yen-asus")) {
+                            // TODO momenteel nog hardgecodeerde mapping yen-asus naar enum 1
+                            IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                        } else if (actionDeviceToSendTo.equalsIgnoreCase("yen-medion")) {
+                            // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
+                            IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                        } else {
+                            Log.w("pushnotificationlistener", "SystemID unknown so no mapped IP address for Gesture Handler found");
+                        }
+
+
+                        Log.w(LOG_TAG, "saved IP is " + IPAddress);
+
+                        // TODO met of zonder slash?
+                        final String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
+                        // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
+
+
+                        // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
 //                            new AsyncPOSTGestureToServer().execute(stringURL, gid);
 
 
-                // Network actions not allowed on main thread (= UI thread) so starting a new thread.
-                Thread t = new Thread() {
-                    public void run() {
+                        // Network actions not allowed on main thread (= UI thread) so starting a new thread.
+                        Thread t = new Thread() {
+                            public void run() {
 
-                        // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
-                        // UPDATE: EIGEN CODE WERKT NU :D
-                        int httpResult = POSTGestureToServer(stringURL, recognizedGesture);
+                                // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
+                                // UPDATE: EIGEN CODE WERKT NU :D
+                                int httpResult = POSTGestureToServer(stringURL, recognizedGesture);
 
-                    }
-                };
-                t.start();
+                            }
+                        };
+                        t.start();
 
 
-
-                // DIT DUS NIET MEER NODIG:
+                        // DIT DUS NIET MEER NODIG:
 //                            nieuweTestcode(stringURL, gid);
 
+                    }
+
+
+                } else {
+                    // Arriving here if no internet connection.
+                    // TODO iets doen: bv. melden aan user of zelfs direct terug IP insert dialog tonen!
+                    // MAAR stel dat er internet is, maar een broker is niet meer verbonden, wordt dat hier niet ontdekt dus moet dat ook ontdekken!
+                    doTwoShortPebbleVibrations();
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            outputWindow.append("No internet connection\n");
+                            ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                        }
+                    });
+
+                    Log.w(LOG_TAG, "No internet connection");
+                }
+
+
+                // ---- STOP EIGEN TOEVOEGING
 
 
             } else {
-                // Arriving here if no internet connection.
+                // Do nothing.
+                doTwoShortPebbleVibrations();
 
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        outputWindow.append("No cross match found\n");
+                        ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                    }
+                });
+
+                Log.w(LOG_TAG, "No cross match found");
             }
 
 
-            // ---- STOP EIGEN TOEVOEGING
-
-
         } else {
-            // Do nothing.
+            // The accel stream isn't running. This means we don't need to do any processing.
+            doTwoShortPebbleVibrations();
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    outputWindow.append("Accel stream not running\n");
+                    ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                }
+            });
+
+            Log.w(LOG_TAG, "Accel stream not running");
         }
 
 
         Log.w(LOG_TAG, "END of sendGestureIfMatchFound");
 
     }
-
 
 
     private void doShortPebbleVibration() {
@@ -800,14 +863,11 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     }
 
 
-
     private void doTwoShortPebbleVibrations() {
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(4, 0);
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
     }
-
-
 
 
     // TODO mag weg want nooit gebruikt of?
@@ -867,8 +927,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
     private int POSTGestureToServer(String stringURL, String stringGesture) {
-
-
 
 
         HttpURLConnection httpcon = null;
@@ -1013,8 +1071,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         // create gesture library
 
 
-
-
         // see if we have a gesture library
         // TODO eventueel deze if binnen de try/catch zetten indien nodig.
         if (GestureLibrary.GLibrarySingleInstance == null) {
@@ -1038,8 +1094,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         }
 
 
-
-
         myGestureRecognizer = new gesturerec3d(myGestureLibrary, 50);
 
         /**
@@ -1052,7 +1106,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
          */
         // TODO finetuning
         theTiltGestureRecognizer = new TiltGestureRecognizer(this, 700, 1000, PebbleGestureModel.MODE_TILT);
-
 
 
         // TODO mag weg maar test of NIETS BREAKT.
@@ -1085,11 +1138,11 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
                 if (toggleAccelStream.isChecked()) {
                     Log.w(LOG_TAG, "CALLING enableAccelStream");
-                    enableAccelStream();
+                    enableAccelStream("triggered-by-user");
 
                 } else {
                     Log.w(LOG_TAG, "CALLING disableAccelStream");
-                    disableAccelStream();
+                    disableAccelStream("triggered-by-user");
                 }
 
             }
@@ -1175,12 +1228,9 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         ((ScrollView) returnedView.findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
 
 
-
-
         // TODO ---------------------------------------------------------------------- goede locatie hier?
         TextView statusText = (TextView) returnedView.findViewById(R.id.statusText);
         setCorrectStateAndView(statusText);
-
 
 
         return returnedView;
@@ -1190,13 +1240,13 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
         Bundle bundle = this.getArguments();
         String state = bundle.getString("state");
-        if(state.equalsIgnoreCase("learn")){
+        if (state.equalsIgnoreCase("learn")) {
             this.state = App.STATES.STATE_LEARN;
-        } else if(state.equalsIgnoreCase("recognize")){
+        } else if (state.equalsIgnoreCase("recognize")) {
             this.state = App.STATES.STATE_RECOGNIZE;
-        } else if(state.equalsIgnoreCase("library")){
+        } else if (state.equalsIgnoreCase("library")) {
             this.state = App.STATES.STATE_LIBRARY;
-        } else if(state.equalsIgnoreCase("default")){
+        } else if (state.equalsIgnoreCase("default")) {
             // TODO iets doen?
         }
 
@@ -1213,8 +1263,10 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
     // ----------- KOPIE OOK TE VINDEN IN MQTTSERVICE.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
-    private void enableAccelStream() {
+    private void enableAccelStream(String systemID) {
 
+
+        /* OUD
         String systemID = "triggered-by-user";
         SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
         SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
@@ -1224,10 +1276,32 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+        */
+
+        // NIEUW
+        String previousList = getEnabledAccelStreamDevices();
+        Log.w(LOG_TAG, "previousList " + previousList);
+
+        addNewAccelStreamState(systemID, "enable"); // List has now been updated.
+
+        if (previousList.equalsIgnoreCase("") || previousList.equalsIgnoreCase(";")) {
+            // The previous list was empty. This means we deliberately need to send a signal to start the accel stream.
+
+            PebbleDictionary dict = new PebbleDictionary();
+            dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
+            PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+
+        } else {
+            // The previous list was NOT empty. This means we don't need to send the signal to start the stream, since it's already running.
+
+        }
+
     }
 
-    private void disableAccelStream() {
+    // ----------- KOPIE OOK TE VINDEN IN MQTTSERVICE.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
+    private void disableAccelStream(String systemID) {
 
+        /* OUD
         String systemID = "triggered-by-user";
         SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
         SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
@@ -1237,6 +1311,109 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+        */
+
+        // NIEUW
+        String previousList = getEnabledAccelStreamDevices();
+        Log.w(LOG_TAG, "previousList " + previousList);
+
+        addNewAccelStreamState(systemID, "disable"); // List has now been updated.
+
+        String newList = getEnabledAccelStreamDevices();
+        Log.w(LOG_TAG, "newList " + newList);
+
+        if (newList.equalsIgnoreCase("") || newList.equalsIgnoreCase(";")) {
+            // The NEW list is empty. This means the just removed device was the only device where it was running. Stop the accel stream.
+
+            PebbleDictionary dict = new PebbleDictionary();
+            dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
+            PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+
+        } else {
+            // The NEW list is NOT empty. This means we keep the accel stream alive. So we do nothing.
+        }
+    }
+
+
+    // STAAT OOK IN MQTTSERVICE.JAVA DUS DAAR OOK AANPASSEN
+    private String getEnabledAccelStreamDevices() {
+
+        SharedPreferences enumSetting = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+        String enabledList = enumSetting.getString("enabledaccelstreamdevices", "");
+        return enabledList;
+    }
+
+    // STAAT OOK IN MQTTSERVICE.JAVA DUS DAAR OOK AANPASSEN
+    // KEY = "accelstreamenabled" - VALUE = comma separated list of systemIDs where stream is currently enabled.
+    private void addNewAccelStreamState(String systemID, String stateRequest) {
+
+
+        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
+
+        String newConcatenatedString = "";
+
+
+        if (stateRequest.equalsIgnoreCase("enable")) {
+
+
+            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+
+                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+                // adding new action device systemID
+                setEnabledActionDevices.add(systemID);
+                // recreate concatenated string from new set
+                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+
+            } else {
+
+                // TODO zien of niet met ";" direct moet.
+                newConcatenatedString = systemID;
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+            }
+
+
+        } else if (stateRequest.equalsIgnoreCase("disable")) {
+
+
+            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+
+                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+                // removing action device systemID
+                setEnabledActionDevices.remove(systemID);
+                // recreate concatenated string from new set
+                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+                // TODO ========= zeker zijn dat als set nu LEEG zou zijn, dat er geen problemen zijn, bv. dat er een ";" instaat en dat dat problemen zou geven.
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+
+            } else {
+
+                // TODO zien of niet met ";" direct moet.
+                newConcatenatedString = systemID;
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+            }
+
+
+        } else {
+            Log.w(LOG_TAG, "Wrong accel stream state request: not 'enable' or 'disable'");
+        }
+
+
+        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+        if (pSharedPref != null) {
+            SharedPreferences.Editor editor = pSharedPref.edit();
+            editor.remove("enabledaccelstreamdevices").commit();
+            editor.putString("enabledaccelstreamdevices", newConcatenatedString);
+            editor.commit();
+        }
+
+
     }
 
 
@@ -1397,11 +1574,10 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                     }
 
 
-
                     // We only allow tilt gesture detection in the RECOGNIZE PHASE. We don't need it in the LEARN PHASE since the system doesn't need to learn the up/down/left/right tilt gestures.
                     // Since there is no clear difference between different persons exercising these 4 gestures.
                     Boolean[] results = {false, false};
-                    if(state == App.STATES.STATE_RECOGNIZE){
+                    if (state == App.STATES.STATE_RECOGNIZE) {
 
                         // TILT GESTURE DETECTION
                         // TODO is testen met float[] ipv int[]. want andere recognizer past float toe.
@@ -1415,7 +1591,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                         results[0] = false;
                         results[1] = false;
                     }
-
 
 
                     // If NO tilt gesture was detected, we pass the accel data to the more advanced recognizer.
@@ -1449,8 +1624,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                         e.printStackTrace();
                     }
                     // ------ TEST - voor MOEILIJKERE gesture detection*/
-
-
 
 
                     //Show
