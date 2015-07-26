@@ -115,13 +115,13 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
         SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
-        String searchString = "ip_address_broker_" + enumerator;
+        String searchString = "ip_address_broker_" + (enumerator-1); // TODO FIX -1
         String savedBrokerIP = settings.getString(searchString, "None");
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Location of User Detector and Gesture Handler");
-        builder.setMessage("Insert the current IPv4 address for Action Device " + enumerator + ". Use saved location (" + savedBrokerIP + ") by inserting nothing.");
+        builder.setMessage("Insert the current IPv4 address for Action Device " + (enumerator-1) + ". Use saved location (" + savedBrokerIP + ") by leaving the field blank.");
 
         // TODO dit toepassen? WEL ALS WE BV. 2x EDITTEXT WENSEN ALS USER VERSCHILLENDE IPs ZOU KUNNEN INGEVEN.
 //        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -166,10 +166,15 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                     public void onClick(DialogInterface dialog, int arg1) {
                         // TODO is dit nodig? dialog.dismiss();
 
+
+
+
                         String value = String.valueOf(input.getText());
                         // TODO IP User Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
                         // Wordt verondersteld dat dit in toekomst ook zo is of niet?
                         saveIPIfInserted(enumerator, value);
+
+
 
                         TextView textViewGeneric = (TextView) getView().findViewById(R.id.textView_generic);
                         // TODO feitelijk moeten we EERST service starten, DIE ZEGT dan of de connecties allemaal goed zijn, EN DAN PAS LABELS AANPASSEN
@@ -177,7 +182,17 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
 
 
-                        startOrRestartService();
+                        /*
+                        SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
+                        editorUserDetector.putString("ip_address_broker_" + enumerator, value);
+                        // editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
+                        editorUserDetector.commit();
+                        */
+
+
+                        Log.w(LOG_TAG, "enumerator net voor starten service " + enumerator); // TODO enumerator-1 ?
+                        startOrRestartService(enumerator);
 
 
                     }
@@ -210,7 +225,9 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
     }
 
-    private void startOrRestartService() {
+    private void startOrRestartService(int enumerator) {
+
+        Log.w(LOG_TAG, "enum int begin " + enumerator);
 
         // deze IF logica mag wrsl weg.
         // if (enumerator == 2) {
@@ -223,6 +240,17 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         // STARTING THE SERVICE NOW THAT THE IP ADDRESS OF THE BROKER IS KNOWN
         // TODO getApplicationContext()is hier wrsl WEL OK want service best niet gelinkt aan een bepaalde activity?
         Intent svcNew = new Intent(getActivity().getApplicationContext(), MQTTService.class);
+
+        // TODO SYSTEEM VIA INTENTS LIJKT NIET TE WERKEN? DUS DOEN NU MET SHAREDPREF
+        // want onCreate van service werd eerder aangeroepen dan handleStart ?
+        Log.w(LOG_TAG, "enum net voor putExtra " + enumerator);
+        svcNew.putExtra("enumerator", enumerator);
+
+        SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
+        editorUserDetector.putInt("enumerator", enumerator);
+        editorUserDetector.commit();
+
         getActivity().startService(svcNew);
         // }
 
@@ -244,14 +272,14 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
             // TODO SERVICE MOET NU GEHERSTART WORDEN - OF BEDENK ANDERE WERKWIJZE ZODAT SERVICE NOG NIET IS GESTART VOORALEER JUISTE IP IN SYSTEEM ZIT.
             SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
             SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
-            editorUserDetector.putString("ip_address_broker_" + enumerator, value);
+            editorUserDetector.putString("ip_address_broker_" + (enumerator-1), value); // Because here we still counted from 1 onwards. Not 0 onwards.
             // editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
             editorUserDetector.commit();
 
 
             SharedPreferences settingsGestureHandler = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
             SharedPreferences.Editor editorGestureHandler = settingsGestureHandler.edit();
-            editorGestureHandler.putString("ip_address_" + enumerator, value);
+            editorGestureHandler.putString("ip_address_" + (enumerator-1), value); // Because here we still counted from 1 onwards. Not 0 onwards.
             editorGestureHandler.commit();
         }
 
@@ -620,13 +648,13 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
         TextView textViewPebble = (TextView) returnedView.findViewById(R.id.textView_pebble);
         TextView textViewGeneric = (TextView) returnedView.findViewById(R.id.textView_generic);
         if (isFound) {
-            textViewPebble.setText(getResources().getString(R.string.pebble_found));
-            bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_found));
+            textViewPebble.setText(getResources().getString(R.string.pebble_connected));
+            bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_connected));
             textViewGeneric.setText(getResources().getString(R.string.generic_connected));
             bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
         } else {
-            textViewPebble.setText(getResources().getString(R.string.pebble_not_found));
-            bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_not_found));
+            textViewPebble.setText(getResources().getString(R.string.pebble_not_connected));
+            bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_not_connected));
             textViewGeneric.setText(getResources().getString(R.string.generic_not_connected));
             bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
         }
