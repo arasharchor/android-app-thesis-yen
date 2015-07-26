@@ -9,12 +9,12 @@
     <string name="pebble_found">Pebble™ found!</string>
     <string name="acceldata_stream">Accel Data Stream</string>
     <string name="acceldata_datalogging">Accel Data DataLogging</string>
-    <string name="generic_not_found">Action Device (user detector + gesture handler) not found</string>
-    <string name="generic_found">Action Device (user detector + gesture handler) found!</string>
-    <string name="generic_toggle">Action Device toggle</string>
+    <string name="generic_not_connected">Action Device(s) (user detector + gesture handler) not connected</string>
+    <string name="generic_connected">Action Device(s) (user detector + gesture handler) CONNECTED</string>
+    <string name="generic_toggle">Action Device(s) toggle</string>
     <string name="label_toggle_2">Toggle 2</string>
     <string name="label_toggle_3">Toggle 3</string>
-    <string name="label_generic_sensor_streaming">Action Device (user detector + gesture handler) sensor streaming</string>
+    <string name="label_generic_sensor_streaming">Action Device(s) sensor streaming</string>
 
     <string name="title_masterdetailitem_list">MasterDetailItems</string>
     <string name="title_masterdetailitem_detail">MasterDetailItem Detail</string>
@@ -50,7 +50,7 @@
     <string name="stop_pebble_data_logging">STOP PEBBLE™ DATA LOGGING</string>
     <string name="sending_data_log_finished">Sending data log FINISHED</string>
     <string name="icon_content_description">Mobile Device</string>
-    <string name="connect_generic">Connect Action Device</string>
+    <string name="connect_generic">Connect Action Device(s)</string>
     <string name="BT">Bluetooth</string>
     <string name="toggle_BT">Bluetooth toggle</string>
     <string name="start_BT">Enabled Bluetooth</string>

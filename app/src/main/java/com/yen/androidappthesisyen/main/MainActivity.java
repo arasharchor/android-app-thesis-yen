@@ -19,6 +19,7 @@ import android.view.WindowManager;
 
 import com.yen.androidappthesisyen.R;
 import com.yen.androidappthesisyen.advancedrecognizer.AdvancedFragment;
+import com.yen.androidappthesisyen.gesturelibrary.GestureListFragment;
 import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 
 
@@ -56,6 +57,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         }
 
     }
+
 
     private void switchToMainFragment() {
 
@@ -116,7 +118,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             bundle.putString("state", "learn");
         } else if(requestedState.equalsIgnoreCase("recognize")){
             bundle.putString("state", "recognize");
-        } else if(requestedState.equalsIgnoreCase("library")){
+        } else if(requestedState.equalsIgnoreCase("library")){ // TODO dit mag weg want komt toch nooit voor hier?
             bundle.putString("state", "library");
         } else {
             // JA wel zetten want nu bij getString GEEN default waarde systeem (vereiste API groter dan 21)
@@ -449,7 +451,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
             case R.id.action_button_2:
 
-                switchToAdvancedRecognizerFragment("library");
+                switchToGestureLibraryFragment();
 
                 /*showHomeUp = !showHomeUp;
                 item.setChecked(showHomeUp);
@@ -495,7 +497,27 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     }
 
+    private void switchToGestureLibraryFragment() {
 
+        // Create new fragment and transaction
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        Fragment fragment = new GestureListFragment();
+        // Nu GEEN BUNDLE NODIG MET STATE want het STATE systeem geldt enkel bij de learn/recognize/library state omdat die dezelfde "ouderfragment" hebben die telkens wordt aangepast.
+        // De MainActivity en MainFragment EN GestureListFragment hebben hier niets mee te zien.
+
+        // Replace whatever is in the fragment_container view with this fragment,
+// and add the transaction to the back stack if needed
+        transaction.replace(R.id.framelayout_container_main_activity, fragment);
+        /*Note: When you remove or replace a fragment and add the transaction to the back stack, the fragment that is removed is stopped (not destroyed). If the user navigates back to restore the fragment, it restarts. If you do not add the transaction to the back stack, then the fragment is destroyed when removed or replaced. To allow the user to navigate backward
+        through the fragment transactions, you must call addToBackStack() before you commit the FragmentTransaction.*/
+//        http://sapandiwakar.in/replacing-fragments/
+        transaction.addToBackStack(null);
+
+// Commit the transaction
+        transaction.commit();
+
+    }
 
 
     // OLD CODE: fragment is now standalone instead of line.

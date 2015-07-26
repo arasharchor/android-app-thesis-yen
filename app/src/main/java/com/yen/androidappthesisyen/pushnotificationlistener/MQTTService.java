@@ -58,6 +58,8 @@ import java.util.UUID;
 
 public class MQTTService extends Service implements MqttSimpleCallback {
 
+    private static final String LOG_TAG = MQTTService.class.getName();
+
 
     // TODO
 //    momenteel is de hashmap nog opgeslaan in het MQTTSERVICE OBJECT gewoon: bij orientatieaanpassing of HEROPSTART SERVICE zal het verdwijnen!
@@ -69,14 +71,14 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
         Map<String,String> savedMap = getMapSupportedGestures();
         if(savedMap == null){
-            Log.w("pushnotificationlistener", "SAVEDMAP IS NULL");
+            Log.w(LOG_TAG, "SAVEDMAP IS NULL");
         }
 
 
 
         String concatenatedGestures = savedMap.get(systemID);
 //        if(concatenatedGestures == null){
-//            Log.w("pushnotificationlistener", "concatenatedGestures IS NULL");
+//            Log.w(LOG_TAG, "concatenatedGestures IS NULL");
 //        }
 
         String newConcatenatedString = "";
@@ -90,14 +92,14 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             // recreate concatenated string from new set
             newConcatenatedString = TextUtils.join(";", setGestures);
 
-            Log.w("pushnotificationlistener", "newConcatenatedString " + newConcatenatedString);
+            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
 
         } else {
 
             // TODO zien of niet met ";" direct moet.
             newConcatenatedString = gestureToBeAdded;
 
-            Log.w("pushnotificationlistener", "newConcatenatedString " + newConcatenatedString);
+            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
         }
 
 
@@ -354,7 +356,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             }
         }, "MQTTservice").start();
 
-        Log.w("pushnotificationlistener", "------------------------- SERVICE WERD GESTART");
+        Log.w(LOG_TAG, "------------------------- SERVICE WERD GESTART");
 
 
         // return START_NOT_STICKY - we want this Service to be left running
@@ -430,7 +432,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             Notification notification = new Notification(R.drawable.logo_yen,
-                    "MQTT",
+                    "Commands Receiver",
                     System.currentTimeMillis());
             notification.flags |= Notification.FLAG_ONGOING_EVENT;
             notification.flags |= Notification.FLAG_NO_CLEAR;
@@ -438,7 +440,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                     notificationIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            notification.setLatestEventInfo(this, "MQTT", "MQTT Service is running", contentIntent);
+            notification.setLatestEventInfo(this, "Commands Receiver", "Commands Receiver is running", contentIntent);
             nm.notify(MQTT_NOTIFICATION_ONGOING, notification);
 
 
@@ -490,7 +492,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             Notification notification = new Notification(R.drawable.logo_yen,
-                    "MQTT",
+                    "Commands Receiver",
                     System.currentTimeMillis());
             notification.flags |= Notification.FLAG_ONGOING_EVENT;
             notification.flags |= Notification.FLAG_NO_CLEAR;
@@ -498,7 +500,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                     notificationIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            notification.setLatestEventInfo(this, "MQTT", "MQTT Service is running", contentIntent);
+            notification.setLatestEventInfo(this, "Commands Receiver", "Commands Receiver is running", contentIntent);
             nm.notify(MQTT_NOTIFICATION_ONGOING, notification);
 
 
@@ -547,6 +549,8 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             registerReceiver(netConnReceiver_1,
                     new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
+            Log.w(LOG_TAG, "NETCONRECEIVER 1 REGISTERED");
+
         }
 
         // ======================== voor BROKER 2
@@ -555,6 +559,8 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             netConnReceiver_2 = new NetworkConnectionIntentReceiver(2);
             registerReceiver(netConnReceiver_2,
                     new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+            Log.w(LOG_TAG, "NETCONRECEIVER 2 REGISTERED");
 
         }
 
@@ -604,7 +610,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             mBinder = null;
         }
 
-        Log.w("pushnotificationlistener", "------------------------- SERVICE DESTROYED");
+        Log.w(LOG_TAG, "------------------------- SERVICE DESTROYED");
     }
 
 
@@ -633,8 +639,8 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         //   (for times when it is running / active) so that it can be displayed
         //   in the app GUI
 
-        Log.w("pushnotificationlistener", "------------------------- TOPIC WAS " + topic);
-        Log.w("pushnotificationlistener", "------------------------- MESSAGE WAS " + message);
+        Log.w(LOG_TAG, "------------------------- TOPIC WAS " + topic);
+        Log.w(LOG_TAG, "------------------------- MESSAGE WAS " + message);
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(MQTT_MSG_RECEIVED_INTENT);
@@ -668,7 +674,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
 
     /************************************************************************/
-    /*    METHODS - binding that allows access from the Actitivy            */
+    /*    METHODS - binding that allows access from the Activity            */
     /**
      * ********************************************************************
      */
@@ -711,7 +717,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         } else if (enumerator == 2) {
             return connectionStatus_2;
         } else {
-            Log.w("pushnotificationlistener", "WRONG ENUM");
+            Log.w(LOG_TAG, "WRONG ENUM");
             return MQTTConnectionStatus.INITIAL;
         }
 
@@ -775,7 +781,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
         } else {
 
-            Log.w("pushnotificationlistener", "wrong enum");
+            Log.w(LOG_TAG, "wrong enum");
 
         }
 
@@ -822,14 +828,14 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         // have we lost our data connection?
         //
 
-        if (isOnline() == false) {
+        if (!isOnline()) {
 
 //            if(enumerator == 1){
             connectionStatus_1 = MQTTConnectionStatus.NOTCONNECTED_WAITINGFORINTERNET;
 //            } else if (enumerator == 2){
             connectionStatus_2 = MQTTConnectionStatus.NOTCONNECTED_WAITINGFORINTERNET;
 //            } else {
-//                Log.w("pushnotificationlistener", "wrong enum");
+//                Log.w(LOG_TAG, "wrong enum");
 //            }
 
 
@@ -840,7 +846,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             // inform the user (for times when the Activity UI isn't running)
             //   that we are no longer able to receive messages
             notifyUser("Connection lost - no network connection",
-                    "MQTT", "Connection lost - no network connection");
+                    "Commands Receiver", "Connection lost - no network connection");
 
             //
             // wait until the phone has a network connection again, when we
@@ -860,7 +866,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 //            } else if (enumerator == 2){
             connectionStatus_2 = MQTTConnectionStatus.NOTCONNECTED_UNKNOWNREASON;
 //            } else {
-//                Log.w("pushnotificationlistener", "wrong enum");
+//                Log.w(LOG_TAG, "wrong enum");
 //            }
 
             // inform the app that we are not connected any more, and are
@@ -879,7 +885,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 subscribeToTopic(2, topicNameGesturePusher);
             }
 //            } else {
-//                Log.w("pushnotificationlistener", "wrong enum");
+//                Log.w(LOG_TAG, "wrong enum");
 //            }
 
 
@@ -911,7 +917,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         //   strings - anything that can be sent as bytes is valid
         String messageBody = new String(payloadbytes);
 
-        Log.w("pushnotificationlistener", "------------------------- publishArrived !!! messageBody: " + messageBody);
+        Log.w(LOG_TAG, "------------------------- publishArrived !!! messageBody: " + messageBody);
 
 
         //
@@ -926,29 +932,29 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         // DIT IS GOED: WANT ALS DE STREAM AL BV. ENABLED WAS EN KREGEN TERUG ENABLED, MOETEN WE NIET DIRECT STARTEN HE WANT DE STREAM LIEP AL!
         String[] splitArray = messageBody.split(";");
         String systemID = splitArray[0]; // TODO ======= dus ergens toepassen?
-        Log.w("pushnotificationlistener", "============ SYSTEMID " + systemID);
+        Log.w(LOG_TAG, "============ SYSTEMID " + systemID);
         if (topic.equalsIgnoreCase("accelstream/state") && messageBody.endsWith("enable")) {
             enableAccelStream(systemID);
         } else if (topic.equalsIgnoreCase("accelstream/state") && messageBody.endsWith("disable")) {
             disableAccelStream(systemID);
         } else if (topic.equalsIgnoreCase("gesturepusher/state") && messageBody.endsWith("enable")) {
             // TODO dit ook in map opslaan? of is gans deze enable en disable bij gesturepusher OVERBODIG?
-            Log.w("pushnotificationlistener", "======================== kreeg TOPIC gesturepusher/state en MESSAGE enable ========================");
+            Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/state en MESSAGE enable ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/state") && messageBody.endsWith("disable")) {
             // TODO dit ook in map opslaan? of is gans deze enable en disable bij gesturepusher OVERBODIG?
-            Log.w("pushnotificationlistener", "======================== kreeg TOPIC gesturepusher/state en MESSAGE disable ========================");
+            Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/state en MESSAGE disable ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("up")) {
             addSupportedGesture(systemID, "up");
-            Log.w("pushnotificationlistener", "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE up ========================");
+            Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE up ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("down")) {
             addSupportedGesture(systemID, "down");
-            Log.w("pushnotificationlistener", "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE down ========================");
+            Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE down ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("left")) {
             addSupportedGesture(systemID, "left");
-            Log.w("pushnotificationlistener", "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE left ========================");
+            Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE left ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("right")) {
             addSupportedGesture(systemID, "right");
-            Log.w("pushnotificationlistener", "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE right ========================");
+            Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE right ========================");
         }
 
 
@@ -981,7 +987,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         accelStreamEditor.putString("enabledSystem", systemID);
         accelStreamEditor.commit();
 
-        Log.w("pushnotificationlistener", "------------------------- arrived in enableAccelStream");
+        Log.w(LOG_TAG, "------------------------- arrived in enableAccelStream");
 
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
@@ -1016,8 +1022,8 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         String mqttConnSpec = "tcp://" + brokerHostName + "@" + brokerPortNumber;
 
 
-        Log.w("pushnotificationlistener", "------------------------- brokerHostName " + enumerator + " " + brokerHostName);
-        Log.w("pushnotificationlistener", "------------------------- brokerPortNumber " + brokerPortNumber);
+        Log.w(LOG_TAG, "------------------------- brokerHostName " + enumerator + " " + brokerHostName);
+        Log.w(LOG_TAG, "------------------------- brokerPortNumber " + brokerPortNumber);
 
 
         if (enumerator == 1) {
@@ -1041,7 +1047,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 //
                 // inform the user (for times when the Activity UI isn't running)
                 //   that we failed to connect
-                notifyUser("Unable to connect", "MQTT", "Unable to connect");
+                notifyUser("Unable to connect", "Commands Receiver", "Unable to connect");
             }
 
         } else if (enumerator == 2) {
@@ -1065,11 +1071,11 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 //
                 // inform the user (for times when the Activity UI isn't running)
                 //   that we failed to connect
-                notifyUser("Unable to connect", "MQTT", "Unable to connect");
+                notifyUser("Unable to connect", "Commands Receiver", "Unable to connect");
             }
 
         } else {
-            Log.w("pushnotificationlistener", "FOUTE ENUMERATOR");
+            Log.w(LOG_TAG, "FOUTE ENUMERATOR");
         }
 
 
@@ -1081,7 +1087,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     private boolean connectToBroker(int enumerator) {
         try {
 
-            Log.w("pushnotificationlistener", "------------------------- TRYING TO CONNECT TO BROKER " + enumerator);
+            Log.w(LOG_TAG, "------------------------- TRYING TO CONNECT TO BROKER " + enumerator);
 
             // try to connect
             if (enumerator == 1) {
@@ -1102,7 +1108,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             }
 
 
-            Log.w("pushnotificationlistener", "------------------------- CONNECTION SUCCESS " + enumerator);
+            Log.w(LOG_TAG, "------------------------- CONNECTION SUCCESS " + enumerator);
 
             // we need to wake up the phone's CPU frequently enough so that the
             //  keep alive messages can be sent
@@ -1115,7 +1121,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         } catch (MqttException e) {
 
 
-            Log.w("pushnotificationlistener", "------------------------- CONNECTION FAILED " + enumerator);
+            Log.w(LOG_TAG, "------------------------- CONNECTION FAILED " + enumerator);
 
 
             // something went wrong!
@@ -1133,7 +1139,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
             // inform the user (for times when the Activity UI isn't running)
             //   that we failed to connect
-            notifyUser("Unable to connect", "MQTT", "Unable to connect - will retry later");
+            notifyUser("Unable to connect", "Commands Receiver", "Unable to connect - will retry later");
 
             // if something has failed, we wait for one keep-alive period before
             //   trying again
@@ -1156,7 +1162,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
      */
     private void subscribeToTopic(int enumerator, String topicName) {
 
-        Log.w("pushnotificationlistener", "------------------------- SUBSCRIBE TO TOPIC: " + topicName);
+        Log.w(LOG_TAG, "------------------------- SUBSCRIBE TO TOPIC: " + topicName);
 
         boolean subscribed = false;
 
@@ -1164,7 +1170,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             // quick sanity check - don't try and subscribe if we
             //  don't have a connection
 
-            Log.e("pushnotificationlistener", "Unable to subscribe as we are not connected");
+            Log.e(LOG_TAG, "Unable to subscribe as we are not connected");
 
         } else {
 
@@ -1177,17 +1183,17 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 } else if (enumerator == 2) {
                     mqttClient_2.subscribe(topics, qualitiesOfService);
                 } else {
-                    Log.w("pushnotificationlistener", "foute enumerator");
+                    Log.w(LOG_TAG, "foute enumerator");
                 }
 
                 subscribed = true;
 
             } catch (MqttNotConnectedException e) {
-                Log.e("pushnotificationlistener", "subscribe failed - MQTT not connected", e);
+                Log.e(LOG_TAG, "subscribe failed - MQTT not connected", e);
             } catch (IllegalArgumentException e) {
-                Log.e("pushnotificationlistener", "subscribe failed - illegal argument", e);
+                Log.e(LOG_TAG, "subscribe failed - illegal argument", e);
             } catch (MqttException e) {
-                Log.e("pushnotificationlistener", "subscribe failed - MQTT exception", e);
+                Log.e(LOG_TAG, "subscribe failed - MQTT exception", e);
             }
         }
 
@@ -1199,7 +1205,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
             //
             // inform the user (for times when the Activity UI isn't running)
-            notifyUser("Unable to subscribe", "MQTT", "Unable to subscribe");
+            notifyUser("Unable to subscribe", "Commands Receiver", "Unable to subscribe");
         }
     }
 
@@ -1220,13 +1226,13 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 }
 
                 if (pingSender_1 != null) {
-                    unregisterReceiver(netConnReceiver_1);
-                    netConnReceiver_1 = null;
+                    unregisterReceiver(pingSender_1);
+                    pingSender_1 = null;
                 }
 
             } catch (Exception eee) {
                 // probably because we hadn't registered it
-                Log.e("pushnotificationlistener", "unregister failed", eee);
+                Log.e(LOG_TAG, "unregister failed", eee);
             }
 
         } else if (enumerator == 2) {
@@ -1239,17 +1245,17 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 }
 
                 if (pingSender_2 != null) {
-                    unregisterReceiver(netConnReceiver_2);
-                    netConnReceiver_2 = null;
+                    unregisterReceiver(pingSender_2);
+                    pingSender_2 = null;
                 }
 
             } catch (Exception eee) {
                 // probably because we hadn't registered it
-                Log.e("pushnotificationlistener", "unregister failed", eee);
+                Log.e(LOG_TAG, "unregister failed", eee);
             }
 
         } else {
-            Log.w("pushnotificationlistener", "wrong enum");
+            Log.w(LOG_TAG, "wrong enum");
         }
 
 
@@ -1260,7 +1266,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                     mqttClient_1.disconnect();
                 }
             } catch (MqttPersistenceException e) {
-                Log.e("pushnotificationlistener", "disconnect failed - persistence exception", e);
+                Log.e(LOG_TAG, "disconnect failed - persistence exception", e);
             } finally {
                 mqttClient_1 = null;
             }
@@ -1272,13 +1278,13 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                     mqttClient_2.disconnect();
                 }
             } catch (MqttPersistenceException e) {
-                Log.e("pushnotificationlistener", "disconnect failed - persistence exception", e);
+                Log.e(LOG_TAG, "disconnect failed - persistence exception", e);
             } finally {
                 mqttClient_2 = null;
             }
 
         } else {
-            Log.w("pushnotificationlistener", "wrong enum");
+            Log.w(LOG_TAG, "wrong enum");
         }
 
 
@@ -1299,7 +1305,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         } else if (enumerator == 2) {
             return ((mqttClient_2 != null) && (mqttClient_2.isConnected() == true));
         } else {
-            Log.w("pushnotificationlistener", "wrong enum");
+            Log.w(LOG_TAG, "wrong enum");
             return false;
         }
 
@@ -1333,7 +1339,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 } else if (enumerator == 2) {
                     defineConnectionToBroker(2, brokerHostName_2);
                 } else {
-                    Log.w("pushnotificationlistener", "wrong enum");
+                    Log.w(LOG_TAG, "wrong enum");
                 }
 
                 // TODO HIER NOG DE 2DE REGEL OF TOTALE OMRINGENDE CODE COPYPASTEN.
@@ -1347,7 +1353,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 } else if (enumerator == 2) {
                     connectionStatus_2 = MQTTConnectionStatus.NOTCONNECTED_DATADISABLED;
                 } else {
-                    Log.w("pushnotificationlistener", "wrong enum");
+                    Log.w(LOG_TAG, "wrong enum");
                 }
 
                 // update the app to show that the connection has been disabled
@@ -1359,7 +1365,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 } else if (enumerator == 2) {
                     disconnectFromBroker(2);
                 } else {
-                    Log.w("pushnotificationlistener", "wrong enum");
+                    Log.w(LOG_TAG, "wrong enum");
                 }
 
             }
@@ -1416,7 +1422,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
                 } else {
 
-                    Log.w("pushnotificationlistener", "wrong enum");
+                    Log.w(LOG_TAG, "wrong enum");
 
                 }
 
@@ -1504,13 +1510,13 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 } catch (MqttException e) {
                     // if something goes wrong, it should result in connectionLost
                     //  being called, so we will handle it there
-                    Log.e("pushnotificationlistener", "ping failed - MQTT exception", e);
+                    Log.e(LOG_TAG, "ping failed - MQTT exception", e);
 
                     // assume the client connection is broken - trash it
                     try {
                         mqttClient_1.disconnect();
                     } catch (MqttPersistenceException e1) {
-                        Log.e("pushnotificationlistener", "disconnect failed - persistence exception", e1);
+                        Log.e(LOG_TAG, "disconnect failed - persistence exception", e1);
                     }
 
                     // reconnect
@@ -1529,14 +1535,14 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 } catch (MqttException e) {
                     // if something goes wrong, it should result in connectionLost
                     //  being called, so we will handle it there
-                    // TODO ff uitgezet of aanlaten? Log.e("pushnotificationlistener", "ping failed - MQTT exception", e);
+                    // TODO ff uitgezet of aanlaten? Log.e(LOG_TAG, "ping failed - MQTT exception", e);
 
                     // assume the client connection is broken - trash it
 
                     try {
                         mqttClient_2.disconnect();
                     } catch (MqttPersistenceException e1) {
-                        // TODO ff uitgezet of aanlaten? Log.e("pushnotificationlistener", "disconnect failed - persistence exception", e1);
+                        // TODO ff uitgezet of aanlaten? Log.e(LOG_TAG, "disconnect failed - persistence exception", e1);
                     }
 
                     // reconnect
@@ -1548,7 +1554,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
             } else {
 
-                Log.w("pushnotificationlistener", "wrong enum");
+                Log.w(LOG_TAG, "wrong enum");
 
             }
 

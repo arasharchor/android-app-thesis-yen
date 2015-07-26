@@ -30,7 +30,6 @@ import android.widget.ToggleButton;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.yen.androidappthesisyen.R;
-import com.yen.androidappthesisyen.advancedrecognizer.App;
 import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 
 import java.util.ArrayList;
@@ -102,8 +101,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     private List<String> arrayListNamesPairedBTDevices;
 
 
-
-
     // TODO verzet wat naar beneden.
     private void showIPDialog(final int enumerator) {
         // 16-07 Tot nu toe enkel 1 en 2 gebruikt als parameter "enumerator".
@@ -117,14 +114,20 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 //            showIPDialog(2);
 
 
+        SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
+        String searchString = "ip_address_broker_" + enumerator;
+        String savedBrokerIP = settings.getString(searchString, "None");
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Location of User Detector and Gesture Handler");
-        builder.setMessage("Insert the current IPv4 address " + enumerator);
+        builder.setMessage("Insert the current IPv4 address for Action Device " + enumerator + ". Use saved location (" + savedBrokerIP + ") by inserting nothing.");
 
         // TODO dit toepassen? WEL ALS WE BV. 2x EDITTEXT WENSEN ALS USER VERSCHILLENDE IPs ZOU KUNNEN INGEVEN.
 //        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 //        View view = inflater.inflate(R.layout.alert, null);
 //        final EditText ipfield = (EditText) view.findViewById(R.id.ipfield);
+
 
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER);
@@ -134,66 +137,48 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         builder.setView(input);
 
 
-        builder.setPositiveButton("Save",
+        builder.setPositiveButton("Insert next",
                 new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
 
-                        // TODO IP User Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
-                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+
+
 
                         String value = String.valueOf(input.getText());
-
-                        // !! Patterns.IP_ADDRESS only applies to IPv4, so it's misleading.
-                        // http://blog.danlew.net/2014/05/22/why-i-dont-use-patterns/
-                        // TODO bedenken hoe IPv6 ook kan ondersteund worden? WRSL VIA CHECKBOX dat user kan aanvinken en afhankelijk daarvan wordt andere matcher gekozen.
-                        // dus google op "android verify ipv6" ofzo
-                        Matcher matcher = Patterns.IP_ADDRESS.matcher(value);
-
-                        if(matcher.matches()){
-                            // Only when the value is not empty, the value gets saved.
-
-                            // TODO SERVICE MOET NU GEHERSTART WORDEN - OF BEDENK ANDERE WERKWIJZE ZODAT SERVICE NOG NIET IS GESTART VOORALEER JUISTE IP IN SYSTEEM ZIT.
-                            SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
-                            editorUserDetector.putString("ip_address_broker_" + enumerator, value);
-                            // editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
-                            editorUserDetector.commit();
-                        }
+                        // TODO IP User Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
+                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+                        saveIPIfInserted(enumerator, value);
 
 
-
-                        // we gaan ENKEL herstarten als IP 1 en IP 2 werden ingevuld. Na invullen IP 2 (en niet al bij IP 1) wordt service geherstart.
-                        if(enumerator == 2){
-                            // TODO doen we dit in alle gevallen? of moet er soms NIET gestopt worden na klikken op "save" bij bepaalde values?
-                            // WE STOPPEN EERST DE SERVICE EN HERSTARTEN DAN. ZO KAN NIEUW IP DIRECT TOEGEPAST WORDEN :D
-                            Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
-                            getActivity().stopService(svcOld);
-
-                            // Dit BUITEN de IF lus: zelfs als er geen tekst werd ingevuld, wordt service gestart: die gebruikt dan het eerder opgeslagen IP.
-                            // STARTING THE SERVICE NOW THAT THE IP ADDRESS OF THE BROKER IS KNOWN
-                            // TODO getApplicationContext()is hier wrsl WEL OK want service best niet gelinkt aan een bepaalde activity?
-                            Intent svcNew = new Intent(getActivity().getApplicationContext(), MQTTService.class);
-                            getActivity().startService(svcNew);
-                        }
+                        showIPDialog(enumerator + 1);
 
 
+                    }
+                });
 
 
-                        if(matcher.matches()){
-                            SharedPreferences settingsGestureHandler = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editorGestureHandler = settingsGestureHandler.edit();
-                            editorGestureHandler.putString("ip_address_" + enumerator, value);
-                            editorGestureHandler.commit();
-                        }
+        builder.setNeutralButton("Done",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+                        // TODO is dit nodig? dialog.dismiss();
+
+                        String value = String.valueOf(input.getText());
+                        // TODO IP User Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
+                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+                        saveIPIfInserted(enumerator, value);
+
+                        TextView textViewGeneric = (TextView) getView().findViewById(R.id.textView_generic);
+                        // TODO feitelijk moeten we EERST service starten, DIE ZEGT dan of de connecties allemaal goed zijn, EN DAN PAS LABELS AANPASSEN
+                        textViewGeneric.setText(getResources().getString(R.string.generic_connected));
+                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
 
 
+                        startOrRestartService();
 
-
-                        if(enumerator == 1){
-                            showIPDialog(2);
-                        }
 
                     }
                 });
@@ -203,21 +188,74 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
-                        dialog.dismiss();
+                        // TODO nodig? dialog.dismiss();
 
-                        if(enumerator == 1){
-                            showIPDialog(2);
-                        }
+
+                        TextView textViewGeneric = (TextView) getView().findViewById(R.id.textView_generic);
+                        textViewGeneric.setText(getResources().getString(R.string.generic_not_connected));
+                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
+
+
+                        // TODO We stoppen service in het geval die draaide.
+                        // OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
+                        Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
+                        getActivity().stopService(svcOld);
+
                     }
                 });
 
         AlertDialog dialog = builder.create();
         dialog.show();
+
+
     }
 
+    private void startOrRestartService() {
+
+        // deze IF logica mag wrsl weg.
+        // if (enumerator == 2) {
+        // TODO doen we dit in alle gevallen? of moet er soms NIET gestopt worden na klikken op "save" bij bepaalde values?
+        // WE STOPPEN EERST DE SERVICE EN HERSTARTEN DAN. ZO KAN NIEUW IP DIRECT TOEGEPAST WORDEN :D
+        Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
+        getActivity().stopService(svcOld);
+
+        // Dit BUITEN de IF lus: zelfs als er geen tekst werd ingevuld, wordt service gestart: die gebruikt dan het eerder opgeslagen IP.
+        // STARTING THE SERVICE NOW THAT THE IP ADDRESS OF THE BROKER IS KNOWN
+        // TODO getApplicationContext()is hier wrsl WEL OK want service best niet gelinkt aan een bepaalde activity?
+        Intent svcNew = new Intent(getActivity().getApplicationContext(), MQTTService.class);
+        getActivity().startService(svcNew);
+        // }
+
+    }
+
+    private void saveIPIfInserted(int enumerator, String value) {
 
 
 
+        // !! Patterns.IP_ADDRESS only applies to IPv4, so it's misleading.
+        // http://blog.danlew.net/2014/05/22/why-i-dont-use-patterns/
+        // TODO bedenken hoe IPv6 ook kan ondersteund worden? WRSL VIA CHECKBOX dat user kan aanvinken en afhankelijk daarvan wordt andere matcher gekozen.
+        // dus google op "android verify ipv6" ofzo
+        Matcher matcher = Patterns.IP_ADDRESS.matcher(value);
+
+        if (matcher.matches()) {
+            // Only when the value is not empty, the value gets saved.
+
+            // TODO SERVICE MOET NU GEHERSTART WORDEN - OF BEDENK ANDERE WERKWIJZE ZODAT SERVICE NOG NIET IS GESTART VOORALEER JUISTE IP IN SYSTEEM ZIT.
+            SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
+            editorUserDetector.putString("ip_address_broker_" + enumerator, value);
+            // editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
+            editorUserDetector.commit();
+
+
+            SharedPreferences settingsGestureHandler = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editorGestureHandler = settingsGestureHandler.edit();
+            editorGestureHandler.putString("ip_address_" + enumerator, value);
+            editorGestureHandler.commit();
+        }
+
+    }
 
 
     public MainFragment() {
@@ -584,13 +622,13 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
         if (isFound) {
             textViewPebble.setText(getResources().getString(R.string.pebble_found));
             bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_found));
-            textViewGeneric.setText(getResources().getString(R.string.generic_found));
-            bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_found));
+            textViewGeneric.setText(getResources().getString(R.string.generic_connected));
+            bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
         } else {
             textViewPebble.setText(getResources().getString(R.string.pebble_not_found));
             bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_not_found));
-            textViewGeneric.setText(getResources().getString(R.string.generic_not_found));
-            bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_found));
+            textViewGeneric.setText(getResources().getString(R.string.generic_not_connected));
+            bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
         }
     }
 
@@ -1010,7 +1048,6 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
 
 
     private void stopPebbleCommunicationTest() {
-
 
 
         // TODO uitgeschakeld omdat niet meer nodig is

@@ -1013,12 +1013,31 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         // create gesture library
 
 
-        // TODO je hebt hier TRY CATCH rond gezet want gaf error over SQL en close(): to fix.
-        try {
-            myGestureLibrary = new GestureLibrary("GESTURES", getActivity());
-        } catch (Exception ex) {
 
+
+        // see if we have a gesture library
+        // TODO eventueel deze if binnen de try/catch zetten indien nodig.
+        if (GestureLibrary.GLibrarySingleInstance == null) {
+
+            Log.w(LOG_TAG, "--------------------- NO GESTURE LIBRARY YET AdvancedFragment ---------------------");
+            // TODO iets doen? popup? leeg venster met tekst? etc.
+
+
+            // TODO je hebt hier TRY CATCH rond gezet want gaf error over SQL en close(): to fix.
+            try {
+                myGestureLibrary = new GestureLibrary("GESTURES", getActivity());
+            } catch (Exception ex) {
+
+            }
+
+            Log.w(LOG_TAG, "--------------------- nu gemaakt ---------------------");
+
+        } else {
+
+            myGestureLibrary = GestureLibrary.GLibrarySingleInstance;
         }
+
+
 
 
         myGestureRecognizer = new gesturerec3d(myGestureLibrary, 50);
@@ -1037,7 +1056,7 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
         // TODO mag weg maar test of NIETS BREAKT.
-        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        // mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         // TODO mag weg maar test of NIETS BREAKT.
 //        mSensorManager.registerListener(sensorListener, SensorManager.SENSOR_ACCELEROMETER, SensorManager.SENSOR_DELAY_FASTEST/*SensorManager.SENSOR_DELAY_GAME*/);
 
@@ -1183,11 +1202,12 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
         stateChanged(statusText); // FYI: dit doet niets concreets als het state "library" is.
 
-        if(state.equalsIgnoreCase("library")){
-            // start library activity
-            Intent i = new Intent(getActivity(), DBManagerUIActivity.class);
-            startActivityForResult(i, 0);
-        }
+        // 16-07 OUD
+//        if(state.equalsIgnoreCase("library")){
+//            // start library activity
+//            Intent i = new Intent(getActivity(), DBManagerUIActivity.class);
+//            startActivityForResult(i, 0);
+//        }
 
     }
 
@@ -1293,7 +1313,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                 break;
 
             case STATE_LIBRARY:
-
+                // njet: en logisch want we komen hier nooit als Gesture Library action button wordt geklikt: er wordt dan direct naar ander Fragment gesprongen,
+                // ipv DIT fragment met z'n learn en recognize states.
                 break;
 
             default:
@@ -1303,11 +1324,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     }
 
 
+    // TODO DEZE GANSE METHOD + LOGICA ERIN MAG WRSL ZOMAAR WEG WANT IS VAN EEN OUD SYSTEEM VIA GESTURELIBRARY DAT IN GANS APARTE ACTIVITY ZAT.
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (DEBUG) {
-            Log.w("onActivityResult", "Code: " + requestCode + " resultCode " + resultCode/*+ " data " + data.getDataString()*/);
-        }
-
         // change state and map to enum value
         this.state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.values()[resultCode];
         //update activity's state
