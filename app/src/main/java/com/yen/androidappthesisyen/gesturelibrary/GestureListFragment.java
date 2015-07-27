@@ -37,6 +37,7 @@ public class GestureListFragment extends ListFragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public GestureListFragment() {
+
     }
 
 
@@ -57,19 +58,6 @@ public class GestureListFragment extends ListFragment {
 
 
 
-
-
-        // OUD:
-        // see if we have a gesture library
-//        if (GestureLibrary.GLibrarySingleInstance != null) {
-//            this.glibrary_instance = GestureLibrary.GLibrarySingleInstance;
-//
-//        } else {
-//            Log.w(LOG_TAG, "--------------------- NO GESTURE LIBRARY YET GestureListFragment ---------------------");
-//            // TODO iets doen? popup? leeg venster met tekst? etc.
-//        }
-
-        // NIEUW:
         // see if we have a gesture library
         // TODO eventueel deze if binnen de try/catch zetten indien nodig.
         if (GestureLibrary.GLibrarySingleInstance == null) {
@@ -128,13 +116,10 @@ public class GestureListFragment extends ListFragment {
 
                     glibrary_instance.removeAllGesturesFromLibrary();
                 }
-                // "return false" staat ook bij een ontouchlistener bij AdvancedFragment dus NIE WEGDOEN!
+                // "return false" staat ook bij een ontouchlistener bij AdvancedFragment dus NIET WEGDOEN!
                 return false;
             }
         });
-
-
-
 
 
 
@@ -145,16 +130,14 @@ public class GestureListFragment extends ListFragment {
 
     public void initListView() {
         /* Inits the list view displaying gesture ids and counts */
-
         // see if we have a gesture library instance
-//        if (DEBUG) Log.w("initListView", "starting");
         String[] gestureIDStrings;
         if (this.glibrary_instance != null) {
             /* initialize the list view */
             gestureIDStrings = this.glibrary_instance.getAllGestureIDs();
         } else {
-            /* fake initialization */
-            gestureIDStrings = new String[]{"No gesture library initialized."};
+            // WE SHOULD NEVER ARRIVE HERE.
+            gestureIDStrings = new String[]{getResources().getString(R.string.error_gesture_library)};
         }
 
         setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, gestureIDStrings));

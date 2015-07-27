@@ -91,6 +91,7 @@
     <orderEntry type="library" exported="" name="jsonrpc2-base-1.36" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="pebblekit-2.6.0" level="project" />
+    <orderEntry type="library" exported="" name="commons-lang3-3.4" level="project" />
     <orderEntry type="library" exported="" name="androidplot-core-0.6.1" level="project" />
     <orderEntry type="library" exported="" name="jsonrpc2-client-1.15" level="project" />
     <orderEntry type="library" exported="" name="graphview-3.1.4" level="project" />

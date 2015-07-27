@@ -120,7 +120,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Location of User Detector and Gesture Handler");
+        builder.setTitle("Location of Face Detector and Gesture Handler");
         builder.setMessage("Insert the current IPv4 address for Action Device " + (enumerator-1) + ". Use saved location (" + savedBrokerIP + ") by leaving the field blank.");
 
         // TODO dit toepassen? WEL ALS WE BV. 2x EDITTEXT WENSEN ALS USER VERSCHILLENDE IPs ZOU KUNNEN INGEVEN.
@@ -147,7 +147,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
                         String value = String.valueOf(input.getText());
-                        // TODO IP User Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
+                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
                         // Wordt verondersteld dat dit in toekomst ook zo is of niet?
                         saveIPIfInserted(enumerator, value);
 
@@ -170,7 +170,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
                         String value = String.valueOf(input.getText());
-                        // TODO IP User Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
+                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
                         // Wordt verondersteld dat dit in toekomst ook zo is of niet?
                         saveIPIfInserted(enumerator, value);
 

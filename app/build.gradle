@@ -41,4 +41,5 @@ dependencies {
     //    compile 'com.thetransactioncompany:jsonrpc2-base:1.38'
     //    compile 'net.minidev:json-smart:2.1.1'
     compile files('libs/wmqtt.jar')
+    compile files('libs/commons-lang3-3.4.jar')
 }

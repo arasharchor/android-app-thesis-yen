@@ -5,12 +5,12 @@
     <string name="action_settings">Settings</string>
     <string name="foobar">foobar</string>
 
-    <string name="pebble_not_connected">Pebble™ not connected: use Bluetooth toggle to retry connection. \nIf this is a first-time installation, click the Connect Pebble™ button</string>
-    <string name="pebble_connected">Pebble™ CONNECTED</string>
+    <string name="pebble_not_connected">Pebble™ not connected: use Bluetooth toggle to retry connection. \nIf this is a first-time installation, click the Connect Pebble™ button.</string>
+    <string name="pebble_connected">Pebble™ CONNECTED. (Use Bluetooth toggle when connection lost.)</string>
     <string name="acceldata_stream">Accel Data Stream</string>
     <string name="acceldata_datalogging">Accel Data DataLogging</string>
-    <string name="generic_not_connected">Action Device(s) (user detector + gesture handler) not connected</string>
-    <string name="generic_connected">Action Device(s) (user detector + gesture handler) CONNECTED</string>
+    <string name="generic_not_connected">Action Device(s) (face detector + gesture handler) not connected.</string>
+    <string name="generic_connected">Action Device(s) (face detector + gesture handler) CONNECTED.</string>
     <string name="generic_toggle">Action Device(s) toggle</string>
     <string name="label_toggle_2">Toggle 2</string>
     <string name="label_toggle_3">Toggle 3</string>
@@ -98,4 +98,7 @@
     <string name="recognized_gestures">Recognized Gestures: \n</string>
     <string name="WiFi">Wi-Fi</string>
     <string name="label_insert_ip_address">Insert IP address</string>
+    <string name="no_gestures_trained">No additional gestures trained.</string>
+    <string name="error_gesture_library">Error loading the gesture library. Clear the app data and retrain your gestures.</string>
+    <string name="clear_gestures">Clear all trained gestures</string>
 </resources>

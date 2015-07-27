@@ -62,6 +62,14 @@
                     <!--empty tablerow atm-->
 
 
+                    <TextView
+                        android:id="@+id/textView_pebble"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pebble_not_connected"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textStyle="bold"
+                        android:layout_column="0" />
                 </TableRow>
 
                 <TableRow
@@ -79,13 +87,6 @@
 
 
                     <!-- perhaps use android:layout_span="4"-->
-                    <TextView
-                        android:id="@+id/textView_pebble"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/pebble_not_connected"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
 
                 </TableRow>
 
@@ -138,6 +139,22 @@
                 </TableRow>
 
                 <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/textView_generic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:text="@string/generic_not_connected"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+
+                        android:layout_column="0"
+                        android:textStyle="bold" />
+                </TableRow>
+
+                <TableRow
                     android:id="@+id/tableRow_3_main"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -153,17 +170,9 @@
                         android:text="@string/connect_generic"
                         android:layout_column="0" />
 
-                    <TextView
-                        android:id="@+id/textView_generic"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:text="@string/generic_not_connected"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-
-                        android:layout_column="1"
-                        android:textStyle="bold" />
                 </TableRow>
+
+
 
                 <TableRow
                     android:id="@+id/tableRow_4_main"
@@ -247,10 +256,10 @@
         android:text="@string/BT"
         android:id="@+id/textView_BT"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_alignBottom="@+id/toggle_BT"
-        android:layout_alignLeft="@+id/horizontalScrollView_main_fragment"
-        android:layout_alignStart="@+id/horizontalScrollView_main_fragment"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_above="@+id/horizontalScrollView_main_fragment"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <!--android:enabled="false"-->
     <ToggleButton
@@ -259,8 +268,8 @@
         android:text="@string/toggle_BT"
         android:id="@+id/toggle_BT"
         android:enabled="false"
-        android:layout_marginLeft="39dp"
-        android:layout_marginStart="39dp"
+        android:layout_marginLeft="33dp"
+        android:layout_marginStart="33dp"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/textView_BT"
         android:layout_toEndOf="@+id/textView_BT" />
@@ -272,7 +281,7 @@
         android:text="@string/BT_discoverable"
         android:id="@+id/button_BT_discoverable"
         android:enabled="false"
-        android:layout_alignTop="@+id/toggle_BT"
+        android:layout_above="@+id/horizontalScrollView_main_fragment"
         android:layout_toRightOf="@+id/toggle_BT"
         android:layout_toEndOf="@+id/toggle_BT" />
 
@@ -283,9 +292,8 @@
         android:id="@+id/textView"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold"
-        android:layout_alignTop="@+id/textView_BT"
-        android:layout_alignLeft="@+id/scrollView_output_window"
-        android:layout_alignStart="@+id/scrollView_output_window" />
+        android:layout_above="@+id/horizontalScrollView_main_fragment"
+        android:layout_centerHorizontal="true" />
 
 
 

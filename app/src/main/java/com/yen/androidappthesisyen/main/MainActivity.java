@@ -499,6 +499,15 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     private void switchToGestureLibraryFragment() {
 
+
+        // This is a work-around to make it so no tab is selected.
+        try {
+            ActionBar actionbar = (ActionBar) getActionBar();
+            actionbar.selectTab(null);
+        } catch (Exception e) {
+            // Do nothing.
+        }
+
         // Create new fragment and transaction
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
@@ -578,12 +587,12 @@ Note: When your activity is paused, the Activity instance is kept resident in me
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // TODO doe iets
+        // TODO doe iets?
     }
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // TODO doe iets
+        // TODO doe iets?
     }
 
 
