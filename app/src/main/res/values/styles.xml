@@ -7,10 +7,7 @@
     from which it inherits all styles not explicitly declared by your theme. When modifying the action bar, using a parent theme is important so that you can simply override the action bar styles you want to change without re-implementing the styles you want to leave alone (such as text size or padding in action items).-->
     <style name="AppTheme" parent="android:Theme.Holo.Light">
         <!-- Customize your theme here. -->
-
         <item name="android:actionBarTabStyle">@style/MyActionBarTabStyle</item>
-
-
     </style>
 
     <!-- style for the tabs -->
@@ -20,5 +17,131 @@
         <item name="android:paddingRight">32dp</item>
     </style>
 
+
+
+
+
+
+    <!-- File created by the Android Action Bar Style Generator
+
+     Copyright (C) 2011 The Android Open Source Project
+     Copyright (C) 2012 readyState Software Ltd
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+    <style name="Theme.Lightdarkmixed" parent="@android:style/Theme.Holo.Light.DarkActionBar">
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_lightdarkmixed</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu.Lightdarkmixed</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Lightdarkmixed</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Lightdarkmixed</item>
+        <item name="android:actionDropDownStyle">@style/DropDownNav.Lightdarkmixed</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.Lightdarkmixed</item>
+        <item name="android:actionModeBackground">@drawable/cab_background_top_lightdarkmixed</item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_lightdarkmixed</item>
+        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Lightdarkmixed</item>
+
+        <!-- Light.DarkActionBar specific -->
+        <item name="android:actionBarWidgetTheme">@style/Theme.Lightdarkmixed.Widget</item>
+
+
+
+
+
+
+
+        <!-- Generated with http://android-holo-colors.com -->
+        <item name="android:editTextBackground">@drawable/extrabuttons_edit_text_holo_light</item>
+
+        <item name="android:textColorHighlight">#9933b5e5</item>
+        <item name="android:textSelectHandleLeft">@drawable/extrabuttons_text_select_handle_left</item>
+        <item name="android:textSelectHandleRight">@drawable/extrabuttons_text_select_handle_right</item>
+        <item name="android:textSelectHandle">@drawable/extrabuttons_text_select_handle_middle</item>
+
+        <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewExtraButtons</item>
+
+        <item name="android:listChoiceIndicatorMultiple">@drawable/extrabuttons_btn_check_holo_light</item>
+
+        <item name="android:listChoiceIndicatorSingle">@drawable/extrabuttons_btn_radio_holo_light</item>
+
+        <item name="android:buttonStyle">@style/ButtonExtraButtons</item>
+
+        <item name="android:imageButtonStyle">@style/ImageButtonExtraButtons</item>
+
+        <item name="android:dropDownSpinnerStyle">@style/SpinnerExtraButtons</item>
+
+        <item name="android:progressBarStyleHorizontal">@style/ProgressBarExtraButtons</item>
+
+        <item name="android:seekBarStyle">@style/SeekBarExtraButtons</item>
+
+        <item name="android:ratingBarStyle">@style/RatingBarExtraButtons</item>
+
+        <item name="android:ratingBarStyleIndicator">@style/RatingBarBigExtraButtons</item>
+
+        <item name="android:ratingBarStyleSmall">@style/RatingBarSmallExtraButtons</item>
+
+        <item name="android:buttonStyleToggle">@style/ToggleExtraButtons</item>
+
+        <item name="android:listChoiceBackgroundIndicator">@drawable/extrabuttons_list_selector_holo_light</item>
+
+        <item name="android:activatedBackgroundIndicator">@drawable/extrabuttons_activated_background_holo_light</item>
+
+        <item name="android:fastScrollThumbDrawable">@drawable/extrabuttons_fastscroll_thumb_holo</item>
+
+
+    </style>
+
+    <style name="ActionBar.Solid.Lightdarkmixed" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@drawable/ab_solid_lightdarkmixed</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_lightdarkmixed</item>
+        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_lightdarkmixed</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Lightdarkmixed</item>
+    </style>
+
+    <style name="ActionBar.Transparent.Lightdarkmixed" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@drawable/ab_transparent_lightdarkmixed</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Lightdarkmixed</item>
+    </style>
+
+    <style name="PopupMenu.Lightdarkmixed" parent="@android:style/Widget.Holo.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_lightdarkmixed</item>
+    </style>
+
+    <style name="DropDownListView.Lightdarkmixed" parent="@android:style/Widget.Holo.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_lightdarkmixed</item>
+    </style>
+
+    <style name="ActionBarTabStyle.Lightdarkmixed" parent="@android:style/Widget.Holo.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab_lightdarkmixed</item>
+    </style>
+
+    <style name="DropDownNav.Lightdarkmixed" parent="@android:style/Widget.Holo.Spinner">
+        <item name="android:background">@drawable/spinner_background_ab_lightdarkmixed</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_lightdarkmixed</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_lightdarkmixed</item>
+    </style>
+
+    <style name="ProgressBar.Lightdarkmixed" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_lightdarkmixed</item>
+    </style>
+
+    <style name="ActionButton.CloseMode.Lightdarkmixed" parent="@android:style/Widget.Holo.ActionButton.CloseMode">
+        <item name="android:background">@drawable/btn_cab_done_lightdarkmixed</item>
+    </style>
+
+    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
+    <style name="Theme.Lightdarkmixed.Widget" parent="@android:style/Theme.Holo">
+        <item name="android:popupMenuStyle">@style/PopupMenu.Lightdarkmixed</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Lightdarkmixed</item>
+    </style>
 
 </resources>

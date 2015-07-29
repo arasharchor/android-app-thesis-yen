@@ -108,9 +108,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
         IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-        this.registerReceiver(BTReceiver, filter1);
-        this.registerReceiver(BTReceiver, filter2);
-        this.registerReceiver(BTReceiver, filter3);
+        registerReceiver(BTReceiver, filter1);
+        registerReceiver(BTReceiver, filter2);
+        registerReceiver(BTReceiver, filter3);
 
 
         // Certain apps need to keep the screen turned on, such as games or movie apps. The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
@@ -328,6 +328,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         unregisterReceiver(statusUpdateIntentReceiver);
         unregisterReceiver(messageIntentReceiver);
+        unregisterReceiver(BTReceiver);
 
 
         super.onDestroy();

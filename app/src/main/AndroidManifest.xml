@@ -32,11 +32,12 @@
     android:screenOrientation="landscape"
     Dit had je bij AdvancedActivity maar heb je niet meer nodig.
     Moest het nog nodig zijn, zet het dan bij MainActivity...-->
+    <!-- DEFAULT android:theme="@style/AppTheme"-->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
+        android:theme="@style/Theme.Lightdarkmixed"
         android:uiOptions="splitActionBarWhenNarrow" >
 
 
