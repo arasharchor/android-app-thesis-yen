@@ -68,7 +68,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         theActionBar.setDisplayHomeAsUpEnabled(false);
 
 
-        // TODO hoort dit niet in onCreateOptionsMenu ? UPDATE is goed volgens tutorial @ https://developer.android.com/training/implementing-navigation/lateral.html#tabs
         // TODO inflate the tab layout by using XML files instead of coding it here.
         addNavigationTabs(theActionBar);
 
@@ -169,17 +168,22 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // Don't check == 0 because that tab 0 is SELECTED by DEFAULT when starting the app.
         // So tab 0 corresponds with the MainActivity!
         if (tab.getPosition() == 0) {
-            switchToMainFragment();
+            switchToMainFragment(tab);
         } else if (tab.getPosition() == 1) {
-            switchToAdvancedRecognizerFragment("learn");
+            switchToAdvancedRecognizerFragment(tab, "learn");
         } else if (tab.getPosition() == 2) {
-            switchToAdvancedRecognizerFragment("recognize");
+            switchToAdvancedRecognizerFragment(tab, "recognize");
         }
 
     }
 
 
-    private void switchToMainFragment() {
+    private void switchToMainFragment(ActionBar.Tab tab) {
+
+
+//        ActionBar actionbar = (ActionBar) getActionBar();
+//        actionbar.selectTab(tab);
+
 
         // Create new fragment and transaction
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -202,31 +206,17 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     }
 
-    // 16-07 mag weg
-    private void toSecondTabActivity() {
-        // TODO eventueel nieuwe tab nog gebruiken voor iets
-//        Intent intent = new Intent(this, PebbleAccelStreamActivity.class);
-//        startActivity(intent);
 
-        switchToAdvancedRecognizerFragment("learn");
 
-    }
 
-    // TODO 16-07 VOLGENDE MAG WEG MAAR LEES NOG IS COMMENTS EERST.
-    /*TODO perhaps: You can also declare the click event handler programmatically rather than in an XML layout. This might be necessary if you instantiate the Button at runtime or you need to declare the click behavior in a Fragment subclass.
-     https://developer.android.com/guide/topics/ui/controls/button.html
-      So put the following code in the FRAGMENT since it's the FRAGMENT that builds the GUI; not the ACTIVITY in our case. */
-    // UPDATE: maar dan moet je de states van de tabs continu tussen de fragments doorgeven. Ipv nu: nu heeft de MainActivity de tab logica en zit daar dus de state.
-    // TODO ----------- er stond public void toGestureRecognizerActivity(View view) { maar die parameter precies nooit gebruikt?
-    public void toGestureRecognizerActivity() {
-//        Intent intent = new Intent(this, AdvancedActivity.class);
-//        startActivity(intent);
-        // TODO bovenstaande is oud: we BLIJVEN deze MainActivity gebruiken maar switchen gewoon van Fragment:
+    private void switchToAdvancedRecognizerFragment(ActionBar.Tab tab, String requestedState) {
 
-        switchToAdvancedRecognizerFragment("recognize");
-    }
 
-    private void switchToAdvancedRecognizerFragment(String requestedState) {
+//        ActionBar actionbar = (ActionBar) getActionBar();
+//        actionbar.selectTab(tab);
+
+
+
         // Create new fragment and transaction
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
@@ -349,14 +339,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     public boolean onCreateOptionsMenu(Menu menu) {
         // INFO OVER ALLE MOGELIJKE OPTIES: https://stackoverflow.com/questions/10303898/oncreateoptionsmenu-calling-super
 
-
         super.onCreateOptionsMenu(menu);
-
-
-        // You have inflated the menu IN THE ACTIVITY. It's also possible to do it into the FRAGMENT. (right now, MainFragment doesn't have this method onCreateOptionsMenu)
-        // We could place all the following code into the MainFragment if we want.
-        // TODO perhaps?
-        // It's also possible to have a portion in an ACTIVITY and a portion into a FRAGMENTS. Those portions will then get combined at runtime!
 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
