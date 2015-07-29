@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.yen.androidappthesisyen.R;
 import com.yen.androidappthesisyen.advancedrecognizer.AdvancedFragment;
@@ -36,11 +39,128 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     /* FOR MQTT SERVICE */
     private StatusUpdateReceiver statusUpdateIntentReceiver;
-    private MQTTMessageReceiver  messageIntentReceiver;
+    private MQTTMessageReceiver messageIntentReceiver;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+        setContentView(R.layout.activity_main);
+
+
+        // !! "R.id.framelayout_container_main_activity" werd gedefinieerd
+        // in "R.layout.activity_main" !
+        if (savedInstanceState == null) {
+
+            // DONT PLACE THIS FRAGMENT IN A GLOBAL VARIABLE. Since fragments get made and remade upon orientation changes and stuff!
+            // So that variable could become NULL at some point!
+            Fragment aPlaceholderFragment = new MainFragment();
+            getFragmentManager().beginTransaction()
+                    .add(R.id.framelayout_container_main_activity, aPlaceholderFragment)
+                    .commit();
+        }
+
+        final ActionBar theActionBar = getActionBar();
+
+        // FALSE because ROOT ACTIVITY
+        theActionBar.setDisplayHomeAsUpEnabled(false);
+
+
+        // TODO hoort dit niet in onCreateOptionsMenu ? UPDATE is goed volgens tutorial @ https://developer.android.com/training/implementing-navigation/lateral.html#tabs
+        // TODO inflate the tab layout by using XML files instead of coding it here.
+        addNavigationTabs(theActionBar);
 
 
 
-    // TODO verzet volgende code (tot onCreate()) terug verder naar beneden.
+
+
+        /* REGARDING THE MQTT SERVICE */
+        // TODO juiste plek om het hier te zetten?
+        /*SharedPreferences settings = getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("ip_address_broker_1", "192.168.1.1");
+        editor.putString("ip_address_broker_2", "192.168.1.2");
+        editor.putString("topic_accelstream",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
+        editor.putString("topics_gesturepusher",  "gesturepusher/#"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
+        editor.commit();
+        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na editor.commit()");*/
+
+
+        statusUpdateIntentReceiver = new StatusUpdateReceiver();
+        IntentFilter intentSFilter = new IntentFilter(MQTTService.MQTT_STATUS_INTENT);
+        registerReceiver(statusUpdateIntentReceiver, intentSFilter);
+
+        messageIntentReceiver = new MQTTMessageReceiver();
+        IntentFilter intentCFilter = new IntentFilter(MQTTService.MQTT_MSG_RECEIVED_INTENT);
+        registerReceiver(messageIntentReceiver, intentCFilter);
+
+
+        // SERVICE NU PAS GESTART NADAT IP ADRES WERD INGEGEVEN.
+//        Intent svc = new Intent(this, MQTTService.class);
+//        startService(svc);
+//        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na startService(svc)");
+
+
+        // TODO dit wrsl WEL goede plek want moet werken globaal over alle fragments?
+//        To detect Pebble being (dis)connected.
+        IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
+        IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        IntentFilter filter3 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        this.registerReceiver(BTReceiver, filter1);
+        this.registerReceiver(BTReceiver, filter2);
+        this.registerReceiver(BTReceiver, filter3);
+
+
+        // Certain apps need to keep the screen turned on, such as games or movie apps. The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
+        // From https://developer.android.com/training/scheduling/wakelock.html
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+    }
+
+
+    //The BroadcastReceiver that listens for bluetooth broadcasts
+    private final BroadcastReceiver BTReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            String action = intent.getAction();
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Device found
+                // TODO?
+            }
+            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                // Device is now connected
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, R.string.pebble_connected_toast, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                // Done searching
+                // TODO?
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                // Device is about to disconnect
+                // TODO?
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                // Device has disconnected
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, R.string.pebble_not_connected_toast, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        }
+    };
+
+
     // Following 3 methods are due to "implements ActionBar.TabListener"
     // TODO tabs are probably meant to CHANGE THE LAYOUT (change activity or fragment) while the BUTTONS on the left of the OVERFLOW BUTTON are probably for ACTIONS on the current layout
     @Override
@@ -114,11 +234,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // In dit geval dus Bundle OK want SharedPreferences is voor ECHTE PREFERENTIES DIE LANGDURIGER BLIJVEN!
         Fragment fragment = new AdvancedFragment();
         Bundle bundle = new Bundle();
-        if(requestedState.equalsIgnoreCase("learn")){
+        if (requestedState.equalsIgnoreCase("learn")) {
             bundle.putString("state", "learn");
-        } else if(requestedState.equalsIgnoreCase("recognize")){
+        } else if (requestedState.equalsIgnoreCase("recognize")) {
             bundle.putString("state", "recognize");
-        } else if(requestedState.equalsIgnoreCase("library")){ // TODO dit mag weg want komt toch nooit voor hier?
+        } else if (requestedState.equalsIgnoreCase("library")) { // TODO dit mag weg want komt toch nooit voor hier?
             bundle.putString("state", "library");
         } else {
             // JA wel zetten want nu bij getString GEEN default waarde systeem (vereiste API groter dan 21)
@@ -148,85 +268,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 //    }
 
 
-
-
-
-
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-        setContentView(R.layout.activity_main); // WAT IN WEZEN DE FRAGMENT CONTAINER IS (type FrameLayout) !
-
-
-        // !! "R.id.framelayout_container_main_activity" werd gedefinieerd
-        // in "R.layout.activity_main" !
-        if (savedInstanceState == null) {
-
-            // DONT PLACE THIS FRAGMENT IN A GLOBAL VARIABLE. Since fragments get made and remade upon orientation changes and stuff!
-            // So that variable could become NULL at some point!
-            Fragment aPlaceholderFragment = new MainFragment();
-            getFragmentManager().beginTransaction()
-                    .add(R.id.framelayout_container_main_activity, aPlaceholderFragment)
-                    .commit();
-        }
-
-        final ActionBar theActionBar = getActionBar();
-
-        // FALSE because ROOT ACTIVITY
-        theActionBar.setDisplayHomeAsUpEnabled(false);
-
-
-
-
-
-        // TODO hoort dit niet in onCreateOptionsMenu ? UPDATE is goed volgens tutorial @ https://developer.android.com/training/implementing-navigation/lateral.html#tabs
-        // TODO inflate the tab layout by using XML files instead of coding it here.
-        addNavigationTabs(theActionBar);
-
-
-
-
-
-        /* REGARDING THE MQTT SERVICE */
-        // TODO juiste plek om het hier te zetten?
-        /*SharedPreferences settings = getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("ip_address_broker_1", "192.168.1.1");
-        editor.putString("ip_address_broker_2", "192.168.1.2");
-        editor.putString("topic_accelstream",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
-        editor.putString("topics_gesturepusher",  "gesturepusher/#"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
-        editor.commit();
-        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na editor.commit()");*/
-
-
-
-        statusUpdateIntentReceiver = new StatusUpdateReceiver();
-        IntentFilter intentSFilter = new IntentFilter(MQTTService.MQTT_STATUS_INTENT);
-        registerReceiver(statusUpdateIntentReceiver, intentSFilter);
-
-        messageIntentReceiver = new MQTTMessageReceiver();
-        IntentFilter intentCFilter = new IntentFilter(MQTTService.MQTT_MSG_RECEIVED_INTENT);
-        registerReceiver(messageIntentReceiver, intentCFilter);
-
-
-        // SERVICE NU PAS GESTART NADAT IP ADRES WERD INGEGEVEN.
-//        Intent svc = new Intent(this, MQTTService.class);
-//        startService(svc);
-//        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na startService(svc)");
-
-
-
-        // Certain apps need to keep the screen turned on, such as games or movie apps. The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
-        // From https://developer.android.com/training/scheduling/wakelock.html
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-    }
-
-
     // TODO ALS JE HIER IETS AANPAST, OOK IN ZELFDE METHODE IN ADVANCEDACTIVITY.JAVA
     private void addNavigationTabs(ActionBar theActionBar) {
 
@@ -252,33 +293,29 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
 
     /* FOR MQTT SERVICE */
-    public class StatusUpdateReceiver extends BroadcastReceiver
-    {
+    public class StatusUpdateReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
+        public void onReceive(Context context, Intent intent) {
             Bundle notificationData = intent.getExtras();
             String newStatus = notificationData.getString(MQTTService.MQTT_STATUS_MSG);
 
             // ...
         }
     }
-    public class MQTTMessageReceiver extends BroadcastReceiver
-    {
+
+    public class MQTTMessageReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
+        public void onReceive(Context context, Intent intent) {
             Bundle notificationData = intent.getExtras();
             String newTopic = notificationData.getString(MQTTService.MQTT_MSG_RECEIVED_TOPIC);
-            String newData  = notificationData.getString(MQTTService.MQTT_MSG_RECEIVED_MSG);
+            String newData = notificationData.getString(MQTTService.MQTT_MSG_RECEIVED_MSG);
 
             // ...
         }
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
 
         // ...
 
@@ -296,18 +333,15 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         super.onDestroy();
 
     }
+
     @Override
-    public void onWindowFocusChanged(boolean hasFocus)
-    {
+    public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus)
-        {
+        if (hasFocus) {
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             mNotificationManager.cancel(MQTTService.MQTT_NOTIFICATION_UPDATE);
         }
     }
-
-
 
 
     @Override
@@ -444,18 +478,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                 Log.w(LOG_TAG, "clicked action button 1");
 
                 // TODO doe iets
-                /*useLogo = !useLogo; VANBOVEN STOND ER: private boolean useLogo = false;
-                item.setChecked(useLogo);
-                getActionBar().setDisplayUseLogoEnabled(useLogo);*/
+
                 return true;
 
             case R.id.action_button_2:
 
                 switchToGestureLibraryFragment();
 
-                /*showHomeUp = !showHomeUp;
-                item.setChecked(showHomeUp);
-                getActionBar().setDisplayHomeAsUpEnabled(showHomeUp);*/
                 return true;
 
             case R.id.action_set_1_opt_1:
@@ -578,11 +607,6 @@ Note: When your activity is paused, the Activity instance is kept resident in me
 
 
     }
-
-
-
-
-
 
 
     @Override

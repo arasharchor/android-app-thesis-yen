@@ -2,30 +2,29 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yen.androidappthesisyen" >
 
-    <!-- Temporarily, for CursorListActivity -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <!-- Temporarily, for CursorListActivity -->
+    <!--<uses-permission android:name="android.permission.READ_CONTACTS" />-->
 
     <!-- For connecting to the Pebble™ smartwatch -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
-
-
-    <!-- voor COMPLEXE gesture detection -->
+    <!-- voor o.a. COMPLEXE gesture detection -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <!--TODO stond aan maar is toch niet nodig?-->
-    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!-- For network access so gesture commands can be sent to the Linux (Ubuntu) server -->
+    <!--TODO stond aan maar is toch niet nodig?-->
+    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
+
+    <!-- For network access so gesture commands can be sent to Action Devices (= Linux (Ubuntu) servers) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
-    <!-- Bijkomend voor MQTT service -->
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <!-- For MQTT service -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+
 
 
 
@@ -33,7 +32,6 @@
     android:screenOrientation="landscape"
     Dit had je bij AdvancedActivity maar heb je niet meer nodig.
     Moest het nog nodig zijn, zet het dan bij MainActivity...-->
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -52,10 +50,11 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
         <activity
             android:name=".eventueelnognuttig.MasterDetailItemListActivity"
             android:label="@string/title_masterdetailitem_list"
@@ -67,6 +66,8 @@
                 android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
         </activity>
+
+
         <activity
             android:name=".eventueelnognuttig.MasterDetailItemDetailActivity"
             android:label="@string/title_masterdetailitem_detail"
@@ -101,10 +102,6 @@
         -->
 
 
-
-        <!-- TODO zien of dit wel nodig is want die AIDL dinges is mss overbodig? -->
-
-
         <activity
             android:name=".advancedrecognizer.DBManagerUIActivity"
             android:label="dbmanager"
@@ -112,11 +109,17 @@
             android:screenOrientation="landscape">
         </activity>
 
+
+
         <service
             android:name=".pushnotificationlistener.MQTTService"
             android:enabled="true"
             android:exported="true" >
         </service>
+
+
     </application>
+
+
 
 </manifest>

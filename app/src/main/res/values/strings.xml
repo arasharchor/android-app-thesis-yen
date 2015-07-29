@@ -1,12 +1,12 @@
 <resources>
 
     <string name="app_name">Gesture Recognizer for Pebble™</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="foobar">foobar</string>
 
     <string name="pebble_not_connected">Pebble™ not connected: use Bluetooth toggle to retry connection. \nIf this is a first-time installation, click the Connect Pebble™ button.</string>
+    <string name="pebble_not_connected_toast">Pebble™ disconnected</string>
     <string name="pebble_connected">Pebble™ CONNECTED. (Use Bluetooth toggle when connection lost.)</string>
+    <string name="pebble_connected_toast">Pebble™ connected</string>
     <string name="acceldata_stream">Accel Data Stream</string>
     <string name="acceldata_datalogging">Accel Data DataLogging</string>
     <string name="generic_not_connected">Action Device(s) (face detector + gesture handler) not connected.</string>
@@ -30,42 +30,47 @@
     <string name="action_label_set_2_opt_1">Set 2 Opt 1</string>
     <string name="action_label_set_2_opt_2">Set 2 Opt 2</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="title_activity_cursor_list">CursorListActivity</string>
     <string name="output_window">Output Window\n</string>
     <string name="label_toggle_1">Toggle 1</string>
     <string name="toggle_1">Toggle 1</string>
+
     <string name="start_communication_test">START COMMUNICATION TEST</string>
     <string name="stop_communication_test">STOP COMMUNICATION TEST</string>
     <string name="pebble_button_up_pressed">Pebble™ button UP pressed.</string>
     <string name="pebble_button_down_pressed">Pebble™ button DOWN pressed.</string>
     <string name="pebble_button_select_pressed">Pebble™ button SELECT pressed.</string>
+
     <string name="connect_pebble">Connect Pebble™</string>
     <string name="pebble_companion_app_not_found">Pebbe Companion App not found. Redirecting to App Store.</string>
+
     <string name="pebble_companion_app_found">Official Pebble™ Companion App found. Now opening.</string>
     <string name="connect_your_pebble">Connect your Pebble™ through the official Pebble™ Companion App.</string>
     <string name="download_and_retry">Download the official Pebble™ Companion App and retry.</string>
+
     <string name="start_pebble_data_logging">START PEBBLE™ DATA LOGGING</string>
     <string name="stop_pebble_data_logging">STOP PEBBLE™ DATA LOGGING</string>
+
     <string name="sending_data_log_finished">Sending data log FINISHED</string>
+
     <string name="icon_content_description">Mobile Device</string>
     <string name="connect_generic">Connect Action Device(s)</string>
+
     <string name="BT">Bluetooth</string>
     <string name="toggle_BT">Bluetooth toggle</string>
-    <string name="start_BT">Enabled Bluetooth</string>
     <string name="BT_already_enabled">Bluetooth is enabled already</string>
-    <string name="stop_BT">Disabled Bluetooth</string>
     <string name="BT_already_disabled">Bluetooth is disabled already</string>
     <string name="start_BT_discoverable">Made your mobile device discoverable for 2 minutes</string>
     <string name="BT_already_discoverable">Bluetooth is discoverable already. Now cancelled</string>
     <string name="BT_adapter_not_found">Bluetooth adapter not found</string>
-    <string name="BT_is_enabled">Bluetooth is enabled</string>
-    <string name="BT_is_disabled">Bluetooth is disabled</string>
     <string name="BT_discoverable">Discoverable (2 min)</string>
+
     <string name="title_activity_pebble_accel_stream">Pebble™ Acceleration Data Stream</string>
     <string name="no_data">NO DATA</string>
+
     <string name="start">START</string>
+
     <string name="label_tab_2">Connect</string>
     <string name="label_tab_3">Train</string>
     <string name="label_tab_4">Recognize</string>
@@ -77,28 +82,27 @@
     <string name="x_axis_title">x-axis</string>
     <string name="y_axis_title">y-axis</string>
     <string name="z_axis_title">z-axis</string>
-    <!--<string name="activity_Plot">Plot</string>-->
-    <string name="dynamic_plot">Dynamic Plot</string>
-
-
-
 
 
 
     <string name="title_activity_pebble_gesture_overview">Pebble™ Gesture Overview</string>
-    <string name="edit_gestures">Edit Gestures</string>
     <string name="title_advanced_recognizer">Gesture Recognizer for Pebble™</string>
 
 
     <!-- voor THREE DOLLAR gesture detection -->
-    <string name="hello">Hello World, Acceleration!</string>
-    <string name="Button01_str">Hold to record gesture</string>
+    <string name="hello">""</string>
+    <string name="hold_to_record">Hold to record gesture</string>
 
 
     <string name="recognized_gestures">Recognized Gestures: \n</string>
+
     <string name="WiFi">Wi-Fi</string>
+
     <string name="label_insert_ip_address">Insert IP address</string>
+
     <string name="no_gestures_trained">No additional gestures trained.</string>
+
     <string name="error_gesture_library">Error loading the gesture library. Clear the app data and retrain your gestures.</string>
     <string name="clear_gestures">Clear all trained gestures</string>
+
 </resources>

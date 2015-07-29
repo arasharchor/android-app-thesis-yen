@@ -103,7 +103,7 @@
 
 
         <Button
-            android:text="@string/Button01_str"
+            android:text="@string/hold_to_record"
             android:id="@+id/Button01"
             android:layout_height="wrap_content"
             android:height="150px"

@@ -64,7 +64,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
     public static final UUID WATCHAPP_UUID = UUID.fromString("7c5167e8-9df4-479f-9353-714481681af1");
 
-
     // TODO use more useful name
     // For Pebble communication test
     private PebbleKit.PebbleDataReceiver myPebbleDataReceiver;
@@ -101,7 +100,129 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     private List<String> arrayListNamesPairedBTDevices;
 
 
-    // TODO verzet wat naar beneden.
+
+
+
+
+
+    public MainFragment() {
+        // Required empty public constructor
+    }
+
+
+
+
+    // onCreate wasn't displayed by default.
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Useful and good practice! See http://www.androiddesignpatterns.com/2013/04/retaining-objects-across-config-changes.html
+        // Retain this fragment across configuration changes.
+        setRetainInstance(true);
+
+        // TODO als je toch gaat werken met savedInstanceState.
+//        if(savedInstanceState == null){
+//            bundleLabelStates = new Bundle();
+//            bundleEnableDisableStates = new Bundle();
+//            bundleToggleStates = new Bundle();
+//        } else {
+//            // TODO haal de 2 bundles uit savedInstanceState en assign aan de vars.
+//        }
+
+
+
+        /*public void setRetainInstance (boolean retain)
+        * onCreate(Bundle) will not be called since the fragment is not being re-created.
+        * https://developer.android.com/reference/android/app/Fragment.html#setRetainInstance(boolean) */
+        // DUS HIER KOMEN WE ENKEL DE ALLEREERSTE KEER DAT FRAGMENT WORDT GEMAAKT.
+        // DUS HIER INITIALISEREN VAN DE BUNDLES?
+        // EN DIRECT DUS DE BEGIN STATES INVULLEN HIER ZEKER?!
+//        bundleLabelStates = new Bundle();
+//        bundleEnableDisableStates = new Bundle();
+//        bundleToggleStates = new Bundle();
+
+
+//        BTadapter = BluetoothAdapter.getDefaultAdapter();
+//        Log.w("BLUETOOTH", "name BT adapter: " + BTadapter.getName());
+
+        // direct ook die lijst van paired BT devices opvullen.
+        // get a list of paired devices by calling getBondedDevices()
+        // maar lijst LEEG als BT uit staat!
+        setPairedBTDevices = BTadapter.getBondedDevices();
+
+        // TODO of gaan we toch globaal landscape afdwingen? (als ja, doe dit via manifest)
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+
+        // Inflate the layout for this fragment
+        View returnedView = inflater.inflate(R.layout.fragment_main, container, false);
+
+
+        // SYSTEEM DAT WE NU NIET TOEPASSEN
+//        if(savedInstanceState == null){
+//
+//            // If you do it in onCreate in MainActivity it seems to crash! (Even though the view has been inflated using setContentView(...) beforehand.
+//            // UPDATE: this is logical! Since the FRAGMENT inflates the View objects; not the ACTIVITY, in your case.
+//            setLabelStates(returnedView, false);
+//        setEnableDisableStatesFromBundle
+//            setEnableDisableStates(returnedView, false);
+//
+//        } else {
+//
+//            // TODO gebruik die bundle om de state eruit te halen van je buttons enzo.
+//
+//        }
+
+        // SAVE THE DEFAULTS THE VERY FIRST TIME THE FRAGMENT GETS MADE. AND ONLY THEN.
+        // We could use the second parameter in bundle.getString(...) to define a DEFAULT VALUE, but that means we have to add that 2nd parameter each time we call bundle.getString(...)
+        // + it requires API LEVEL >= 12!
+        // So we here make sure everything has a value in the bundles.
+        if (!areDefaultsInserted) {
+            insertDefaultLabelStates(returnedView);
+            insertDefaultEnableDisableStates(returnedView);
+            insertDefaultToggleStates(returnedView);
+            areDefaultsInserted = true;
+        }
+
+
+        // SYSTEEM DAT WE NU TOEPASSEN
+        setLabelStatesFromBundle(returnedView);
+        setEnableDisableStatesFromBundle(returnedView);
+        setToggleStatesFromBundle(returnedView);
+
+
+        // hier moet geen if(==null) rond omdat bij creëren view dit ALTIJD moet gebeuren, terwijl hierboven niet steeds hetzelfde gedrag mag zijn!
+        // BEST SOLUTION TO COMPLETELY DECOUPLING THE GUI COMPONENTS AND THEIR LISTENERS FROM THE ACTIVITY THE FRAGMENT IS RESIDING IN.
+        // SEE https://stackoverflow.com/questions/6091194/how-to-handle-button-clicks-using-the-xml-onclick-within-fragments
+        // TODO via onClick in XML
+        registerButtonAndToggleListeners(returnedView);
+        // TODO the above doesn't really belong here in onCreateView but for example in onViewCreated or similar.
+
+        initListViewMain(returnedView);
+
+
+        // We also place it here, since in case there is already text in the Output Window when arriving there, we immediately scroll.
+        ((ScrollView) returnedView.findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+
+
+        // TODO maar doen we nu geen overbodige enable/disable en on/off aanpassingen bij de toggle voor BT?
+        // of toch behouden wat we hebben: anders wordt het te complex.
+        setBTRelatedStates(returnedView);
+
+
+        return returnedView;
+    }
+
+
+
+
     private void showIPDialog(final int enumerator) {
         // 16-07 Tot nu toe enkel 1 en 2 gebruikt als parameter "enumerator".
 //        HOE HET WERD AANGESPROKEN INDERTIJD:
@@ -286,118 +407,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     }
 
 
-    public MainFragment() {
-        // Required empty public constructor
-    }
 
-
-    // onCreate wasn't displayed by default.
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Useful and good practice! See http://www.androiddesignpatterns.com/2013/04/retaining-objects-across-config-changes.html
-        // Retain this fragment across configuration changes.
-        setRetainInstance(true);
-
-        // TODO als je toch gaat werken met savedInstanceState.
-//        if(savedInstanceState == null){
-//            bundleLabelStates = new Bundle();
-//            bundleEnableDisableStates = new Bundle();
-//            bundleToggleStates = new Bundle();
-//        } else {
-//            // TODO haal de 2 bundles uit savedInstanceState en assign aan de vars.
-//        }
-
-
-
-        /*public void setRetainInstance (boolean retain)
-        * onCreate(Bundle) will not be called since the fragment is not being re-created.
-        * https://developer.android.com/reference/android/app/Fragment.html#setRetainInstance(boolean) */
-        // DUS HIER KOMEN WE ENKEL DE ALLEREERSTE KEER DAT FRAGMENT WORDT GEMAAKT.
-        // DUS HIER INITIALISEREN VAN DE BUNDLES?
-        // EN DIRECT DUS DE BEGIN STATES INVULLEN HIER ZEKER?!
-//        bundleLabelStates = new Bundle();
-//        bundleEnableDisableStates = new Bundle();
-//        bundleToggleStates = new Bundle();
-
-
-//        BTadapter = BluetoothAdapter.getDefaultAdapter();
-//        Log.w("BLUETOOTH", "name BT adapter: " + BTadapter.getName());
-
-        // direct ook die lijst van paired BT devices opvullen.
-        // get a list of paired devices by calling getBondedDevices()
-        // maar lijst LEEG als BT uit staat!
-        setPairedBTDevices = BTadapter.getBondedDevices();
-
-
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-
-        // Inflate the layout for this fragment
-        View returnedView = inflater.inflate(R.layout.fragment_main, container, false);
-
-
-        // SYSTEEM DAT WE NU NIET TOEPASSEN
-//        if(savedInstanceState == null){
-//
-//            // If you do it in onCreate in MainActivity it seems to crash! (Even though the view has been inflated using setContentView(...) beforehand.
-//            // UPDATE: this is logical! Since the FRAGMENT inflates the View objects; not the ACTIVITY, in your case.
-//            setLabelStates(returnedView, false);
-//        setEnableDisableStatesFromBundle
-//            setEnableDisableStates(returnedView, false);
-//
-//        } else {
-//
-//            // TODO gebruik die bundle om de state eruit te halen van je buttons enzo.
-//
-//        }
-
-        // SAVE THE DEFAULTS THE VERY FIRST TIME THE FRAGMENT GETS MADE. AND ONLY THEN.
-        // We could use the second parameter in bundle.getString(...) to define a DEFAULT VALUE, but that means we have to add that 2nd parameter each time we call bundle.getString(...)
-        // + it requires API LEVEL >= 12!
-        // So we here make sure everything has a value in the bundles.
-        if (!areDefaultsInserted) {
-            insertDefaultLabelStates(returnedView);
-            insertDefaultEnableDisableStates(returnedView);
-            insertDefaultToggleStates(returnedView);
-            areDefaultsInserted = true;
-        }
-
-
-        // SYSTEEM DAT WE NU TOEPASSEN
-        setLabelStatesFromBundle(returnedView);
-        setEnableDisableStatesFromBundle(returnedView);
-        setToggleStatesFromBundle(returnedView);
-
-
-        // hier moet geen if(==null) rond omdat bij creëren view dit ALTIJD moet gebeuren, terwijl hierboven niet steeds hetzelfde gedrag mag zijn!
-        // BEST SOLUTION TO COMPLETELY DECOUPLING THE GUI COMPONENTS AND THEIR LISTENERS FROM THE ACTIVITY THE FRAGMENT IS RESIDING IN.
-        // SEE https://stackoverflow.com/questions/6091194/how-to-handle-button-clicks-using-the-xml-onclick-within-fragments
-        // TODO via onClick in XML
-        registerButtonAndToggleListeners(returnedView);
-        // TODO the above doesn't really belong here in onCreateView but for example in onViewCreated or similar.
-
-        initListViewMain(returnedView);
-
-
-        // We also place it here, since in case there is already text in the Output Window when arriving there, we immediately scroll.
-        ((ScrollView) returnedView.findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-
-        // TODO maar doen we nu geen overbodige enable/disable en on/off aanpassingen bij de toggle voor BT?
-        // of toch behouden wat we hebben: anders wordt het te complex.
-        setBTRelatedStates(returnedView);
-
-
-        return returnedView;
-    }
 
     private void setBTRelatedStates(View returnedView) {
 
@@ -418,7 +428,13 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
             bundleToggleStates.putBoolean("R.id.toggle_BT", false);
             // NVT voor buttonBTDiscoverable
 
-            Toast.makeText(getActivity(), R.string.BT_adapter_not_found, Toast.LENGTH_LONG).show();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getActivity(), R.string.BT_adapter_not_found, Toast.LENGTH_LONG).show();
+                }
+            });
+
 
         } else {
 
@@ -434,8 +450,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                 bundleToggleStates.putBoolean("R.id.toggle_BT", true);
                 // NVT voor buttonBTDiscoverable
 
-                Toast.makeText(getActivity(), R.string.BT_is_enabled, Toast.LENGTH_LONG).show();
-
             } else {
                 // set toggle ENABLED
                 // set toggle OFF
@@ -448,7 +462,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                 bundleToggleStates.putBoolean("R.id.toggle_BT", false);
                 // NVT voor buttonBTDiscoverable
 
-                Toast.makeText(getActivity(), R.string.BT_is_disabled, Toast.LENGTH_LONG).show();
             }
         }
 
@@ -810,18 +823,15 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 //            ListView listViewMain = (ListView) getView().findViewById(R.id.listView_main);
 
 
-            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-            outputWindow.append("--- " + getResources().getString(R.string.start_BT) + " ---" + "\n");
-            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-            // THE REASON parameter "R.string.pebble_companion_app_found" WORKS INSTEAD OF NEEDING
-            // "getResources().getString() is because makeText also has a parameter list that
-            // only needs the string ID.
-            Toast.makeText(getActivity(), R.string.start_BT, Toast.LENGTH_LONG).show();
 
         } else {
 
-            Toast.makeText(getActivity(), R.string.BT_already_enabled, Toast.LENGTH_LONG).show();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getActivity(), R.string.BT_already_enabled, Toast.LENGTH_LONG).show();
+                }
+            });
 
         }
 
@@ -865,11 +875,16 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE), REQUEST_BT_DISCOVERABLE);
 
-            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-            outputWindow.append("--- " + getResources().getString(R.string.start_BT_discoverable) + " ---" + "\n");
-            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+                    outputWindow.append("--- " + getResources().getString(R.string.start_BT_discoverable) + " ---" + "\n");
+                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+                    Toast.makeText(getActivity(), R.string.start_BT_discoverable, Toast.LENGTH_LONG).show();
+                }
+            });
 
-            Toast.makeText(getActivity(), R.string.start_BT_discoverable, Toast.LENGTH_LONG).show();
 
         } else {
 
@@ -878,11 +893,16 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
             // TODO systeem werkt niet? we geraken hier nooit?
             BTadapter.cancelDiscovery();
 
-            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-            outputWindow.append("--- " + getResources().getString(R.string.BT_already_discoverable) + " ---" + "\n");
-            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
+                    outputWindow.append("--- " + getResources().getString(R.string.BT_already_discoverable) + " ---" + "\n");
+                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+                    Toast.makeText(getActivity(), R.string.BT_already_discoverable, Toast.LENGTH_LONG).show();
+                }
+            });
 
-            Toast.makeText(getActivity(), R.string.BT_already_discoverable, Toast.LENGTH_LONG).show();
         }
 
     }
@@ -899,14 +919,15 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
             buttonBTDiscoverable.setEnabled(false);
             bundleEnableDisableStates.putBoolean("R.id.button_BT_discoverable", false);
 
-            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-            outputWindow.append("--- " + getResources().getString(R.string.stop_BT) + " ---" + "\n");
-            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-            Toast.makeText(getActivity(), R.string.stop_BT, Toast.LENGTH_LONG).show();
         } else {
 
-            Toast.makeText(getActivity(), R.string.BT_already_disabled, Toast.LENGTH_LONG).show();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getActivity(), R.string.BT_already_disabled, Toast.LENGTH_LONG).show();
+                }
+            });
+
         }
 
     }
@@ -917,13 +938,20 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
         // Changed "context" to "getActivity()"
         Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("com.getpebble.android");
         if (intent != null) {
-            Toast t = Toast.makeText(getActivity(), R.string.pebble_companion_app_found, Toast.LENGTH_LONG);
-            t.setGravity(Gravity.CENTER, 0, 0);
-            t.show();
 
-            Toast t2 = Toast.makeText(getActivity(), R.string.connect_your_pebble, Toast.LENGTH_LONG);
-            t2.setGravity(Gravity.CENTER, 0, 0);
-            t2.show();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast t = Toast.makeText(getActivity(), R.string.pebble_companion_app_found, Toast.LENGTH_LONG);
+                    t.setGravity(Gravity.CENTER, 0, 0);
+                    t.show();
+
+                    Toast t2 = Toast.makeText(getActivity(), R.string.connect_your_pebble, Toast.LENGTH_LONG);
+                    t2.setGravity(Gravity.CENTER, 0, 0);
+                    t2.show();
+                }
+            });
+
 
             /*You can use flags to modify the default behaviour of how an activity will be associated with a task when using startActivity() to start the activity:
 
@@ -935,13 +963,19 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
             getActivity().startActivity(intent);
         } else {
 
-            Toast t = Toast.makeText(getActivity(), R.string.pebble_companion_app_not_found, Toast.LENGTH_LONG);
-            t.setGravity(Gravity.CENTER, 0, 0);
-            t.show();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast t = Toast.makeText(getActivity(), R.string.pebble_companion_app_not_found, Toast.LENGTH_LONG);
+                    t.setGravity(Gravity.CENTER, 0, 0);
+                    t.show();
 
-            Toast t2 = Toast.makeText(getActivity(), R.string.download_and_retry, Toast.LENGTH_LONG);
-            t2.setGravity(Gravity.CENTER, 0, 0);
-            t2.show();
+                    Toast t2 = Toast.makeText(getActivity(), R.string.download_and_retry, Toast.LENGTH_LONG);
+                    t2.setGravity(Gravity.CENTER, 0, 0);
+                    t2.show();
+                }
+            });
+
 
             intent = new Intent(Intent.ACTION_VIEW);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

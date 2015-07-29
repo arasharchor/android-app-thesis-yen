@@ -24,6 +24,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.getpebble.android.kit.PebbleKit;
@@ -611,17 +612,16 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
                         // TODO eventueel gebruiken: if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
-                        // Updating Gestures ScrollView
                         final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_gestures);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-
                                 outputWindow.append(detected_gid + "\n");
                                 ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
-
+                                Toast.makeText(getActivity(), detected_gid, Toast.LENGTH_LONG).show();
                             }
                         });
+
 
 
                         // TODO "  && !detected_gid.equalsIgnoreCase("not recognized!") " ook in IF steken?
@@ -809,8 +809,10 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                         public void run() {
                             outputWindow.append("No internet connection\n");
                             ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                            Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_LONG).show();
                         }
                     });
+
 
                     Log.w(LOG_TAG, "No internet connection");
                 }
@@ -842,10 +844,12 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    outputWindow.append("Accel stream not running\n");
+                    outputWindow.append("Data stream not running\n");
                     ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                    Toast.makeText(getActivity(), "Data stream not running", Toast.LENGTH_LONG).show();
                 }
             });
+
 
             Log.w(LOG_TAG, "Accel stream not running");
         }
