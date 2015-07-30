@@ -13,41 +13,45 @@
         android:id="@+id/x_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/no_data" />
+        android:text="@string/no_data"
+        android:layout_alignTop="@+id/toggle_accel_stream"
+        android:layout_toRightOf="@+id/toggle_accel_stream"
+        android:layout_toEndOf="@+id/toggle_accel_stream" />
 
     <TextView
         android:id="@+id/y_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/x_view"
-        android:text="@string/no_data" />
+        android:text="@string/no_data"
+        android:layout_below="@+id/x_view"
+        android:layout_alignLeft="@+id/x_view"
+        android:layout_alignStart="@+id/x_view" />
 
     <TextView
         android:id="@+id/z_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/y_view"
-        android:text="@string/no_data" />
+        android:text="@string/no_data"
+        android:layout_below="@+id/y_view"
+        android:layout_alignLeft="@+id/y_view"
+        android:layout_alignStart="@+id/y_view" />
 
     <TextView
         android:id="@+id/rate_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/z_view"
-        android:text="@string/no_data" />
+        android:text="@string/no_data"
+        android:layout_below="@+id/z_view"
+        android:layout_alignLeft="@+id/z_view"
+        android:layout_alignStart="@+id/z_view" />
 
     <ToggleButton
         android:id="@+id/toggle_accel_stream"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/rate_view"
-        android:text="@string/start" />
+        android:text="@string/start"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
     <!-- TODO werkt deze tekst nog bij TOGGLE button? of mag nu weg? -->
 
 
@@ -56,22 +60,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toggle_accel_stream"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/relative_layout_three_dollar_gesture_detection"
         android:focusable="true"
         android:orientation="vertical"
-        >
+        android:layout_below="@+id/rate_view"
+        android:weightSum="1">
 
-
-
-
-        <TextView
-            android:id="@+id/statusText"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/hello" />
 
         <LinearLayout
             android:id="@+id/LinearLayout01"
@@ -104,16 +100,14 @@
 
         <Button
             android:text="@string/hold_to_record"
-            android:id="@+id/Button01"
+            android:id="@+id/btn_record_gesture"
             android:layout_height="wrap_content"
             android:height="150px"
             android:width="200px"
             android:layout_marginTop="100px"
-            android:layout_width="wrap_content"
-            android:textSize="30px" />
-
-
-
+            android:layout_width="210dp"
+            android:textSize="30px"
+            android:layout_weight="0.04" />
 
 
     </LinearLayout>
@@ -123,10 +117,11 @@
         android:layout_height="wrap_content"
         android:text="Use gesture spotting."
         android:id="@+id/checkBoxGestureSpotting"
-        android:layout_alignTop="@+id/toggle_accel_stream"
-        android:layout_toRightOf="@+id/toggle_accel_stream"
-        android:layout_toEndOf="@+id/toggle_accel_stream"
-         />
+        android:layout_marginRight="85dp"
+        android:layout_marginEnd="85dp"
+        android:layout_alignTop="@+id/info_manual"
+        android:layout_alignRight="@+id/relative_layout_three_dollar_gesture_detection"
+        android:layout_alignEnd="@+id/relative_layout_three_dollar_gesture_detection" />
 
     <ScrollView
         android:id="@+id/scrollView_gestures"
@@ -134,12 +129,12 @@
         android:layout_height="wrap_content"
         android:background="@drawable/border_ui"
         android:padding="16dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/checkBoxGestureSpotting"
-        android:layout_toRightOf="@+id/checkBoxGestureSpotting"
-        android:layout_alignParentBottom="true">
+        android:layout_below="@+id/rate_view"
+        android:layout_alignRight="@+id/checkBoxGestureSpotting"
+        android:layout_alignEnd="@+id/checkBoxGestureSpotting"
+        android:layout_alignBottom="@+id/relative_layout_three_dollar_gesture_detection"
+        android:layout_alignLeft="@+id/checkBoxGestureSpotting"
+        android:layout_alignStart="@+id/checkBoxGestureSpotting">
 
         <TextView
             android:id="@+id/textView_gestures"
@@ -147,6 +142,19 @@
             android:layout_height="match_parent"
             android:text="@string/recognized_gestures" />
     </ScrollView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="The face detectors on the connected Action Devices allow for automatic enabling &amp; disabling of the Pebble™ accelerometer data stream. Manual toggle:"
+        android:id="@+id/info_manual"
+        android:layout_alignTop="@+id/toggle_accel_stream"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/toggle_accel_stream"
+        android:layout_toLeftOf="@+id/toggle_accel_stream"/>
+
     <!-- android:checked="true" -->
 
 </RelativeLayout>

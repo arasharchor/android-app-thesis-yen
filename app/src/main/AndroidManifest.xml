@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yen.androidappthesisyen" >
 
-
     <!-- Temporarily, for CursorListActivity -->
-    <!--<uses-permission android:name="android.permission.READ_CONTACTS" />-->
+    <!-- <uses-permission android:name="android.permission.READ_CONTACTS" /> -->
+
 
     <!-- For connecting to the Pebble™ smartwatch -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -14,48 +14,43 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!--TODO stond aan maar is toch niet nodig?-->
-    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
+    <!-- TODO stond aan maar is toch niet nodig? -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> -->
+
 
     <!-- For network access so gesture commands can be sent to Action Devices (= Linux (Ubuntu) servers) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- For MQTT service -->
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- For MQTT service. Used in several methods. TODO meer info hier zetten? -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-
-
-
-
-    <!--android:configChanges="orientation"
+    <!--
+    android:configChanges="orientation"
     android:screenOrientation="landscape"
     Dit had je bij AdvancedActivity maar heb je niet meer nodig.
-    Moest het nog nodig zijn, zet het dan bij MainActivity...-->
-    <!-- DEFAULT android:theme="@style/AppTheme"-->
+    Moest het nog nodig zijn, zet het dan bij MainActivity...
+    -->
+    <!-- DEFAULT android:theme="@style/AppTheme" -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Lightdarkmixed"
         android:uiOptions="splitActionBarWhenNarrow" >
-
-
-
         <activity
             android:name=".main.MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
             <meta-data
                 android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".eventueelnognuttig.MasterDetailItemListActivity"
             android:label="@string/title_masterdetailitem_list"
@@ -67,8 +62,6 @@
                 android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
         </activity>
-
-
         <activity
             android:name=".eventueelnognuttig.MasterDetailItemDetailActivity"
             android:label="@string/title_masterdetailitem_detail"
@@ -81,19 +74,18 @@
                 android:value="splitActionBarWhenNarrow" />
         </activity>
 
-
-        <!--TODO eventueel nog te gebruiken:-->
-        <!--<activity-->
-            <!--android:name=".eventueelnognuttig.CursorListActivity"-->
-            <!--android:label="@string/title_activity_cursor_list"-->
-            <!--android:parentActivityName=".main.MainActivity" >-->
-            <!--<meta-data-->
-                <!--android:name="android.support.PARENT_ACTIVITY"-->
-                <!--android:value=".main.MainActivity" />-->
-            <!--<meta-data-->
-                <!--android:name="android.support.UI_OPTIONS"-->
-                <!--android:value="splitActionBarWhenNarrow" />-->
-        <!--</activity>-->
+        <!-- TODO eventueel nog te gebruiken: -->
+        <!-- <activity -->
+        <!-- android:name=".eventueelnognuttig.CursorListActivity" -->
+        <!-- android:label="@string/title_activity_cursor_list" -->
+        <!-- android:parentActivityName=".main.MainActivity" > -->
+        <!-- <meta-data -->
+        <!-- android:name="android.support.PARENT_ACTIVITY" -->
+        <!-- android:value=".main.MainActivity" /> -->
+        <!-- <meta-data -->
+        <!-- android:name="android.support.UI_OPTIONS" -->
+        <!-- android:value="splitActionBarWhenNarrow" /> -->
+        <!-- </activity> -->
 
 
         <!-- portrait mode wordt geforceerd! -->
@@ -102,15 +94,12 @@
             android:screenOrientation="portrait"
         -->
 
-
         <activity
             android:name=".advancedrecognizer.DBManagerUIActivity"
-            android:label="dbmanager"
             android:configChanges="orientation"
-            android:screenOrientation="landscape">
+            android:label="dbmanager"
+            android:screenOrientation="landscape" >
         </activity>
-
-
 
         <service
             android:name=".pushnotificationlistener.MQTTService"
@@ -118,9 +107,15 @@
             android:exported="true" >
         </service>
 
+        <activity
+            android:name=".main.DeviceListActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/select_device"
+            android:theme="@android:style/Theme.Holo.Dialog">
+        </activity>
+
+
 
     </application>
-
-
 
 </manifest>

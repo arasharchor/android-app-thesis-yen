@@ -61,10 +61,8 @@
     <string name="toggle_BT">Bluetooth toggle</string>
     <string name="BT_already_enabled">Bluetooth is enabled already</string>
     <string name="BT_already_disabled">Bluetooth is disabled already</string>
-    <string name="start_BT_discoverable">Made your mobile device discoverable for 2 minutes</string>
-    <string name="BT_already_discoverable">Bluetooth is discoverable already. Now cancelled</string>
     <string name="BT_adapter_not_found">Bluetooth adapter not found</string>
-    <string name="BT_discoverable">Discoverable (2 min)</string>
+
 
     <string name="title_activity_pebble_accel_stream">Pebble™ Acceleration Data Stream</string>
     <string name="no_data">NO DATA</string>
@@ -104,5 +102,21 @@
 
     <string name="error_gesture_library">Error loading the gesture library. Clear the app data and retrain your gestures.</string>
     <string name="clear_gestures">Clear all trained gestures</string>
+    <string name="title_activity_device_list">DeviceListActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+
+
+
+    <!--  DeviceListActivity -->
+    <string name="scanning">Scanning for Bluetooth devices...</string>
+    <string name="select_device">Select a Bluetooth device to connect</string>
+    <string name="none_paired">No Bluetooth devices have been paired</string>
+    <string name="none_found">No Bluetooth devices found</string>
+    <string name="title_paired_devices">Paired Bluetooth Devices</string>
+    <string name="title_other_devices">Other Available Bluetooth Devices</string>
+    <string name="button_scan">Scan for Bluetooth devices</string>
+
+
 
 </resources>

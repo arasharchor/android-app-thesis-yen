@@ -1,5 +1,6 @@
 package com.yen.androidappthesisyen.main;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
@@ -100,7 +101,8 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     private List<String> arrayListNamesPairedBTDevices;
 
 
-
+    // Intent request code for BT dialog
+    private static final int REQUEST_CONNECT_DEVICE = 7;
 
 
 
@@ -296,20 +298,16 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         saveIPIfInserted(enumerator, value);
 
 
-
-                        TextView textViewGeneric = (TextView) getView().findViewById(R.id.textView_generic);
                         // TODO feitelijk moeten we EERST service starten, DIE ZEGT dan of de connecties allemaal goed zijn, EN DAN PAS LABELS AANPASSEN
-                        textViewGeneric.setText(getResources().getString(R.string.generic_connected));
-                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
+                        // START
+                        // TODO here should arrive code to for example do a Bluetooth sweep of the environment, and show and enable the toggles for the discovered devices.
+                        setLabelStates(getView(), true);
+                        setEnableDisableStates(getView(), true);
+                        // When clicking REFRESH we for now simulate the behavior that several (2) devices get detected.
+                        // So their toggles get enabled but we don't set it on ON automatically. (That would be insane)
+                        setToggleStates(getView(), false);
+                        // END
 
-
-                        /*
-                        SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
-                        editorUserDetector.putString("ip_address_broker_" + enumerator, value);
-                        // editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
-                        editorUserDetector.commit();
-                        */
 
 
                         Log.w(LOG_TAG, "enumerator net voor starten service " + enumerator); // TODO enumerator-1 ?
@@ -412,7 +410,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     private void setBTRelatedStates(View returnedView) {
 
         ToggleButton toggleBT = (ToggleButton) returnedView.findViewById(R.id.toggle_BT);
-        Button buttonBTDiscoverable = (Button) returnedView.findViewById(R.id.button_BT_discoverable);
 
         if (BTadapter == null) {
             // set toggle DISABLED
@@ -421,12 +418,9 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
             // ENABLED/DISABLED
             toggleBT.setEnabled(false);
             bundleEnableDisableStates.putBoolean("R.id.toggle_BT", false);
-            buttonBTDiscoverable.setEnabled(false);
-            bundleEnableDisableStates.putBoolean("R.id.button_BT_discoverable", false);
             // ON/OFF
             toggleBT.setChecked(false);
             bundleToggleStates.putBoolean("R.id.toggle_BT", false);
-            // NVT voor buttonBTDiscoverable
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -443,24 +437,18 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                 // set toggle ON
                 toggleBT.setEnabled(true);
                 bundleEnableDisableStates.putBoolean("R.id.toggle_BT", true);
-                buttonBTDiscoverable.setEnabled(true);
-                bundleEnableDisableStates.putBoolean("R.id.button_BT_discoverable", true);
 
                 toggleBT.setChecked(true);
                 bundleToggleStates.putBoolean("R.id.toggle_BT", true);
-                // NVT voor buttonBTDiscoverable
 
             } else {
                 // set toggle ENABLED
                 // set toggle OFF
                 toggleBT.setEnabled(true);
                 bundleEnableDisableStates.putBoolean("R.id.toggle_BT", true);
-                buttonBTDiscoverable.setEnabled(false);
-                bundleEnableDisableStates.putBoolean("R.id.button_BT_discoverable", false);
 
                 toggleBT.setChecked(false);
                 bundleToggleStates.putBoolean("R.id.toggle_BT", false);
-                // NVT voor buttonBTDiscoverable
 
             }
         }
@@ -486,8 +474,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
         ToggleButton toggleBT = (ToggleButton) returnedView.findViewById(R.id.toggle_BT);
         bundleEnableDisableStates.putBoolean("R.id.toggle_BT", toggleBT.isEnabled());
-        Button buttonBTDiscoverable = (Button) returnedView.findViewById(R.id.button_BT_discoverable);
-        bundleEnableDisableStates.putBoolean("R.id.button_BT_discoverable", buttonBTDiscoverable.isEnabled());
 
         ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
         bundleEnableDisableStates.putBoolean("R.id.toggle_communication_test", toggleCommunicationTest.isEnabled());
@@ -537,8 +523,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
         ToggleButton toggleBT = (ToggleButton) returnedView.findViewById(R.id.toggle_BT);
         toggleBT.setEnabled(bundleEnableDisableStates.getBoolean("R.id.toggle_BT"));
-        Button buttonBTDiscoverable = (Button) returnedView.findViewById(R.id.button_BT_discoverable);
-        buttonBTDiscoverable.setEnabled(bundleEnableDisableStates.getBoolean("R.id.button_BT_discoverable"));
 
         ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
         toggleCommunicationTest.setEnabled(bundleEnableDisableStates.getBoolean("R.id.toggle_communication_test"));
@@ -597,9 +581,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
         ToggleButton toggleBT = (ToggleButton) returnedView.findViewById(R.id.toggle_BT);
         toggleBT.setOnClickListener(this);
-
-        Button buttonBTDiscoverable = (Button) returnedView.findViewById(R.id.button_BT_discoverable);
-        buttonBTDiscoverable.setOnClickListener(this);
 
         Button buttonConnectPebble = (Button) returnedView.findViewById(R.id.button_connect_pebble);
         buttonConnectPebble.setOnClickListener(this);
@@ -736,15 +717,13 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
                 break;
 
 
-            case R.id.button_BT_discoverable:
-
-                setBTDiscoverable();
-
-                break;
-
             case R.id.button_connect_pebble:
 
-                openPebbleCompanionAppOrGoAppStore();
+//                openPebbleCompanionAppOrGoAppStore();
+
+                // Launch the DeviceListActivity to see devices and do scan
+                Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
+                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
 
                 break;
 
@@ -753,12 +732,10 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
                 ToggleButton togglePebbleCommunicationTest = (ToggleButton) v.findViewById(R.id.toggle_communication_test);
 
                 if (togglePebbleCommunicationTest.isChecked()) {
-                    // START TEST
-                    startPebbleCommunicationTest();
+
 
                 } else {
-                    // STOP TEST
-                    stopPebbleCommunicationTest();
+
                 }
 
                 break; // NOT "return true/false" since return type is now VOID.
@@ -768,12 +745,10 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
                 ToggleButton togglePebbleDataLogging = (ToggleButton) v.findViewById(R.id.toggle_pebble_acceldata_datalogging);
 
                 if (togglePebbleDataLogging.isChecked()) {
-                    // START DATA LOGGING
-                    startPebbleDataLogging();
+
 
                 } else {
-                    // STOP DATA LOGGING
-                    stopPebbleDataLogging();
+
                 }
 
                 break;
@@ -791,6 +766,41 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
     }
 
+    // TODO en nu moet gezorgd worden dat lijst links in GUI wordt geupdate. maar gebeurt als sowieso na een pairing en na restart vd app.
+    // Maar kan dit direct nu al gebeuren?
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE:
+                // When DeviceListActivity returns with a device to connect
+                if (resultCode == Activity.RESULT_OK) {
+                    // Get the device MAC address
+                    // TODO usen? bv. weergeven in subtitle van Pebble instantie in lijst?
+                    // Of wrsl geen toegevoegde waarde?
+//                    String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+                    // Get the BluetoothDevice object
+//                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+                }
+
+                break;
+
+            case REQUEST_ENABLE_BT:
+                if (resultCode == Activity.RESULT_CANCELED) {
+
+                    ToggleButton toggleBT = (ToggleButton) getView().findViewById(R.id.toggle_BT);
+                    // ENABLED/DISABLED
+//                    toggleBT.setEnabled(false);
+//                    bundleEnableDisableStates.putBoolean("R.id.toggle_BT", false);
+                    // ON/OFF
+                    toggleBT.setChecked(false);
+                    bundleToggleStates.putBoolean("R.id.toggle_BT", false);
+                }
+
+                break;
+
+        }
+    }
+
     private void startBT() {
 
         if (!BTadapter.isEnabled()) {
@@ -800,11 +810,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
             // TODO eventueel: checken dat er geen error was bij enablen, via https://developer.android.com/training/basics/intents/result.html#ReceiveResult
             // en dan daarop de Toast aanpassen.
-
-            // TODO kunnen dit stuk BUITEN de IF lus zetten, zodat sowieso de button wordt geenabled. Maar is wrsl overbodig en kan mss ongewenst gedrag geven...
-            Button buttonBTDiscoverable = (Button) getView().findViewById(R.id.button_BT_discoverable);
-            buttonBTDiscoverable.setEnabled(true);
-            bundleEnableDisableStates.putBoolean("R.id.button_BT_discoverable", true);
 
 
             // TODO SYSTEEM LIJKT NIET TE WERKEN?
@@ -837,75 +842,7 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
     }
 
-    // TODO
-    /*@Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO nodig?
-//        super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == REQUEST_ENABLE_BT){
-
-            if(resultCode == RESULT_OK){
-
-            }
-        }
-
-    }*/
-
-    private void setBTDiscoverable() {
-
-        // TODO eventueel de button DISABLEN gedurende 2 min.
-        // maar op zich hoeft het niet: als je erop klikt en 2 min. nog niet voorbij, zorgt de IF lus dat er geen problemen komen.
-
-        if (BTadapter == null) {
-            Log.w("BLUETOOTH", "BT adapter is null");
-        }
-
-        if (!BTadapter.isDiscovering()) {
-
-
-            // TODO zien of je volgende werkende kan krijgen.
-            // Om zo die 2de ListView op te vullen met discoverable devices.
-            // Maar die 2de ListView zit dus in ANDER fragment.
-            // Communiceren via andere fragments: TO RESEARCH.
-//            ArrayAdapter<String> neededAdapter = (ArrayAdapter<String>) ((MasterDetailItemListFragment) getFragmentManager().findFragmentById(R.id.masterdetailitem_list)).getListAdapter();
-//            neededAdapter.clear();
-//            neededAdapter.add("blaaa");
-
-
-            startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE), REQUEST_BT_DISCOVERABLE);
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-                    outputWindow.append("--- " + getResources().getString(R.string.start_BT_discoverable) + " ---" + "\n");
-                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-                    Toast.makeText(getActivity(), R.string.start_BT_discoverable, Toast.LENGTH_LONG).show();
-                }
-            });
-
-
-        } else {
-
-
-            // TODO mss dus best met TOGGLE button werken want met normal button ziet er raar uit.
-            // TODO systeem werkt niet? we geraken hier nooit?
-            BTadapter.cancelDiscovery();
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-                    outputWindow.append("--- " + getResources().getString(R.string.BT_already_discoverable) + " ---" + "\n");
-                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-                    Toast.makeText(getActivity(), R.string.BT_already_discoverable, Toast.LENGTH_LONG).show();
-                }
-            });
-
-        }
-
-    }
 
     private void stopBT() {
 
@@ -915,9 +852,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
             BTadapter.disable();
             // hiervoor bestaat er precies geen equivalent voor startActivityForResult
 
-            Button buttonBTDiscoverable = (Button) getView().findViewById(R.id.button_BT_discoverable);
-            buttonBTDiscoverable.setEnabled(false);
-            bundleEnableDisableStates.putBoolean("R.id.button_BT_discoverable", false);
 
         } else {
 
@@ -933,57 +867,7 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
     }
 
 
-    private void openPebbleCompanionAppOrGoAppStore() {
 
-        // Changed "context" to "getActivity()"
-        Intent intent = getActivity().getPackageManager().getLaunchIntentForPackage("com.getpebble.android");
-        if (intent != null) {
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast t = Toast.makeText(getActivity(), R.string.pebble_companion_app_found, Toast.LENGTH_LONG);
-                    t.setGravity(Gravity.CENTER, 0, 0);
-                    t.show();
-
-                    Toast t2 = Toast.makeText(getActivity(), R.string.connect_your_pebble, Toast.LENGTH_LONG);
-                    t2.setGravity(Gravity.CENTER, 0, 0);
-                    t2.show();
-                }
-            });
-
-
-            /*You can use flags to modify the default behaviour of how an activity will be associated with a task when using startActivity() to start the activity:
-
-FLAG_ACTIVITY_NEW_TASK – This starts the activity in a new task. If it’s already running in a task, then that task is brought to the foreground and the activity’s onNewIntent() method receives the intent (this is the same as using singleTask in the manifest)
-FLAG_ACTIVITY_SINGLE_TOP – In this case, if the activity is currently at the top of the stack, then its onNewIntent() method receives the intent. A new activity is not created (this is the same as using singleTop in the manifest).
-FLAG_ACTIVITY_CLEAR_TOP – Here, if the activity is already running in the current task, then this activity is brought to the top of the stack (all others above it are destroyed) and its onNewIntent() method will receive the intent. There is no launchMode equivalent for this flag.
-Make a note: You can use the Intent Flags to override the launch mode defined in the manifest file!*/
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            getActivity().startActivity(intent);
-        } else {
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast t = Toast.makeText(getActivity(), R.string.pebble_companion_app_not_found, Toast.LENGTH_LONG);
-                    t.setGravity(Gravity.CENTER, 0, 0);
-                    t.show();
-
-                    Toast t2 = Toast.makeText(getActivity(), R.string.download_and_retry, Toast.LENGTH_LONG);
-                    t2.setGravity(Gravity.CENTER, 0, 0);
-                    t2.show();
-                }
-            });
-
-
-            intent = new Intent(Intent.ACTION_VIEW);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setData(Uri.parse("market://details?id=com.getpebble.android"));
-            getActivity().startActivity(intent);
-        }
-
-    }
 
 
     @Override
@@ -1017,7 +901,7 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
 
         ToggleButton toggleCommunicationTest = (ToggleButton) theView.findViewById(R.id.toggle_communication_test);
         if (toggleCommunicationTest.isEnabled() && toggleCommunicationTest.isChecked()) {
-            startPebbleCommunicationTest();
+
         } else {
             // Do NOTHING since the service should have been disabled already when the fragment arrived in onPause().
         }
@@ -1027,7 +911,7 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
         }
         ToggleButton togglePebbleDataLogging = (ToggleButton) theView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
         if (togglePebbleDataLogging.isEnabled() && togglePebbleDataLogging.isChecked()) {
-            startPebbleDataLogging();
+
         }
         ToggleButton toggleGeneric = (ToggleButton) theView.findViewById(R.id.toggle_generic);
         if (toggleGeneric.isEnabled() && toggleGeneric.isChecked()) {
@@ -1037,283 +921,6 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
 
     }
 
-    // TODO gebruik de volgende methode bv. bij het geval dat je terugkeert NAAR dit fragment van elders,
-    // en de communication test listener dient NOG ACTIEF TE ZIJN.
-    private void startPebbleCommunicationTest() {
-
-
-        // TODO uitgeschakeld omdat niet meer nodig is
-
-        // FOR DISPLAYING WHICH PEBBLE BUTTON (UP/SELECT/DOWN) WAS PRESSED.
-//        if (myPebbleDataReceiver == null) {
-//
-//
-//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-//            // Without "getResources()." it also seems to work, but better to USE IT!
-//            outputWindow.append("--- " + getResources().getString(R.string.start_communication_test) + " ---" + "\n");
-//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-//
-//
-//            // public static abstract class PebbleKit.PebbleDataReceiver
-//            // extends android.content.BroadcastReceiver
-//            myPebbleDataReceiver = new PebbleKit.PebbleDataReceiver(WATCHAPP_UID) {
-//
-//                // in tutorial: public void receiveData(Context context, int transactionId, PebbleDictionary data)
-//                @Override
-//                public void receiveData(Context context, int transactionId, PebbleDictionary pebbleTuples) {
-//
-//                    // ACK het bericht
-//                    PebbleKit.sendAckToPebble(context, transactionId);
-//
-//                    // check of de key bestaat
-//                    // getUnsignedInteger BESTAAT NIET MEER?
-//                    if (pebbleTuples.getUnsignedIntegerAsLong(KEY_BUTTON_EVENT) != null) {
-//                        int button = pebbleTuples.getUnsignedIntegerAsLong(KEY_BUTTON_EVENT).intValue();
-//
-//                        switch (button) {
-//                            case BUTTON_EVENT_UP:
-//                                outputWindow.append(getResources().getString(R.string.pebble_button_up_pressed));
-//                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-//                                break;
-//                            case BUTTON_EVENT_DOWN:
-//                                outputWindow.append(getResources().getString(R.string.pebble_button_down_pressed));
-//                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-//                                break;
-//                            case BUTTON_EVENT_SELECT:
-//                                outputWindow.append(getResources().getString(R.string.pebble_button_select_pressed));
-//                                ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-//                                break;
-//                        }
-//
-//                    }
-//
-//
-//                    //Make the watch vibrate
-//                    PebbleDictionary dict = new PebbleDictionary();
-//                    dict.addInt32(KEY_VIBRATION, 0);
-//                    PebbleKit.sendDataToPebble(context, WATCHAPP_UUID, dict);
-//
-//
-//                }
-//            };
-//
-//            // first parameter was 'this' (for type CONTEXT)
-//            PebbleKit.registerReceivedDataHandler(getActivity(), myPebbleDataReceiver);
-//
-//
-//        }
-//
-//        // of IN if lus?
-//        PebbleKit.startAppOnPebble(getActivity(), WATCHAPP_UUID);
-
-    }
-
-
-    private void stopPebbleCommunicationTest() {
-
-
-        // TODO uitgeschakeld omdat niet meer nodig is
-
-
-
-        /* http://developer.getpebble.com/docs/android/com/getpebble/android/kit/PebbleKit/
-        A convenience function to assist in programmatically registering a broadcast receiver for the 'CONNECTED' intent. To avoid leaking memory, activities registering BroadcastReceivers must unregister them in the Activity's Activity.onPause() method.
-         */
-
-        // Checking for null is recommended.
-//        if (myPebbleDataReceiver != null) {
-//
-//
-//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-//            outputWindow.append("--- " + getResources().getString(R.string.stop_communication_test) + " ---" + "\n");
-//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-//
-//
-//            // TODO zien of deze try/catch werkt voor fixen: Caused by: java.lang.IllegalArgumentException: Receiver not registered: com.yen.myfirstapp.MainActivity$1@40fc03c0
-//            try {
-//
-////                unregisterReceiver(myPebbleDataReceiver);
-//                // Changed to following since we are in a FRAGMENT; not an ACTIVITY.
-//                getActivity().unregisterReceiver(myPebbleDataReceiver);
-//
-//
-//                // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
-//                myPebbleDataReceiver = null;
-//
-//
-//            } catch (IllegalArgumentException ex) {
-//
-//
-//                // TODO niets doen gewoon?
-//
-//
-//                // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
-//                myPebbleDataReceiver = null;
-//            }
-//
-//        }
-//
-//
-//        // IN if?
-//        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
-
-    }
-
-
-    private void startPebbleDataLogging() {
-
-
-        // TODO mag wrsl weg!
-
-
-        // voor PEBBLE DATA LOGGING
-//        if (myPebbleDataLOGReceiver == null) {
-//
-//
-//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-//            // Without "getResources()." it also seems to work, but better to USE IT!
-//            outputWindow.append("--- " + getResources().getString(R.string.start_pebble_data_logging) + " ---" + "\n");
-//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-//
-//
-//            // MEER INFO https://developer.android.com/reference/android/os/Handler.html
-//            // + https://developer.android.com/training/multiple-threads/communicate-ui.html
-//
-//
-//        /*ZORGT VOOR DELAYS (skipped frames) IN EMULATOR DUS DIT NIET GEBRUIKEN.
-//        TUTORIAL GEBRUIKT OOK BOVENSTAANDE FINAL IMPLEMENTATIE.
-//        if(handler == null){
-//            handler = new Handler();
-//        }
-//        */
-//
-//
-//            myPebbleDataLOGReceiver = new PebbleKit.PebbleDataLogReceiver(WATCHAPP_UUID) {
-//
-//                @Override
-//                public void receiveData(Context context, UUID logUuid, Long timestamp, Long tag, byte[] data) {
-//                    // Important note: If your Java IDE places a call to super() by default, this will cause an UnsupportedOperationException to be thrown.
-//                    // Remove this line to avoid the Exception.
-//                    // super.receiveData(context, logUuid, timestamp, tag, data);
-//
-//
-//                    if (tag.intValue() == DATA_LOG_ACCEL_DATA_TAG) {
-//
-//                        // TODO klopt dit systeem nog?
-//                        // misaligned data, just drop it
-//                        if (data.length % 15 != 0 || data.length < 15) {
-//                            Log.w("DATA LOGGING", "Misaligned data while data logging");
-//                            return;
-//                        }
-//
-//
-//                        List<AccelData> accelDataList = AccelData.fromDataArray(data);
-//
-//
-////                        resultBuilder.append("size van list accelDataList:" + accelDataList.size() + "\n");
-//                        // size gaf 1 MAAR ZAL DIT NIET ALTIJD ZO ZIJN
-//                        // OMDAT WE INGESTELD HADDEN MAAR 1 SAMPLE PER KEER TE STUREN?
-//                        // maar best houden voor als we samples verhogen.
-//
-//
-//                        /* Use Enhanced For Loop Syntax
-//                        * two() is fastest for devices without a JIT, and indistinguishable from one() for devices with a JIT. It uses the enhanced for loop syntax introduced in version 1.5 of the Java programming language.
-//
-//So, you should use the enhanced for loop by default, but consider a hand-written counted loop for performance-critical ArrayList iteration. */
-//                        for (final AccelData accelItem : accelDataList) {
-////                            try {
-//
-////                                resultBuilder.append(accel.toJson().toString(2));
-////                            resultBuilder.append(accelItem.getOneLineString() + "\n");
-//
-//
-//                            /* Gebruik van POST: uitleg zie code @ https://developer.android.com/guide/components/processes-and-threads.html */
-//                            handler.post(new Runnable() {
-//                                @Override
-//                                public void run() {
-//
-//                                    // TODO test of nuttig/nadelig.
-//                                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-//
-////                                    outputWindow.setText(resultBuilder.toString());
-////                                    outputWindow.append(resultBuilder.toString());
-//                                    outputWindow.append(accelItem.getOneLineString() + "\n");
-//                                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-//                                }
-//                            });
-////
-////                            } catch (JSONException e) {
-////                                e.printStackTrace();
-////                            }
-//                        }
-//
-//
-//                    }
-//                }
-//
-//                @Override
-//                public void onFinishSession(Context context, UUID logUuid, Long timestamp, Long tag) {
-//                    super.onFinishSession(context, logUuid, timestamp, tag);
-//
-//                    // Session is finished, use the data!
-//
-//                    // logView.setText("Sending data log FINISHED. " + resultBuilder.toString());
-////                    outputWindow.setText("Sending data log FINISHED.");
-//
-//                    outputWindow.append("--- " + getResources().getString(R.string.sending_data_log_finished) + " ---" + "\n");
-//                    ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-//                }
-//            };
-//
-//            PebbleKit.registerDataLogReceiver(getActivity(), myPebbleDataLOGReceiver);
-//
-//
-//            // TODO TEST: PebbleKit.requestDataLogsForApp(this, WATCHAPP_UUID);
-//            // A convenience function to emit an intent to pebble.apk to request the data logs for a particular app.
-//
-//        }
-//
-//        // IN if lus?
-//        PebbleKit.startAppOnPebble(getActivity(), WATCHAPP_UUID);
-
-
-    }
-
-
-    private void stopPebbleDataLogging() {
-
-        // TODO mag wrsl weg!
-
-        // Finally, as with any Receivers registered with PebbleKit,
-        // remember to unregister your receiver when the user leaves the app:
-//        if (myPebbleDataLOGReceiver != null) {
-//
-//
-//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-//            // Without "getResources()." it also seems to work, but better to USE IT!
-//            outputWindow.append("--- " + getResources().getString(R.string.stop_pebble_data_logging) + " ---" + "\n");
-//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-//
-//
-//            try {
-//
-//                getActivity().unregisterReceiver(myPebbleDataLOGReceiver);
-//
-//                myPebbleDataLOGReceiver = null;
-//
-//            } catch (IllegalArgumentException ex) {
-//                // TODO niets doen gewoon?
-//
-//
-//                myPebbleDataLOGReceiver = null;
-//            }
-//        }
-//
-//
-//        // IN if?
-//        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
-
-    }
 
 
     @Override
@@ -1328,8 +935,6 @@ Make a note: You can use the Intent Flags to override the launch mode defined in
 
         // NIET de BT service disablen he. Gebeurt expliciet als user het wilt en niet zomaar bij onPause ofzo.
 
-        stopPebbleCommunicationTest();
-        stopPebbleDataLogging();
 
         // hier dus best NIET maar wel in de individuele methodes?
 //        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);

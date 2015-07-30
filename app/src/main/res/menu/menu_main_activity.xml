@@ -7,27 +7,18 @@
 
 
     <!-- Settings, should always be in the overflow -->
-    <!-- Here no icon defined -->
     <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
 
-    <!-- icon -->
-    <item
+    <!-- TODO dus niet meer gebruiken? Refresh icon -->
+    <!--<item
         android:id="@+id/action_button_refresh"
         android:showAsAction="ifRoom"
         android:title="@string/action_label_refresh"
-        android:icon="@drawable/ic_menu_refresh_holo_light" />
-
-
-    <!--android:checkable="true"-->
-    <!--android:checked="false"-->
-    <item
-        android:id="@+id/action_button_1"
-        android:showAsAction="ifRoom"
-        android:title="@string/action_label_button_1" />
+        android:icon="@drawable/ic_menu_refresh_holo_light" />-->
 
 
     <!--android:checkable="true"-->
@@ -36,6 +27,20 @@
         android:id="@+id/action_button_2"
         android:showAsAction="ifRoom"
         android:title="@string/action_label_button_2" />
+
+
+    <!--android:checkable="true"-->
+    <!--android:checked="false"-->
+    <item
+        android:id="@+id/action_button_1"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/action_label_button_1"
+        android:icon="@drawable/pebble_small"/>
+
+
+
+
+
 
     <!-- Navigation submenu -->
     <item

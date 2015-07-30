@@ -10,7 +10,6 @@ import android.content.pm.ActivityInfo;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -33,21 +32,12 @@ import com.yen.androidappthesisyen.R;
 import com.yen.androidappthesisyen.simplerecognizer.PebbleGestureModel;
 import com.yen.androidappthesisyen.simplerecognizer.TiltGestureRecognizer;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -160,17 +150,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
         /*
          * Shows alert box when gesture recognition thread returns
-		 *
-		 * also change the statusText back
-		 *
-		 * also turn acceleration sensor back on
 		 */
 
-        // status text
-        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
-        statusText.setText("Gesture recognition mode");
-        Log.w("show_alert_box", "ALLLLLEEEEERRRRRTTTTT");
-        // display a dialog
 
         // stond 'this'
         new AlertDialog.Builder(getActivity())
@@ -178,9 +159,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                 .setPositiveButton("OK", null)
                 .show();
 
-        // TODO dit dus disablen want niet nodig maar TEST OF HET NIET BREAKT.
-        // turn on the acc sensor
-//        mSensorManager.registerListener(sensorListener, SensorManager.SENSOR_ACCELEROMETER, SensorManager.SENSOR_DELAY_GAME);
 
     }
 
@@ -277,15 +255,20 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         Boolean useGestureSpotting = settings.getBoolean("use", true);
 
 
-        if (useGestureSpotting) {
-            findBoundariesGesture(values);
-        } else {
+        Bundle bundle = this.getArguments();
+        String state = bundle.getString("state");
+        if (state.equalsIgnoreCase("recognize")) {
+
+            if (useGestureSpotting) {
+                findBoundariesGesture(values);
+            } else {
+                // TODO eigenlijk mag IF weg want doen niets bij ELSE?
+            }
 
 
-            // ======================================================================================================================================================
-            // TODO hierboven wordt alle gekregen accel data gewoon getoond.
-            // en HIERONDER wordt in IF lus de gekregen accel data bepaald die in een TRACE moet om een GESTURE te vormen.
-            // dus wrsl aanpassen van CODE DAT BOOLEAN RECORD_GESTURE aanpast wat dat moet nu gebeuren automatisch (in RECOGNIZE phase tenminste).
+        } else if (state.equalsIgnoreCase("learn")) {
+
+
             if (RECORD_GESTURE) {
 
                 float[] traceItem = {dataX.floatValue(),
@@ -295,9 +278,30 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                     recordingGestureTrace.add(traceItem);
                 }
 
+            } else {
+                // TODO eigenlijk mag IF weg want doen niets bij ELSE?
             }
 
         }
+
+
+        // OUDER
+//        if (useGestureSpotting) {
+//            findBoundariesGesture(values);
+//        } else {
+//
+//            if (RECORD_GESTURE) {
+//
+//                float[] traceItem = {dataX.floatValue(),
+//                        dataY.floatValue(),
+//                        dataZ.floatValue()};
+//                if (recordingGestureTrace != null) {
+//                    recordingGestureTrace.add(traceItem);
+//                }
+//
+//            }
+//
+//        }
 
 
     }
@@ -568,31 +572,21 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
     private void doRemainingTasksAfterRecording() {
 
-
-        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
-
         // clear the existing trace
         switch (state) {
 
             case STATE_LEARN:
                 // recordingGestureTrace = null;
                 // note that the arraylist is being copied
-                statusText.setText("Saving gesture to DB...");
                 Gesture ng = new Gesture(recordingGestureIDString, new ArrayList<float[]>(recordingGestureTrace));
 
                 // add gesture to library but prepare with recognizer settings first
                 myGestureLibrary.addGesture(ng.gestureID, this.myGestureRecognizer.prepare_gesture_for_library(ng), false);
                 if (DEBUG)
                     Log.w("stopRecordingGesture", "Recorded Gesture ID " + recordingGestureIDString + " Gesture Trace Length:" + recordingGestureTrace.size());
-                statusText.setText("Press button to train gesture.");
                 break;
 
             case STATE_RECOGNIZE:
-                statusText.setText("Recognizing gesture...");
-
-                // TODO mag weg?
-                // stop accelerometer
-//                mSensorManager.unregisterListener(sensorListener);
 
                 // BUGFIX VIA https://code.google.com/p/three-dollar-gesture-recognizer/issues/detail?id=1
                 final Gesture candidate = new Gesture(null, new ArrayList<float[]>(recordingGestureTrace));
@@ -623,7 +617,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                         });
 
 
-
                         // TODO "  && !detected_gid.equalsIgnoreCase("not recognized!") " ook in IF steken?
                         // of dat net niet om te zien wann er NOG GEEN GESTURES in DB zitten?
                         // maar dat wrsl op betere manier tonen dan via dialog na uitvoeren gebaar?
@@ -651,12 +644,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                     }
                 };
                 t.start();
-
-                // TEST LOCATIE ASYNCTASK
-                // UPDATE: werkt wrsl niet OMDAT DETECTED_GID hier nog de VORIGE waarde bevat
-                // omdat de THREAD nog aan het runnen is terwijl men HIER komt!
-//                Log.w(LOG_TAG, "DETECTED GID: " + detected_gid);
-//                new AsyncPOSTGestureToServer().execute(stringURL, detected_gid);
 
 
                 if (DEBUG) Log.w("stopRecordingGesture", "STATE_RECOGNIZE --> thread dispatched");
@@ -775,10 +762,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                         // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
 
 
-                        // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
-//                            new AsyncPOSTGestureToServer().execute(stringURL, gid);
-
-
                         // Network actions not allowed on main thread (= UI thread) so starting a new thread.
                         Thread t = new Thread() {
                             public void run() {
@@ -874,62 +857,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     }
 
 
-    // TODO mag weg want nooit gebruikt of?
-    private void nieuweTestcode(String stringURL, String stringGesture) {
-
-
-        HttpClient client = new DefaultHttpClient();
-        HttpConnectionParams.setConnectionTimeout(client.getParams(), 10000); //Timeout Limit
-        HttpResponse response;
-        JSONObject json = new JSONObject();
-
-        try {
-            HttpPost post = new HttpPost(stringURL);
-            json.put("gesture", stringGesture);
-//            json.put("emailid", email);
-            Log.w("JSON NAAR STRING", json.toString());
-            StringEntity se = new StringEntity(json.toString());
-            se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-            post.setEntity(se);
-            response = client.execute(post);
-
-        /*Checking response */
-            if (response != null) {
-                InputStream in = response.getEntity().getContent(); //Get the data in the entity
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.v("Error", "Cannot Establish Connection");
-        }
-
-    }
-
-    // TODO mag weg want nooit gebruikt of?
-    private class AsyncPOSTGestureToServer extends AsyncTask<String, Void, Integer> {
-
-        @Override
-        protected Integer doInBackground(String... params) {
-
-
-            int httpResult = POSTGestureToServer(params[0], params[1]);
-
-
-            return httpResult;
-        }
-
-
-        @Override
-        protected void onPostExecute(Integer httpResult) {
-//            super.onPostExecute(httpResult);
-
-            // TODO DIALOG OF TOAST OFZO TONEN ALS HET FOUTLIEP
-            // TODO OOK TELKENS MELDEN ALS GOED GING?
-
-        }
-    }
-
-
     private int POSTGestureToServer(String stringURL, String stringGesture) {
 
 
@@ -951,8 +878,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
             httpcon.setRequestMethod("POST");
             httpcon.setUseCaches(false);
             // TODO EVENTUEEL MEE SPELEN:
-            httpcon.setConnectTimeout(30000); // stond op 10000
-            httpcon.setReadTimeout(30000); // stond op 10000
+            httpcon.setConnectTimeout(10000);
+            httpcon.setReadTimeout(10000);
 
 
             // TODO is testen: (dan moet JSON object hier gemaakt worden ipv verderop)
@@ -982,13 +909,9 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
             os.close();
 
 
-            // -------------- EVEN UITGEZET OMDAT PAS REPONSE KRIJGT ALS JE HET C GUI WINDOW SLUIT.
-
             httpResult = httpcon.getResponseCode();
             if (httpResult == HttpURLConnection.HTTP_OK) { // Numeric status code, 200: OK
 
-
-                //Read
                 BufferedReader br = new BufferedReader(new InputStreamReader(httpcon.getInputStream(), "UTF-8"));
 
 
@@ -1005,6 +928,10 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                 System.out.println(" ------- RESULT STRING: " + resultString);
 
             } else {
+                // TODO DIALOG OF TOAST OFZO TONEN ALS HET FOUTLIEP
+                // TODO OOK TELKENS MELDEN ALS GOED GING?
+
+
                 // TODO eventueel:
 //            } else if (statusCode != HttpURLConnection.HTTP_OK) {
 //                // handle any other errors, like 404, 500,..
@@ -1054,10 +981,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
         setRetainInstance(true);
-
-
-        // voor starten app voor ACCEL DATA STREAM.
-        PebbleKit.startAppOnPebble(getActivity(), uuid);
 
 
         // voor THREE DOLLAR gestures
@@ -1153,6 +1076,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         });
 
 
+        // TODO die checkbox mag eigenlijk weg he, want user zal nooit toch manueel gesture spotting aan/uit zetten?
+        // Of houden en gewoon in comments zetten.
         checkboxGestureSpotting = (CheckBox) returnedView.findViewById(R.id.checkBoxGestureSpotting);
         SharedPreferences gestureSpottingSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_spotting", Context.MODE_PRIVATE);
         Boolean useGestureSpotting = gestureSpottingSettings.getBoolean("use", true);
@@ -1168,14 +1093,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         });
 
 
-        // voor THREE DOLLAR gestures
-        final Button mainButton = (Button) returnedView.findViewById(R.id.Button01);
-
-
-        mainButton.setOnTouchListener(new View.OnTouchListener()
-
-
-                                      {
+        final Button mainButton = (Button) returnedView.findViewById(R.id.btn_record_gesture);
+        mainButton.setOnTouchListener(new View.OnTouchListener() {
                                           public boolean onTouch(View v, MotionEvent event) {
 
                                               if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -1199,11 +1118,9 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                                               return false;
                                           }
                                       }
-
-
         );
 
-
+        // TODO vereist of?
         mainButton.setOnClickListener(new View.OnClickListener()
 
                                       {
@@ -1223,24 +1140,28 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
                                       }
-
-
         );
+
+        Bundle bundle = this.getArguments();
+        String state = bundle.getString("state");
+        if (state.equalsIgnoreCase("recognize")) {
+            mainButton.setVisibility(View.INVISIBLE);
+        } else if (state.equalsIgnoreCase("learn")) {
+            checkboxGestureSpotting.setVisibility(View.INVISIBLE);
+        }
 
 
         // We also place it here, since in case there is already text in the ScrollView when arriving there, we immediately scroll.
         ((ScrollView) returnedView.findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
 
 
-        // TODO ---------------------------------------------------------------------- goede locatie hier?
-        TextView statusText = (TextView) returnedView.findViewById(R.id.statusText);
-        setCorrectStateAndView(statusText);
+        setCorrectStateAndView();
 
 
         return returnedView;
     }
 
-    private void setCorrectStateAndView(TextView statusText) {
+    private void setCorrectStateAndView() {
 
         Bundle bundle = this.getArguments();
         String state = bundle.getString("state");
@@ -1254,7 +1175,7 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
             // TODO iets doen?
         }
 
-        stateChanged(statusText); // FYI: dit doet niets concreets als het state "library" is.
+        stateChanged(); // FYI: dit doet niets concreets als het state "library" is.
 
         // 16-07 OUD
 //        if(state.equalsIgnoreCase("library")){
@@ -1270,19 +1191,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     private void enableAccelStream(String systemID) {
 
 
-        /* OUD
-        String systemID = "triggered-by-user";
-        SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
-        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putString("enabledSystem", systemID);
-        accelStreamEditor.commit();
-
-        PebbleDictionary dict = new PebbleDictionary();
-        dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
-        PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
-        */
-
-        // NIEUW
         String previousList = getEnabledAccelStreamDevices();
         Log.w(LOG_TAG, "previousList " + previousList);
 
@@ -1305,19 +1213,7 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     // ----------- KOPIE OOK TE VINDEN IN MQTTSERVICE.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
     private void disableAccelStream(String systemID) {
 
-        /* OUD
-        String systemID = "triggered-by-user";
-        SharedPreferences accelStreamSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
-        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putString("enabledSystem", systemID);
-        accelStreamEditor.commit();
 
-        PebbleDictionary dict = new PebbleDictionary();
-        dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
-        PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
-        */
-
-        // NIEUW
         String previousList = getEnabledAccelStreamDevices();
         Log.w(LOG_TAG, "previousList " + previousList);
 
@@ -1336,6 +1232,25 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         } else {
             // The NEW list is NOT empty. This means we keep the accel stream alive. So we do nothing.
         }
+    }
+
+
+    private void enableAccelStreamForTraining() {
+
+        PebbleDictionary dict = new PebbleDictionary();
+        dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
+        PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+
+    }
+
+
+    private void disableAccelStreamForTraining() {
+
+        PebbleDictionary dict = new PebbleDictionary();
+        dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
+        PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+
+        Log.w(LOG_TAG, "stream disabled");
     }
 
 
@@ -1442,7 +1357,7 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
     // 16-07 PARAMETER GEBRUIKT IPV INITIALISATIE HIER.
-    public void stateChanged(TextView statusText) {
+    public void stateChanged() {
 //        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
 
         if (DEBUG) Log.w("stateChanged", "current State is: " + this.state.toString());
@@ -1454,7 +1369,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                 // show dialog with which the user can enter the gesture id
 
                 if (DEBUG) Log.w("stateChanged", "STATE_LEARN");
-                statusText.setText("Press button to train gesture");
                 Context ctx = getActivity();
                 LayoutInflater li = LayoutInflater.from(getActivity());
                 // final so that i can use it in the inner class uargh!
@@ -1490,7 +1404,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
                 break;
 
             case STATE_RECOGNIZE:
-                statusText.setText("Gesture recognition mode");
                 break;
 
             case STATE_LIBRARY:
@@ -1510,8 +1423,7 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         // change state and map to enum value
         this.state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.values()[resultCode];
         //update activity's state
-        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
-        this.stateChanged(statusText);
+        this.stateChanged();
     }
 
 
@@ -1520,12 +1432,40 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         super.onResume();
 
 
+        // TODO stond zeer lange tijd in onCreate maar hier is wrsl beter?
+        // voor starten app voor ACCEL DATA STREAM.
+        PebbleKit.startAppOnPebble(getActivity(), uuid);
+
+
         // voor (o.a.) PEBBLE ACCEL STREAM
         getToggleStatesAndEnableServices();
 
-        // TODO mag dus weg maar check dat NIETS BREAKT.
-        // voor THREE DOLLAR gestures
-//        mSensorManager.registerListener(sensorListener, SensorManager.SENSOR_ACCELEROMETER, SensorManager.SENSOR_DELAY_GAME);
+
+        // ONLY when we are in the TRAIN tab do we automatically enable the data stream.
+        Bundle bundle = this.getArguments();
+        String state = bundle.getString("state");
+        if (state.equalsIgnoreCase("learn")) {
+            Log.w(LOG_TAG, "======================= net voor enableAccelStreamForTraining");
+
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    try {
+                        Thread.sleep(1000); // TODO default 5000. Als problemen geeft, verhoog.
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    enableAccelStreamForTraining();
+
+                }
+            }).start();
+
+
+        }
+
     }
 
 
@@ -1670,8 +1610,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         }
 
 
-        // TODO of beter IN if lus?
-        PebbleKit.startAppOnPebble(getActivity(), uuid);
     }
 
 
@@ -1679,9 +1617,19 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     public void onPause() {
         super.onPause();
 
+
+        // ONLY when we leave in the TRAIN tab do we automatically disable the data stream (since we also enabled it automatically).
+        Bundle bundle = this.getArguments();
+        String state = bundle.getString("state");
+        if (state.equalsIgnoreCase("learn")) {
+            disableAccelStreamForTraining();
+        }
+
         // TODO mag dit wel pauzeren of niet?
         // voor PEBBLE ACCEL STREAM
         disableAllServices();
+
+        PebbleKit.closeAppOnPebble(getActivity(), uuid);
     }
 
 
@@ -1725,8 +1673,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
         }
 
-        // TODO of IN de if lus? Maar mag erbuiten.
-        PebbleKit.closeAppOnPebble(getActivity(), uuid);
 
     }
 

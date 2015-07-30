@@ -11,12 +11,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -47,6 +50,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         super.onCreate(savedInstanceState);
 
 
+
         setContentView(R.layout.activity_main);
 
 
@@ -67,24 +71,15 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // FALSE because ROOT ACTIVITY
         theActionBar.setDisplayHomeAsUpEnabled(false);
 
+        // Only when the screen is large enough do we show the app title in the ActionBar.
+        // On smaller screens the tabs would otherwise be shown as a drop-down list.
+        if(!isLargeScreen()){
+            theActionBar.setDisplayShowTitleEnabled(false);
+        }
+
 
         // TODO inflate the tab layout by using XML files instead of coding it here.
         addNavigationTabs(theActionBar);
-
-
-
-
-
-        /* REGARDING THE MQTT SERVICE */
-        // TODO juiste plek om het hier te zetten?
-        /*SharedPreferences settings = getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("ip_address_broker_1", "192.168.1.1");
-        editor.putString("ip_address_broker_2", "192.168.1.2");
-        editor.putString("topic_accelstream",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
-        editor.putString("topics_gesturepusher",  "gesturepusher/#"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
-        editor.commit();
-        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na editor.commit()");*/
 
 
         statusUpdateIntentReceiver = new StatusUpdateReceiver();
@@ -112,7 +107,8 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         registerReceiver(BTReceiver, filter3);
 
 
-        // Certain apps need to keep the screen turned on, such as games or movie apps. The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
+        // Certain apps need to keep the screen turned on, such as games or movie apps.
+        // The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
         // From https://developer.android.com/training/scheduling/wakelock.html
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -158,6 +154,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             }
         }
     };
+
+    private boolean isLargeScreen() {
+        return (this.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
 
 
     // Following 3 methods are due to "implements ActionBar.TabListener"
@@ -345,19 +347,19 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         getMenuInflater().inflate(R.menu.menu_main_activity, menu);
 
         // FOR REFRESH ICON
-        final MenuItem refreshMenuItem = (MenuItem) menu.findItem(R.id.action_button_refresh);
-        refreshMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            // on selecting show progress spinner for 1s
-            public boolean onMenuItemClick(MenuItem item) {
-                // Probably best to NOT do something here, but do it in the right section in onOptionsItemSelected.
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        refreshMenuItem.setActionView(null);
-                    }
-                }, 1000);
-                return false;
-            }
-        });
+//        final MenuItem refreshMenuItem = (MenuItem) menu.findItem(R.id.action_button_refresh);
+//        refreshMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            // on selecting show progress spinner for 1s
+//            public boolean onMenuItemClick(MenuItem item) {
+//                // Probably best to NOT do something here, but do it in the right section in onOptionsItemSelected.
+//                handler.postDelayed(new Runnable() {
+//                    public void run() {
+//                        refreshMenuItem.setActionView(null);
+//                    }
+//                }, 1000);
+//                return false;
+//            }
+//        });
 
 
         // Here we work programmatically instead of via XML. Since we have to check AT RUNTIME some conditions.
@@ -376,10 +378,30 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
 
         if (intent != null) {
+
+
+
+
             firstButton.setTitle("Official Pebble™ Companion App");
             firstButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
+
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast t = Toast.makeText(getApplicationContext(), R.string.pebble_companion_app_found, Toast.LENGTH_LONG);
+                            t.setGravity(Gravity.CENTER, 0, 0);
+                            t.show();
+
+                            Toast t2 = Toast.makeText(getApplicationContext(), R.string.connect_your_pebble, Toast.LENGTH_LONG);
+                            t2.setGravity(Gravity.CENTER, 0, 0);
+                            t2.show();
+                        }
+                    });
+
+
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
 
@@ -389,11 +411,25 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
 
         } else {
-            // TODO translate
+
             firstButton.setTitle("Install official Pebble™ Companion App");
             firstButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast t = Toast.makeText(getApplicationContext(), R.string.pebble_companion_app_not_found, Toast.LENGTH_LONG);
+                            t.setGravity(Gravity.CENTER, 0, 0);
+                            t.show();
+
+                            Toast t2 = Toast.makeText(getApplicationContext(), R.string.download_and_retry, Toast.LENGTH_LONG);
+                            t2.setGravity(Gravity.CENTER, 0, 0);
+                            t2.show();
+                        }
+                    });
+
                     Intent newIntent = new Intent(Intent.ACTION_VIEW);
                     newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     newIntent.setData(Uri.parse("market://details?id=com.getpebble.android"));
@@ -430,32 +466,17 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         The method must be public and accept a single MenuItem parameter—when the system calls this method, it passes the menu item selected. For more information and an example, see the Menu Resource document.*/
 
         switch (item.getItemId()) {
-            // TODO eventueel zoekfunctie implementeren
-            /*case R.id.action_search:
-                // TODO zoekfunctie
-                return true;*/
 
             case android.R.id.home:
                 // TODO handle clicking the app icon/logo
-                return false; // TODO why here 'false'?
+                return false; // TODO wrom 'false'?
 
-            case R.id.action_button_refresh:
-                // switch to a progress animation
-                // THIS CODE TRIGGERS THE ANIMATION. AND THE CODE ABOVE (with handler.postDelayed) STOPS the animation after 1 sec.
-                item.setActionView(R.layout.indeterminate_progress_action);
-
-                // !!
-                MainFragment currentFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.framelayout_container_main_activity);
-
-
-                // TODO here should arrive code to for example do a Bluetooth sweep of the environment, and show and enable the toggles for the discovered devices.
-                currentFragment.setLabelStates(currentFragment.getView(), true);
-                currentFragment.setEnableDisableStates(currentFragment.getView(), true);
-                // When clicking REFRESH we for now simulate the behavior that several (2) devices get detected.
-                // So their toggles get enabled but we don't set it on ON automatically. (That would be insane)
-                currentFragment.setToggleStates(currentFragment.getView(), false);
-
-                return true;
+//            case R.id.action_button_refresh:
+//                // switch to a progress animation
+//                // THIS CODE TRIGGERS THE ANIMATION. AND THE CODE ABOVE (with handler.postDelayed) STOPS the animation after 1 sec.
+//                item.setActionView(R.layout.indeterminate_progress_action);
+//
+//                return true;
 
 
             case R.id.action_button_1:

@@ -38,8 +38,8 @@
         android:layout_marginBottom="16dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_toRightOf="@+id/listView_main"
+        android:layout_toEndOf="@+id/listView_main">
 
 
         <!--of fill parent of match parent maken?-->
@@ -214,30 +214,26 @@
         android:id="@+id/listView_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/horizontalScrollView_main_fragment"
-        android:layout_marginBottom="16dp"
-        android:layout_marginTop="16dp"
         android:background="@drawable/border_ui"
         android:padding="16dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/button_BT_discoverable"
-        android:layout_alignEnd="@+id/button_BT_discoverable" />
+        android:layout_alignTop="@+id/horizontalScrollView_main_fragment"
+        android:layout_alignBottom="@+id/horizontalScrollView_main_fragment"
+        android:layout_toStartOf="@+id/imageView2"
+        android:layout_toLeftOf="@+id/imageView2" />
 
 
     <ScrollView
         android:id="@+id/scrollView_output_window"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/listView_main"
-        android:layout_alignTop="@+id/listView_main"
         android:background="@drawable/border_ui"
         android:padding="16dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@+id/button_BT_discoverable"
-        android:layout_toEndOf="@+id/button_BT_discoverable">
+        android:layout_below="@+id/horizontalScrollView_main_fragment"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/horizontalScrollView_main_fragment"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/horizontalScrollView_main_fragment">
 
 
         <!--TODO Eventueel aanpassen naar EditText als dit meer opties zou bieden? -->
@@ -250,7 +246,8 @@
 
     </ScrollView>
 
-    <TextView
+    <!-- mag weg -->
+    <!--<TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/BT"
@@ -259,7 +256,7 @@
         android:textStyle="bold"
         android:layout_above="@+id/horizontalScrollView_main_fragment"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true" />-->
 
     <!--android:enabled="false"-->
     <ToggleButton
@@ -268,22 +265,9 @@
         android:text="@string/toggle_BT"
         android:id="@+id/toggle_BT"
         android:enabled="false"
-        android:layout_marginLeft="33dp"
-        android:layout_marginStart="33dp"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/textView_BT"
-        android:layout_toEndOf="@+id/textView_BT" />
-
-    <!-- This button is BY DEFAULT DISABLED, because the DEFAULT STATE for toggle_BT is also DISABLED. -->
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/BT_discoverable"
-        android:id="@+id/button_BT_discoverable"
-        android:enabled="false"
-        android:layout_above="@+id/horizontalScrollView_main_fragment"
-        android:layout_toRightOf="@+id/toggle_BT"
-        android:layout_toEndOf="@+id/toggle_BT" />
+        android:layout_toRightOf="@+id/imageView"
+        android:layout_toEndOf="@+id/imageView" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -295,9 +279,25 @@
         android:layout_above="@+id/horizontalScrollView_main_fragment"
         android:layout_centerHorizontal="true" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:contentDescription="bt_icon"
+        android:src="@drawable/bt_icon"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/listView_main" />
 
-
-
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView2"
+        android:contentDescription="wifi_icon"
+        android:src="@drawable/wifi_icon"
+        android:layout_above="@+id/horizontalScrollView_main_fragment"
+        android:layout_toLeftOf="@+id/textView" />
 
 
     <!-- android:onClick="" bij BUTTON laat toe om methode in FRAGMENT te specifiëren.

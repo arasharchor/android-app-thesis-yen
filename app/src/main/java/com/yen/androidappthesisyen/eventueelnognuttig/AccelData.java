@@ -28,6 +28,7 @@ public class AccelData {
     final private boolean didVibrate;
 
     public AccelData(byte[] data) {
+        // Convert byte array sent from Pebble back to AccelData on Android
         x = (data[0] & 0xff) | (data[1] << 8);
         y = (data[2] & 0xff) | (data[3] << 8);
         z = (data[4] & 0xff) | (data[5] << 8);
