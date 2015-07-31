@@ -834,16 +834,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     private void enableAccelStream(String systemID) {
 
 
-        /* OUDE CODE
-        // Only 1 system at a time can detect the user's face, so only 1 system can have the accel stream enabled. Hence we only allow space for 1 saved systemID.
-        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
-        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putString("enabledSystem", systemID);
-        accelStreamEditor.commit();
-        */
-
-
-        // NIEUW
         String previousList = getEnabledAccelStreamDevices();
         Log.w(LOG_TAG, "previousList " + previousList);
 
@@ -866,15 +856,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
     private void disableAccelStream(String systemID) {
 
-        /*
-//      OVERBODIG  mapSystemIDToIsAccelStreamEnabled.put(systemID, false);
-        SharedPreferences accelStreamSettings = getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
-        SharedPreferences.Editor accelStreamEditor = accelStreamSettings.edit();
-        accelStreamEditor.putString("enabledSystem", "none");
-        accelStreamEditor.commit();
-        */
-
-        // NIEUW
         String previousList = getEnabledAccelStreamDevices();
         Log.w(LOG_TAG, "previousList " + previousList);
 
@@ -1233,7 +1214,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         // !! WE KOMEN DUS ENKEL HIER ALS HET GEKREGEN BERICHT ANDERS IS DAN HET VOORGAAND.
         // DIT IS GOED: WANT ALS DE STREAM AL BV. ENABLED WAS EN KREGEN TERUG ENABLED, MOETEN WE NIET DIRECT STARTEN HE WANT DE STREAM LIEP AL!
         String[] splitArray = messageBody.split(";");
-        String systemID = splitArray[0]; // TODO ======= dus ergens toepassen?
+        String systemID = splitArray[0];
         Log.w(LOG_TAG, "============ SYSTEMID " + systemID);
 
         if (topic.equalsIgnoreCase("accelstream/state") && messageBody.endsWith("enable")) {
@@ -1246,7 +1227,10 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         } else if (topic.equalsIgnoreCase("gesturepusher/state") && messageBody.endsWith("disable")) {
             // TODO dit ook in map opslaan? of is gans deze enable en disable bij gesturepusher OVERBODIG?
             Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/state en MESSAGE disable ========================");
-        } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("up")) {
+        }
+
+        // OUD
+        /*else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("up")) {
             addSupportedGesture(systemID, "up");
             Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE up ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("down")) {
@@ -1258,7 +1242,16 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         } else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("right")) {
             addSupportedGesture(systemID, "right");
             Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE right ========================");
+        }*/
+
+        // NIEUW
+        String[] splitArray2 = messageBody.split("\\+");
+        if(splitArray2.length > 1){
+            String gesture = splitArray2[1];
+            addSupportedGesture(systemID, gesture);
+            Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/supportedgestures en MESSAGE " + gesture + " ========================");
         }
+
 
 
         // inform the app (for times when the Activity UI is running) of the

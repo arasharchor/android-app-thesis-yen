@@ -300,7 +300,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
                         // TODO feitelijk moeten we EERST service starten, DIE ZEGT dan of de connecties allemaal goed zijn, EN DAN PAS LABELS AANPASSEN
                         // START
-                        // TODO here should arrive code to for example do a Bluetooth sweep of the environment, and show and enable the toggles for the discovered devices.
                         setLabelStates(getView(), true);
                         setEnableDisableStates(getView(), true);
                         // When clicking REFRESH we for now simulate the behavior that several (2) devices get detected.

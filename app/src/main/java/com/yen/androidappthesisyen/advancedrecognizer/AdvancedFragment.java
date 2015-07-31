@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,9 +30,11 @@ import android.widget.ToggleButton;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.yen.androidappthesisyen.R;
+import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 import com.yen.androidappthesisyen.simplerecognizer.PebbleGestureModel;
 import com.yen.androidappthesisyen.simplerecognizer.TiltGestureRecognizer;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,12 +51,14 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 
@@ -63,7 +68,8 @@ import java.util.UUID;
  * {@link AdvancedFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class AdvancedFragment extends Fragment implements DialogInterface.OnClickListener {
+// 31-07 verwijderd: implements DialogInterface.OnClickListener
+public class AdvancedFragment extends Fragment {
 
 
     //    private static final String LOG_TAG = AdvancedFragment.class.getName();
@@ -83,6 +89,7 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     private int[] latest_data;
     private int sampleCounter = 0;
     private int totalData = 0;
+    private Boolean isTrainingAccelStreamEnabled = false;
 
     private TextView
             xView,
@@ -91,6 +98,7 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
             rateView;
     private ToggleButton toggleAccelStream;
     private CheckBox checkboxGestureSpotting;
+
 
     private PebbleKit.PebbleDataReceiver receiver;
 
@@ -126,18 +134,19 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
     // dialog view for entering learning gesture
-
     private AlertDialog learning_dialog = null;
     private View learning_dialog_view = null;
 
 
     final Handler alertHandler = new Handler();
     public String detected_gid = "Unknown";
-    final Runnable showAlert = new Runnable() {
-        public void run() {
-            show_alert_box();
-        }
-    };
+
+    // mag wrsl weg
+//    final Runnable showAlert = new Runnable() {
+//        public void run() {
+//            show_alert_box();
+//        }
+//    };
 
     // ff public
     public com.yen.androidappthesisyen.advancedrecognizer.App.STATES state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.STATE_LEARN;
@@ -146,76 +155,61 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     // private MENUITEMS menuitems;
 
 
-    public void show_alert_box() {
 
-        /*
-         * Shows alert box when gesture recognition thread returns
-		 */
+    private void showChooseGestureDialog() {
+
+        // Get a list of all the distinct gestures by checking which gestures all the Action Devices reported.
+        // So if an Action Device adds/removes/renames a gesture, the list in the Android app will adapt.
+        Map<String, String> savedMap = getMapSupportedGestures();
+        Set setSupportedGestures = new TreeSet();
+        if (savedMap != null) {
+
+            List<String> listGestures = new ArrayList<>();
+
+            //iterating over values only. Values = concatenated string of gestures using ";".
+            for (String concatenatedString : savedMap.values()) {
+                String[] arrayGestures = concatenatedString.split(";");
+                List<String> newList = Arrays.asList(arrayGestures);
+                for (int i = 0; i < newList.size(); i++) {
+                    newList.set(i, WordUtils.capitalize(newList.get(i)));
+                }
+                listGestures.addAll(newList);
+            }
+
+            // Remove duplicates by converting to Set datatype.
+            // More specific: using TreeSet so the gestures are sorted alphabetically.
+            setSupportedGestures = new TreeSet<>(listGestures);
+        }
+
+        final String[] arraySupportedGestures = (String[]) setSupportedGestures.toArray(new String[setSupportedGestures.size()]);
 
 
-        // stond 'this'
-        new AlertDialog.Builder(getActivity())
-                .setMessage("Recognized Gesture: " + this.detected_gid)
-                .setPositiveButton("OK", null)
-                .show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getResources().getString(R.string.description_choose_gesture))
+                .setItems(arraySupportedGestures, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        String chosenGesture = arraySupportedGestures[which];
+                        // Saved with NO uppercase: all internal processing works without uppercases.
+                        recordingGestureIDString = WordUtils.uncapitalize(chosenGesture);
+                        Log.w(LOG_TAG, "recording for " + recordingGestureIDString);
+                        TextView lblRecordedGesture = (TextView) getView().findViewById(R.id.lbl_recorded_gesture);
+                        lblRecordedGesture.setText("Gesture being trained: " + chosenGesture);
+//                        Toast.makeText(getActivity(), chosenGesture, Toast.LENGTH_LONG).show();
+
+                        if(!isTrainingAccelStreamEnabled){
+                            enableAccelStreamForTraining();
+                        }
+
+                    }
+                });
+
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
 
 
     }
-
-
-    // TODO niet meer nodig wrsl.
-    // TODO lol easy fix maarja...
-//    @SuppressWarnings("deprecation")
-//    private final SensorListener sensorListener = new SensorListener() {
-//
-//        public void onSensorChanged(int sensor, float[] values) {
-//
-//            // TODO TEST in comments gezet want gebruiken ZELF GEMAAKTE methode die we aanroepen
-//
-//            /*//Retrieve the values from the float array values which contains sensor data
-//            Float dataX = values[SensorManager.DATA_X];
-//
-//            Float dataY = values[SensorManager.DATA_Y];
-//
-//            Float dataZ = values[SensorManager.DATA_Z];
-//
-//            //	Context c = getApplicationContext();
-//
-//            //Now we got the values and we can use it as we want
-//            if (VERBOSE) {
-//                Log.w("X - Value, " + dataX, "");
-//
-//                Log.w("Y - Value, " + dataY, "");
-//
-//                Log.w("Z - Value, " + dataZ, "");
-//            }
-//            TextView tv1 = (TextView) getView().findViewById(R.id.accX);
-//            TextView tv2 = (TextView) getView().findViewById(R.id.accY);
-//            TextView tv3 = (TextView) getView().findViewById(R.id.accZ);
-//
-//            tv1.setText(dataX.toString());
-//            tv2.setText(dataY.toString());
-//            tv3.setText(dataZ.toString());
-//
-//            if (RECORD_GESTURE) {
-//
-//                float[] traceItem = {dataX.floatValue(),
-//                        dataY.floatValue(),
-//                        dataZ.floatValue()};
-//                if (recordingGestureTrace != null) {
-//                    recordingGestureTrace.add(traceItem);
-//                }
-//
-//
-//            }*/
-//
-//        }
-//
-//        public void onAccuracyChanged(int sensor, int accuracy) {
-//
-//        }
-//
-//    };
 
 
     // TODO TEST zelf gemaakt
@@ -404,7 +398,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     }
 
     private float calcVectorNorm(float[] values) {
-        // TODO wijzig de deprecated code. UPDATE DONE.
         float norm = (float) Math.sqrt(values[0] * values[0] + values[1] * values[1] + values[2] * values[2]) - 9.9f;
         return norm;
     }
@@ -427,15 +420,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         RECORD_GESTURE = true;
     }
 
-    private synchronized void stopRecordingGesture() {/*
-         *  stop recording of gesture
-		 *  usually called after onTouchListener, ACTION_UP / CANCEL
-		 */
+    private synchronized void stopRecordingGesture() {
 
-
-        if (DEBUG) {
-            Log.w("stopRecordingGesture", "Stopping Gesture Recording");
-        }
 
         RECORD_GESTURE = false;
         // Object[] gestureTrace = recordingGestureTrace.toArray();
@@ -446,126 +432,9 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         // traces = recordingGestureTrace.toArray(traces);
 
 
-        Boolean nieuwSysteem = true;
 
-
-        /*if (nieuwSysteem){*/
         doRemainingTasksAfterRecording();
-        /*} else {
-            TextView statusText = (TextView) getView().findViewById(R.id.statusText);
 
-            // clear the existing trace
-            switch (state) {
-
-                case STATE_LEARN:
-                    // recordingGestureTrace = null;
-                    // note that the arraylist is being copied
-                    statusText.setText("Saving gesture to DB...");
-                    Gesture ng = new Gesture(recordingGestureIDString, new ArrayList<float[]>(recordingGestureTrace));
-
-                    // add gesture to library but prepare with recognizer settings first
-                    myGestureLibrary.addGesture(ng.gestureID, this.myGestureRecognizer.prepare_gesture_for_library(ng), false);
-                    if (DEBUG)
-                        Log.w("stopRecordingGesture", "Recorded Gesture ID " + recordingGestureIDString + " Gesture Trace Length:" + recordingGestureTrace.size());
-                    statusText.setText("Press button to train gesture.");
-                    break;
-
-                case STATE_RECOGNIZE:
-                    statusText.setText("Recognizing gesture...");
-
-                    // TODO mag weg?
-                    // stop accelerometer
-                    mSensorManager.unregisterListener(sensorListener);
-
-                    // BUGFIX VIA https://code.google.com/p/three-dollar-gesture-recognizer/issues/detail?id=1
-                    final Gesture candidate = new Gesture(null, new ArrayList<float[]>(recordingGestureTrace));
-
-
-                    // save a reference to activity for this context
-                    Thread t = new Thread() {
-                        public void run() {
-
-                            if (DEBUG)
-                                Log.w("stopRecGest-recogThread", "Attempting Gesture Recognition Trace-Length: " + recordingGestureTrace.size());
-                            String gid = myGestureRecognizer.recognize_gesture(candidate);
-                            if (DEBUG)
-                                Log.w("stopRecGest-recogThread", "===== \n" + "Recognized Gesture: " + gid + "\n===");
-                            // set gid as currently detected gid
-                            detected_gid = gid;
-
-
-                            // show the alert
-                            alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
-
-
-                            // ---- START EIGEN TOEVOEGING
-                            // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
-                            // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
-
-
-                            ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-                            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                            if (networkInfo != null && networkInfo.isConnected()) {
-
-                                // fetch data
-
-
-                                SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
-                                String IPAddress = settings.getString("ip_address", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
-                                Log.w(LOG_TAG, "saved IP is " + IPAddress);
-
-                                // TODO met of zonder slash?
-                                String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
-                                // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
-
-
-                                // TODO TIJDELIJK GEEN ASYNCTASK GEBRUIKT OMDAT GAF: Can't create handler inside thread that has not called Looper.prepare(
-//                            new AsyncPOSTGestureToServer().execute(stringURL, gid);
-
-
-                                // EEEEEEEEEEERST NOG IS DIT MAAR MET ENGELSE GESTURETERMEN TESTEN; DAARNA HET ANDERE.
-                                // UPDATE: EIGEN CODE WERKT NU :D
-                                int httpResult = POSTGestureToServer(stringURL, gid);
-                                // DIT DUS NIET MEER NODIG:
-//                            nieuweTestcode(stringURL, gid);
-
-
-                            } else {
-                                // Arriving here if no internet connection.
-
-                            }
-
-
-                            // ---- STOP EIGEN TOEVOEGING
-
-
-
-
-                        }
-                    };
-                    t.start();
-
-                    // TEST LOCATIE ASYNCTASK
-                    // UPDATE: werkt wrsl niet OMDAT DETECTED_GID hier nog de VORIGE waarde bevat
-                    // omdat de THREAD nog aan het runnen is terwijl men HIER komt!
-//                Log.w(LOG_TAG, "DETECTED GID: " + detected_gid);
-//                new AsyncPOSTGestureToServer().execute(stringURL, detected_gid);
-
-
-                    if (DEBUG) Log.w("stopRecordingGesture", "STATE_RECOGNIZE --> thread dispatched");
-                    break;
-
-
-
-                case STATE_LIBRARY:
-                    break;
-                default:
-                    break;
-            }
-            recordingGestureTrace.clear();
-
-
-        }*/
 
 
     }
@@ -668,14 +537,6 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
 
 
         // Check for which action devices the accel stream is currently running.
-
-        /* OUD
-        SharedPreferences systemIDsettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_accel_stream", Context.MODE_PRIVATE);
-        String enabledSystem = systemIDsettings.getString("enabledSystem", "none");
-        Log.w(LOG_TAG, "enabledSystem " + enabledSystem);
-        */
-
-
         String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
 
         if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
@@ -1049,7 +910,7 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View returnedView = inflater.inflate(R.layout.fragment_three_dollar_gesture, container, false);
+        View returnedView = inflater.inflate(R.layout.fragment_advanced, container, false);
 
 
         // voor ACCEL DATA STREAM.
@@ -1093,8 +954,21 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         });
 
 
-        final Button mainButton = (Button) returnedView.findViewById(R.id.btn_record_gesture);
-        mainButton.setOnTouchListener(new View.OnTouchListener() {
+        // Button CHOOSE gesture.
+        final Button btnChooseGesture = (Button) returnedView.findViewById(R.id.btn_choose_gesture);
+        btnChooseGesture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                showChooseGestureDialog();
+
+            }
+        });
+
+
+        // Button TRAIN gesture.
+        final Button btnRecordGesture = (Button) returnedView.findViewById(R.id.btn_record_gesture);
+        btnRecordGesture.setOnTouchListener(new View.OnTouchListener() {
                                           public boolean onTouch(View v, MotionEvent event) {
 
                                               if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -1121,13 +995,13 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         );
 
         // TODO vereist of?
-        mainButton.setOnClickListener(new View.OnClickListener()
+        btnRecordGesture.setOnClickListener(new View.OnClickListener()
 
                                       {
                                           public void onClick(View v) {
                                               // clicked
                                               //Log.w("onClick", "Clicked");
-                        /*if (mainButton.isFocused())
+                        /*if (btnRecordGesture.isFocused())
                         {
     						Log.w("onClick", "InFocus");
     					}
@@ -1145,8 +1019,12 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         Bundle bundle = this.getArguments();
         String state = bundle.getString("state");
         if (state.equalsIgnoreCase("recognize")) {
-            mainButton.setVisibility(View.INVISIBLE);
+            TextView lblRecordedGesture = (TextView) returnedView.findViewById(R.id.lbl_recorded_gesture);
+            lblRecordedGesture.setVisibility(View.INVISIBLE);
+            btnChooseGesture.setVisibility(View.INVISIBLE);
+            btnRecordGesture.setVisibility(View.INVISIBLE);
         } else if (state.equalsIgnoreCase("learn")) {
+            toggleAccelStream.setVisibility(View.INVISIBLE);
             checkboxGestureSpotting.setVisibility(View.INVISIBLE);
         }
 
@@ -1241,6 +1119,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
 
+        isTrainingAccelStreamEnabled = true;
+
     }
 
 
@@ -1249,6 +1129,8 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(0, 0); // key = 0 = FALSE = stop stream, value = 0
         PebbleKit.sendDataToPebble(getActivity(), UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+
+        isTrainingAccelStreamEnabled = false;
 
         Log.w(LOG_TAG, "stream disabled");
     }
@@ -1336,70 +1218,48 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
     }
 
 
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
+    // TODO mag weg: werd gebruikt bij oude dialog waarbij user gesture title kon ingeven.
+//    @Override
+//    public void onClick(DialogInterface dialog, int which) {
+//
+//        /*
+//         * android.content.DialogInterface.OnClickListener callback
+//		 *
+//		 */
+//        if (dialog == this.learning_dialog) {
+//            if (this.learning_dialog_view != null) {
+//                //this.recordingGestureIDString =
+//                EditText et = (EditText) learning_dialog_view.findViewById(R.id.EditText01);
+//                this.recordingGestureIDString = et.getText().toString();
+//
+//            }
+//        }
+//
+//    }
 
-        /*
-         * android.content.DialogInterface.OnClickListener callback
-		 *
-		 */
-        if (dialog == this.learning_dialog) {
-            if (this.learning_dialog_view != null) {
-                //this.recordingGestureIDString =
-                EditText et = (EditText) learning_dialog_view.findViewById(R.id.EditText01);
-                this.recordingGestureIDString = et.getText().toString();
-                if (DEBUG)
-                    Log.w("onClick", "recordingGestureIDString set to: " + this.recordingGestureIDString);
-            }
-        }
 
-    }
-
-
-    // 16-07 PARAMETER GEBRUIKT IPV INITIALISATIE HIER.
+    // TODO 31-07 mag merkelijk nu weg want elke case is nu LEEG?
     public void stateChanged() {
-//        TextView statusText = (TextView) getView().findViewById(R.id.statusText);
-
-        if (DEBUG) Log.w("stateChanged", "current State is: " + this.state.toString());
 
 
         switch (this.state) {
 
             case STATE_LEARN:
-                // show dialog with which the user can enter the gesture id
 
-                if (DEBUG) Log.w("stateChanged", "STATE_LEARN");
-                Context ctx = getActivity();
-                LayoutInflater li = LayoutInflater.from(getActivity());
-                // final so that i can use it in the inner class uargh!
-
-                View dialog = li.inflate(R.layout.learngesturedialog, null);
-                if (DEBUG) Log.w("stateChanged", "inflated");
-                // Dialog dialog = new Dialog(this);
-                // dialog.setContentView(R.layout.learngesturedialog);
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-                // Prompt Listener
-                // PromptListener pl = new PromptListener(dialog);
-
-
-                builder.setTitle("Enter Gesture ID");
-                builder.setView(dialog);
-                builder.setPositiveButton("OK", this);
-                builder.setNegativeButton("Cancel", this);
-
-                // show the actual dialog
-                AlertDialog ad = builder.create();
-                this.learning_dialog = ad;
-                this.learning_dialog_view = dialog;
-                ad.show();
-
-                // this.recordingGestureIDString = pl.getPromptReply();
-                // if (DEBUG) Log.w("statechanged","recording gesture id now changed to:" + this.recordingGestureIDString);
-
-
-                // this.recordingGestureIDString = Alerts.showPrompt("Please Enter Gesture ID", this);
-
+                // OUD:
+//                Context ctx = getActivity();
+//                LayoutInflater li = LayoutInflater.from(getActivity());
+//                View dialog = li.inflate(R.layout.learngesturedialog, null);
+//                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//                builder.setTitle("Enter Gesture ID");
+//                builder.setView(dialog);
+//                builder.setPositiveButton("OK", this);
+//                builder.setNegativeButton("Cancel", this);
+//                // show the actual dialog
+//                AlertDialog ad = builder.create();
+//                this.learning_dialog = ad;
+//                this.learning_dialog_view = dialog;
+//                ad.show();
 
                 break;
 
@@ -1441,30 +1301,30 @@ public class AdvancedFragment extends Fragment implements DialogInterface.OnClic
         getToggleStatesAndEnableServices();
 
 
+        // 31-07 uit want enablen nu pas wann een eerste gesture is geselecteerd.
         // ONLY when we are in the TRAIN tab do we automatically enable the data stream.
-        Bundle bundle = this.getArguments();
-        String state = bundle.getString("state");
-        if (state.equalsIgnoreCase("learn")) {
-            Log.w(LOG_TAG, "======================= net voor enableAccelStreamForTraining");
-
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    try {
-                        Thread.sleep(1000); // TODO default 5000. Als problemen geeft, verhoog.
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    enableAccelStreamForTraining();
-
-                }
-            }).start();
-
-
-        }
+//        Bundle bundle = this.getArguments();
+//        String state = bundle.getString("state");
+//        if (state.equalsIgnoreCase("learn")) {
+//
+//            Log.w(LOG_TAG, "======================= net voor enableAccelStreamForTraining");
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//
+//                    try {
+//                        Thread.sleep(1000); // TODO default 5000. Als problemen geeft, verhoog.
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    enableAccelStreamForTraining();
+//
+//                }
+//            }).start();
+//
+//
+//        }
 
     }
 
