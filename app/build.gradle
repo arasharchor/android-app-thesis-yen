@@ -8,7 +8,7 @@ android {
         applicationId "com.yen.androidappthesisyen"
         minSdkVersion 11
         // TODO nog verhogen? check https://developer.android.com/about/dashboards/index.html
-        targetSdkVersion 21
+        targetSdkVersion 22 // was 21
         versionCode 1
         versionName "1.0"
     }

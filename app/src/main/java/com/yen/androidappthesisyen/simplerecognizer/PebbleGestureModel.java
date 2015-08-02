@@ -8,22 +8,20 @@ package com.yen.androidappthesisyen.simplerecognizer;
 public abstract class PebbleGestureModel {
 
 
-    //Constants
-    public static final int
-            G = 1000,
-            MODE_FLICK = 0,
-            MODE_TILT = 1;
+    public static final int G = 1000, MODE_FLICK = 0, MODE_TILT = 1;
 
     //State - { LEFT, RIGHT, UP, DOWN }
     private boolean[] triggers = {false, false, false, false};
     private int mode = 0;
     private boolean actionYetToEnd = false;
 
-    //Object data state
+
     private int threshold;
-    private long
-            duration,
-            lastActionTime;
+    private long duration, lastActionTime;
+
+    // We reduce the threshold for the right, up and down tilt gesture, since it's harder to recognize otherwise.
+    // This implies the Pebble™ wearer is right handed and hence wears the device on the left wrist.
+    private final double REDUCTION_FACTOR = 0.75;
 
     /**
      * Object that manages Pebble wrist movement gestures.
@@ -56,60 +54,64 @@ public abstract class PebbleGestureModel {
         //Check min duration elapsed
         if (now - lastActionTime > duration) {
             switch (mode) {
-                case MODE_FLICK:
-                    //Check left
-                    if (!triggers[0] && intArray[1] < (-1 * threshold)) {
-                        triggers[0] = true;
-                        onWristLeft();
-                        lastActionTime = now;
-                        actionYetToEnd = true;
-                        Boolean[] booleanArray = {true, false};
-                        return booleanArray;
-                    } else {
-                        triggers[0] = false;
-                    }
 
-                    //Check right
-                    if (!triggers[1] && intArray[1] > threshold) {
-                        triggers[1] = true;
-                        onWristRight();
-                        lastActionTime = now;
-                        actionYetToEnd = true;
-                        Boolean[] booleanArray = {true, false};
-                        return booleanArray;
-                    } else {
-                        triggers[1] = false;
-                    }
-
-                    //Check up
-                    if (!triggers[2] && intArray[2] < ((-1 * G) - threshold)) {
-                        triggers[2] = true;
-                        onWristUp();
-                        lastActionTime = now;
-                        actionYetToEnd = true;
-                        Boolean[] booleanArray = {true, false};
-                        return booleanArray;
-                    } else {
-                        triggers[2] = false;
-                    }
-
-                    //Check down
-                    if (!triggers[3] && intArray[2] > ((-1 * G) + threshold)) {
-                        triggers[3] = true;
-                        onWristDown();
-                        lastActionTime = now;
-                        actionYetToEnd = true;
-                        Boolean[] booleanArray = {true, false};
-                        return booleanArray;
-                    } else {
-                        triggers[3] = false;
-                    }
-
-                    break;
+                // TODO mag weg want niet gebruikt
+//                case MODE_FLICK:
+//
+//                    //Check left
+//                    if (!triggers[0] && intArray[1] < (-1 * threshold)) {
+//                        triggers[0] = true;
+//                        onWristLeft();
+//                        lastActionTime = now;
+//                        actionYetToEnd = true;
+//                        Boolean[] booleanArray = {true, false};
+//                        return booleanArray;
+//                    } else {
+//                        triggers[0] = false;
+//                    }
+//
+//                    //Check right
+//                    if (!triggers[1] && intArray[1] > threshold) {
+//                        triggers[1] = true;
+//                        onWristRight();
+//                        lastActionTime = now;
+//                        actionYetToEnd = true;
+//                        Boolean[] booleanArray = {true, false};
+//                        return booleanArray;
+//                    } else {
+//                        triggers[1] = false;
+//                    }
+//
+//                    //Check up
+//                    if (!triggers[2] && intArray[2] < ((-1 * G) - threshold)) {
+//                        triggers[2] = true;
+//                        onWristUp();
+//                        lastActionTime = now;
+//                        actionYetToEnd = true;
+//                        Boolean[] booleanArray = {true, false};
+//                        return booleanArray;
+//                    } else {
+//                        triggers[2] = false;
+//                    }
+//
+//                    //Check down
+//                    if (!triggers[3] && intArray[2] > ((-1 * G) + threshold)) {
+//                        triggers[3] = true;
+//                        onWristDown();
+//                        lastActionTime = now;
+//                        actionYetToEnd = true;
+//                        Boolean[] booleanArray = {true, false};
+//                        return booleanArray;
+//                    } else {
+//                        triggers[3] = false;
+//                    }
+//
+//                    break;
 
 
                 case MODE_TILT:
-                    //Check left
+
+                    // Check left
                     if (!triggers[0] && intArray[1] > threshold) {
                         triggers[0] = true;
                         onWristLeft();
@@ -121,8 +123,9 @@ public abstract class PebbleGestureModel {
                         triggers[0] = false;
                     }
 
-                    //Check right
-                    if (!triggers[1] && intArray[1] < (-1 * threshold)) {
+
+                    // Check right
+                    if (!triggers[1] && intArray[1] < (-1 * threshold * REDUCTION_FACTOR)) {
                         triggers[1] = true;
                         onWristRight();
                         lastActionTime = now;
@@ -133,8 +136,9 @@ public abstract class PebbleGestureModel {
                         triggers[1] = false;
                     }
 
-                    //Check up
-                    if (!triggers[2] && intArray[0] < (-1 * threshold)) {
+
+                    // Check up
+                    if (!triggers[2] && intArray[0] < (-1 * threshold * REDUCTION_FACTOR)) {
                         triggers[2] = true;
                         onWristUp();
                         lastActionTime = now;
@@ -145,8 +149,9 @@ public abstract class PebbleGestureModel {
                         triggers[2] = false;
                     }
 
-                    //Check down
-                    if (!triggers[3] && intArray[0] > threshold) {
+
+                    // Check down
+                    if (!triggers[3] && intArray[0] > threshold * REDUCTION_FACTOR) {
                         triggers[3] = true;
                         onWristDown();
                         lastActionTime = now;

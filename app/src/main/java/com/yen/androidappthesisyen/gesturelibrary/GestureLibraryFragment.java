@@ -19,14 +19,15 @@ import com.yen.androidappthesisyen.advancedrecognizer.GestureLibrary;
 /**
  * A fragment representing a list of Items.
  */
-public class GestureListFragment extends ListFragment {
+public class GestureLibraryFragment extends ListFragment {
 
 
-    private static final String LOG_TAG = GestureListFragment.class.getName();
+    private static final String LOG_TAG = GestureLibraryFragment.class.getName();
 
 
     public com.yen.androidappthesisyen.advancedrecognizer.App.STATES stateChange = App.STATES.STATE_LIBRARY;
 
+    // TODO uitzetten of zelfs wissen?
     private boolean DEBUG = true;
 
     private GestureLibrary glibrary_instance = null;
@@ -36,7 +37,7 @@ public class GestureListFragment extends ListFragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public GestureListFragment() {
+    public GestureLibraryFragment() {
 
     }
 
@@ -62,7 +63,7 @@ public class GestureListFragment extends ListFragment {
         // TODO eventueel deze if binnen de try/catch zetten indien nodig.
         if (GestureLibrary.GLibrarySingleInstance == null) {
 
-            Log.w(LOG_TAG, "--------------------- NO GESTURE LIBRARY YET GestureListFragment ---------------------");
+            Log.w(LOG_TAG, "--------------------- NO GESTURE LIBRARY YET GestureLibraryFragment ---------------------");
             // TODO iets doen? popup? leeg venster met tekst? etc.
 
 
@@ -134,7 +135,7 @@ public class GestureListFragment extends ListFragment {
         String[] gestureIDStrings;
         if (this.glibrary_instance != null) {
             /* initialize the list view */
-            gestureIDStrings = this.glibrary_instance.getAllGestureIDs();
+            gestureIDStrings = this.glibrary_instance.getAllGestureTitles();
         } else {
             // WE SHOULD NEVER ARRIVE HERE.
             gestureIDStrings = new String[]{getResources().getString(R.string.error_gesture_library)};

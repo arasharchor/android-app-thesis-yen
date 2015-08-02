@@ -12,7 +12,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +28,6 @@ import android.widget.ToggleButton;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.yen.androidappthesisyen.R;
-import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 import com.yen.androidappthesisyen.simplerecognizer.PebbleGestureModel;
 import com.yen.androidappthesisyen.simplerecognizer.TiltGestureRecognizer;
 
@@ -51,7 +48,6 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -301,76 +297,92 @@ public class AdvancedFragment extends Fragment {
     }
 
 
-    // TODO verzet deze blok code terug naar boven wann het is gefinetuned.
-    // for AUTOMATIC detection boundaries gestures (= GESTURE SPOTTING):
-    // TODO hernoem naar iets duidelijker:
+    // TODO START BLOK mag naar boven
     public enum RecordMode {
         MOTION_DETECTION, PUSH_TO_GESTURE
     }
 
     RecordMode recordMode = RecordMode.MOTION_DETECTION;
-    boolean isRecording = false;
+    boolean isAdvancedRecording = false;
     ArrayList<float[]> gestureValues = new ArrayList<float[]>();
-    float THRESHOLD = 1050; // default 2
+
+    // Values related to gesture spotting.
+    float MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING = 1300; // was lange tijd 1050.
+    float MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING = 1150;
     int stepsSinceNoMovement; // TODO default op 0 zetten of niet?
-    final int MIN_GESTURE_SIZE = 5; // default 8
-    final int MIN_STEPS_SINCE_NO_MOVEMENT = 8; // default 10
+    final int MINIMUM_GESTURE_LENGTH = 5; // default 8
+    // als te hoog is moet de user te lang stilstaan met Pebble:
+    final int MINIMUM_STEPS_SINCE_NO_MOVEMENT = 8; // default 10
+    // TODO STOP BLOK mag naar boven
+
+    // TODO =========== zien welke van de 3 methodes hieronder best is om te accessen uit onWristLeft() etc.
+    // TOT NU TOE ENKEL DE 1STE METHODE GETEST (en w momenteel gebruikt) MAAR LIJKT OK.
+    public Boolean isAdvancedRecording() {
+        return isAdvancedRecording;
+    }
+    public ArrayList<float[]> getGestureValues (){
+        return gestureValues;
+    }
+    public int getStepsSinceNoMovement(){
+        return stepsSinceNoMovement;
+    }
+    // einde 3 mogelijke methodes
 
 
     private void findBoundariesGesture(float[] values) {
 
 
-//        float[] values = { sensorEvent.values[0], sensorEvent.values[1], sensorEvent.values[2] };
-
         Log.w(LOG_TAG, "X " + values[0] + " Y " + values[1] + " Z " + values[2]);
 
 
         switch (recordMode) {
-            case MOTION_DETECTION: // WE KOMEN ALTIJD HIER. IS DIT GOED? IS recordmode overbodig want de originele app past dat precies ook niet meer toe?
 
-                // Log.w(LOG_TAG, "============================ arrived in CASE MOTION_DETECTION");
+            case MOTION_DETECTION: // TODO WE KOMEN ALTIJD HIER. IS DIT GOED? IS recordmode overbodig want de originele app past dat precies ook niet meer toe?
 
-                if (isRecording) { // TODO initializen maar WAAR? (UPDATE: op FALSE in begin) of niet nodig deze if check?
+
+                if (isAdvancedRecording) { // TODO initializen maar WAAR? (UPDATE: op FALSE in begin) of niet nodig deze if check?
 
                     gestureValues.add(values);
-                    if (calcVectorNorm(values) < THRESHOLD) {
+                    if (calcVectorNorm(values) < MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING) {
 
                         Log.w(LOG_TAG, "========================= gesture NIET meer gedetecteerd ============= stepsSinceNoMovement++");
                         stepsSinceNoMovement++;
+
                     } else {
 
                         Log.w(LOG_TAG, "===================== NOG STEEDS IN GESTURE ======= stepsSinceNoMovement = 0");
                         stepsSinceNoMovement = 0;
+
                     }
 
-                } else if (calcVectorNorm(values) >= THRESHOLD) { // TODO een andere threshold hiervoor nemen dan diegene dat hierboven wordt gebruikt?
+                } else if (calcVectorNorm(values) >= MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING) {
 
                     Log.w(LOG_TAG, "========================================================== STARTEN met recorden gesture");
 
-                    isRecording = true;
+                    isAdvancedRecording = true;
                     stepsSinceNoMovement = 0;
                     gestureValues = new ArrayList<float[]>();
                     gestureValues.add(values);
                 }
 
 
-                if (stepsSinceNoMovement == MIN_STEPS_SINCE_NO_MOVEMENT) { // TODO =========================================================================================== iets anders dan 10 nemen? ofja 10 wrsl goed genoeg: als te hoog is moet de user te lang stilstaan met Pebble.
+                if (stepsSinceNoMovement == MINIMUM_STEPS_SINCE_NO_MOVEMENT) {
 
                     Log.w(LOG_TAG, "============================ detectie MOGELIJKE gesture ");
 
-                    int length = gestureValues.size() - MIN_STEPS_SINCE_NO_MOVEMENT;
-                    if (length > MIN_GESTURE_SIZE) { // TODO ====================================================================== MIN_GESTURE_SIZE wrsl verhogen?
-//                         listener.onGestureRecorded(gestureValues.subList(0, gestureValues.size() - MIN_STEPS_SINCE_NO_MOVEMENT));
+                    int length = gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT;
+                    if (length > MINIMUM_GESTURE_LENGTH) { // TODO ============================= MINIMUM_GESTURE_LENGTH wrsl verhogen?
+//                         listener.onGestureRecorded(gestureValues.subList(0, gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT));
                         // FYI ArrayList<float[]> gestureValues;
 
                         Log.w(LOG_TAG, "============= het was IDD een gesture =============== GESTOPT MET RECORDEN GESTURE EN DE GESTURE SIZE IS GROTER DAN MINIMUM. size = " + length);
-                        // TODO de gesture is nu gedaan en de geldige waardes zitten in index 0 tem index gestureValues.size() - MIN_STEPS_SINCE_NO_MOVEMENT
+                        // TODO de gesture is nu gedaan en de geldige waardes zitten in index 0 tem index gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT
 
 
                         recordingGestureTrace = new ArrayList<float[]>(250);
                         // opvullen met de juiste accel data.
                         // maken kopie van subList van subList geeft VIEW terug en niet iets dat je kan casten naar ArrayList.
-                        recordingGestureTrace = new ArrayList<>(gestureValues.subList(0, gestureValues.size() - MIN_STEPS_SINCE_NO_MOVEMENT));
+                        recordingGestureTrace = new ArrayList<>(gestureValues.subList(0, gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT));
 
 
                         doRemainingTasksAfterRecording();
@@ -380,7 +392,7 @@ public class AdvancedFragment extends Fragment {
                     Log.w(LOG_TAG, "============================ starten TERUG VAN NUL.");
                     gestureValues = new ArrayList<float[]>(); // TODO stond eerst = null; maar dit wrsl veiliger?
                     stepsSinceNoMovement = 0;
-                    isRecording = false;
+                    isAdvancedRecording = false;
                 }
                 break;
 
@@ -389,7 +401,7 @@ public class AdvancedFragment extends Fragment {
 
                 // Log.w(LOG_TAG, "============================ arrived in CASE PUSH_TO_GESTURE");
 
-                if (isRecording) {
+                if (isAdvancedRecording) {
                     gestureValues.add(values);
                 }
                 break;
@@ -666,7 +678,7 @@ public class AdvancedFragment extends Fragment {
 
 
             } else {
-                // Do nothing.
+
                 doTwoShortPebbleVibrations();
 
                 getActivity().runOnUiThread(new Runnable() {
@@ -789,18 +801,19 @@ public class AdvancedFragment extends Fragment {
                 System.out.println(" ------- RESULT STRING: " + resultString);
 
             } else {
-                // TODO DIALOG OF TOAST OFZO TONEN ALS HET FOUTLIEP
-                // TODO OOK TELKENS MELDEN ALS GOED GING?
+                // Handle any other errors (404, 500, ...)
 
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_gestures);
+                        outputWindow.append("Sending gesture to action device(s) unsuccessful\n");
+                        ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                        Toast.makeText(getActivity(), "Sending gesture to action device(s) unsuccessful", Toast.LENGTH_LONG).show();
+                    }
+                });
 
-                // TODO eventueel:
-//            } else if (statusCode != HttpURLConnection.HTTP_OK) {
-//                // handle any other errors, like 404, 500,..
-//            }
-                // TODO bijvoorbeeld: throw new RuntimeException
-
-                System.out.println("RESPONSE WAS NOT CODE HTTP_OK: " + httpcon.getResponseMessage());
-                // TODO toast?
+                System.out.println("RESPONSE WAS NOT CODE HTTP_OK BUT: " + httpcon.getResponseMessage());
             }
 
 
@@ -888,19 +901,12 @@ public class AdvancedFragment extends Fragment {
          * Object that manages Pebble wrist movement gestures.
          * The user should extend their wrist with the fist pointing directly out from the chest as if to punch, with the watch's face pointing upwards
          *
-         * @param threshold            Value from 0 to 4000 above which an action on an axis will be triggered
-         * @param durationMilliseconds Minimum time between gestures in milliseconds
-         * @param modeConstant         Mode constant from this class for FLICK or TILT operation
+         * For parameter details, see the source class.
          */
         // TODO finetuning
-        theTiltGestureRecognizer = new TiltGestureRecognizer(this, 700, 1000, PebbleGestureModel.MODE_TILT);
-
-
-        // TODO mag weg maar test of NIETS BREAKT.
-        // mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-        // TODO mag weg maar test of NIETS BREAKT.
-//        mSensorManager.registerListener(sensorListener, SensorManager.SENSOR_ACCELEROMETER, SensorManager.SENSOR_DELAY_FASTEST/*SensorManager.SENSOR_DELAY_GAME*/);
-
+        // threshold param was lange tijd 700
+        // update nu 900 maar mag nog wat lager indien nuttig! nu is 850 - nu terug 900 MAAR IS 875 testen
+        theTiltGestureRecognizer = new TiltGestureRecognizer(this, 900, 1000, PebbleGestureModel.MODE_TILT);
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
@@ -1360,10 +1366,10 @@ public class AdvancedFragment extends Fragment {
                     // stond getApplicationContext()
                     PebbleKit.sendAckToPebble(getActivity(), transactionId);
 
-                    //Count total data
+                    // Count total data
                     totalData += 3 * NUM_SAMPLES * 4; // TODO betekenis? 3 wegens XYZ, en 4 wegens 4-byte int?
 
-                    //Get data
+                    // Get data
                     latest_data = new int[3 * NUM_SAMPLES];
 //                    Log.w(LOG_TAG, "NEW DATA PACKET");
                     for (int i = 0; i < NUM_SAMPLES; i++) {
@@ -1400,13 +1406,10 @@ public class AdvancedFragment extends Fragment {
                     // If NO tilt gesture was detected, we pass the accel data to the more advanced recognizer.
                     if (results[0] == false && results[1] == false) {
 
-                        // ------ TEST - voor THREE DOLLAR gesture detection
 // TODO we werken nu met INTs maar de gesture recognizer werkt eigenlijk met FLOATs
 //                    is het nuttig om met FLOATs te werken? to test...
                         float[] floatArray = {latest_data[0], latest_data[1], latest_data[2]};
                         sendAccelDataToFragment(floatArray);
-
-                        // ------ TEST - voor THREE DOLLAR gesture detection
 
                     }
 

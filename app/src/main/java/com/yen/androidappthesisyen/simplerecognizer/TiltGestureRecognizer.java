@@ -42,78 +42,106 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
     @Override
     public void onWristLeft() {
 
-        theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        // We first have to check whether a gesture different from up/down/left/right got recognized.
+        // If yes, we don't recognize the gesture as up/down/left/right.
+        if(!theAdvancedFragment.isAdvancedRecording()){
+
+
+
+            theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
 // Although the following line of code gets duplicated int the following methods, we can't initialize it once in the constructor, since at that time, the View hasn't yet been fully initialized.
-                TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
-                gestureWindow.append("wrist LEFT <--" + "\n");
-                ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
-                Toast.makeText(theAdvancedFragment.getActivity(), "wrist LEFT <--", Toast.LENGTH_LONG).show();
-            }
-        });
+                    TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
+                    gestureWindow.append("wrist LEFT <--" + "\n");
+                    ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                    Toast.makeText(theAdvancedFragment.getActivity(), "wrist LEFT <--", Toast.LENGTH_LONG).show();
+                }
+            });
 
 
-        theAdvancedFragment.sendGestureIfMatchFound("left");
+            theAdvancedFragment.sendGestureIfMatchFound("left");
 
-        Log.w(LOG_TAG, "wrist LEFT <--");
+            Log.w(LOG_TAG, "wrist LEFT <--");
+
+
+
+        }
+
+
     }
 
     @Override
     public void onWristRight() {
 
-        theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
-                gestureWindow.append("wrist RIGHT -->" + "\n");
-                ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
-                Toast.makeText(theAdvancedFragment.getActivity(), "wrist RIGHT -->", Toast.LENGTH_LONG).show();
-            }
-        });
+        // We first have to check whether a gesture different from up/down/left/right got recognized.
+        // If yes, we don't recognize the gesture as up/down/left/right.
+        if(!theAdvancedFragment.isAdvancedRecording()) {
+
+            theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
+                    gestureWindow.append("wrist RIGHT -->" + "\n");
+                    ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                    Toast.makeText(theAdvancedFragment.getActivity(), "wrist RIGHT -->", Toast.LENGTH_LONG).show();
+                }
+            });
 
 
-        theAdvancedFragment.sendGestureIfMatchFound("right");
+            theAdvancedFragment.sendGestureIfMatchFound("right");
 
-        Log.w(LOG_TAG, "wrist RIGHT -->");
+            Log.w(LOG_TAG, "wrist RIGHT -->");
+        }
     }
 
     @Override
     public void onWristUp() {
 
-        theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
-                gestureWindow.append("wrist UP ^^" + "\n");
-                ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
-                Toast.makeText(theAdvancedFragment.getActivity(), "wrist UP ^^", Toast.LENGTH_LONG).show();
-            }
-        });
+        // We first have to check whether a gesture different from up/down/left/right got recognized.
+        // If yes, we don't recognize the gesture as up/down/left/right.
+        if(!theAdvancedFragment.isAdvancedRecording()) {
 
-        theAdvancedFragment.sendGestureIfMatchFound("up");
+            theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
+                    gestureWindow.append("wrist UP ^^" + "\n");
+                    ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                    Toast.makeText(theAdvancedFragment.getActivity(), "wrist UP ^^", Toast.LENGTH_LONG).show();
+                }
+            });
 
-        Log.w(LOG_TAG, "wrist UP ^^");
+            theAdvancedFragment.sendGestureIfMatchFound("up");
+
+            Log.w(LOG_TAG, "wrist UP ^^");
+
+        }
     }
 
     @Override
     public void onWristDown() {
 
-        theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
-                gestureWindow.append("wrist DOWN __" + "\n");
-                ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
-                // TODO is theAdvancedFragment.getActivity() OK of toch ApplicationContext usen?
-                Toast.makeText(theAdvancedFragment.getActivity(), "wrist DOWN __", Toast.LENGTH_LONG).show();
-            }
-        });
+        // We first have to check whether a gesture different from up/down/left/right got recognized.
+        // If yes, we don't recognize the gesture as up/down/left/right.
+        if(!theAdvancedFragment.isAdvancedRecording()) {
+
+            theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
+                    gestureWindow.append("wrist DOWN __" + "\n");
+                    ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                    // TODO is theAdvancedFragment.getActivity() OK of toch ApplicationContext usen?
+                    Toast.makeText(theAdvancedFragment.getActivity(), "wrist DOWN __", Toast.LENGTH_LONG).show();
+                }
+            });
 
 
-        theAdvancedFragment.sendGestureIfMatchFound("down");
+            theAdvancedFragment.sendGestureIfMatchFound("down");
 
-        Log.w(LOG_TAG, "wrist DOWN __");
+            Log.w(LOG_TAG, "wrist DOWN __");
+        }
     }
 
 

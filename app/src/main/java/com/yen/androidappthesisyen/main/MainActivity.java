@@ -19,13 +19,12 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.yen.androidappthesisyen.R;
 import com.yen.androidappthesisyen.advancedrecognizer.AdvancedFragment;
-import com.yen.androidappthesisyen.gesturelibrary.GestureListFragment;
+import com.yen.androidappthesisyen.gesturelibrary.GestureLibraryFragment;
 import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 
 
@@ -545,9 +544,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // Create new fragment and transaction
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
-        Fragment fragment = new GestureListFragment();
+        Fragment fragment = new GestureLibraryFragment();
         // Nu GEEN BUNDLE NODIG MET STATE want het STATE systeem geldt enkel bij de learn/recognize/library state omdat die dezelfde "ouderfragment" hebben die telkens wordt aangepast.
-        // De MainActivity en MainFragment EN GestureListFragment hebben hier niets mee te zien.
+        // De MainActivity en MainFragment EN GestureLibraryFragment hebben hier niets mee te zien.
 
         // Replace whatever is in the fragment_container view with this fragment,
 // and add the transaction to the back stack if needed
