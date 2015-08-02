@@ -31,15 +31,14 @@
         android:id="@+id/horizontalScrollView_main_fragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toggle_BT"
         android:background="@drawable/border_ui"
         android:padding="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@+id/listView_main"
-        android:layout_toEndOf="@+id/listView_main">
+        android:layout_toEndOf="@+id/toggle_BT"
+        android:layout_below="@+id/imageView"
+        android:layout_toRightOf="@+id/toggle_BT">
 
 
         <!--of fill parent of match parent maken?-->
@@ -99,43 +98,10 @@
                         android:id="@+id/label_communication_test"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/label_toggle_1"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        android:text=""
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:minHeight="20dp" />
 
-                    <ToggleButton
-                        android:id="@+id/toggle_communication_test"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/toggle_1"
-                        android:enabled="false" />
-
-                    <TextView
-                        android:id="@+id/label_acceldata_stream"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_toggle_2"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <ToggleButton
-                        android:id="@+id/toggle_pebble_acceldata_stream"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/acceldata_stream"
-                        android:enabled="false" />
-
-                    <TextView
-                        android:id="@+id/label_acceldata_datalogging"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_toggle_3"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <ToggleButton
-                        android:id="@+id/toggle_pebble_acceldata_datalogging"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/acceldata_datalogging"
-                        android:enabled="false" />
                 </TableRow>
 
                 <TableRow
@@ -177,13 +143,14 @@
                 <TableRow
                     android:id="@+id/tableRow_4_main"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    >
 
                     <TextView
                         android:id="@+id/label_generic_sensor_streaming"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/label_generic_sensor_streaming"
+                        android:text="@string/label_mqtt_service_toggle"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <ToggleButton
@@ -194,13 +161,6 @@
                         android:text="@string/generic_toggle"
                         android:enabled="false" />
 
-                    <TextView
-                        android:id="@+id/label_insert_ip_address"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_insert_ip_address"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:layout_column="2" />
                 </TableRow>
 
             </TableLayout>
@@ -218,8 +178,8 @@
         android:padding="16dp"
         android:layout_alignTop="@+id/horizontalScrollView_main_fragment"
         android:layout_alignBottom="@+id/horizontalScrollView_main_fragment"
-        android:layout_toStartOf="@+id/imageView2"
-        android:layout_toLeftOf="@+id/imageView2" />
+        android:layout_toStartOf="@+id/horizontalScrollView_main_fragment"
+        android:layout_toLeftOf="@+id/horizontalScrollView_main_fragment" />
 
 
     <ScrollView
@@ -269,35 +229,17 @@
         android:layout_toRightOf="@+id/imageView"
         android:layout_toEndOf="@+id/imageView" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/WiFi"
-        android:id="@+id/textView"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textStyle="bold"
-        android:layout_above="@+id/horizontalScrollView_main_fragment"
-        android:layout_centerHorizontal="true" />
-
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
         android:contentDescription="bt_icon"
         android:src="@drawable/bt_icon"
-        android:layout_alignParentTop="true"
+        android:layout_alignTop="@+id/toggle_BT"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/listView_main" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView2"
-        android:contentDescription="wifi_icon"
-        android:src="@drawable/wifi_icon"
-        android:layout_above="@+id/horizontalScrollView_main_fragment"
-        android:layout_toLeftOf="@+id/textView" />
+        android:layout_marginLeft="87dp"
+        android:layout_marginStart="87dp" />
 
 
     <!-- android:onClick="" bij BUTTON laat toe om methode in FRAGMENT te specifiëren.

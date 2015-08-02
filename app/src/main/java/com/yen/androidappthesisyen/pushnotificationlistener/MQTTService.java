@@ -272,8 +272,9 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     //  message broker.
     // It has to be unique to the broker - two clients are not permitted to
     //  connect to the same broker using the same client ID.
+    // Regarding scalability: we don't need a different clientID to give to each connected broker/Action Device. It's only important that the clientIDs one specific broker has, are each unique.
     private String mqttClientId = null;
-    // TODO ============== hiervoor ook 2de regel nodig?
+
     // Momenteel dus nog niet gedaan: nu dus 1 clientID maar op zich is niet erg want die clientid telkens bij andere broker gebruikt en dus uniek PER broker?
 
 

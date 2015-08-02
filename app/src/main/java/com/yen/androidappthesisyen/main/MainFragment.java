@@ -267,8 +267,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                     public void onClick(DialogInterface dialog, int arg1) {
 
 
-
-
                         String value = String.valueOf(input.getText());
                         // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
                         // Wordt verondersteld dat dit in toekomst ook zo is of niet?
@@ -287,10 +285,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
-                        // TODO is dit nodig? dialog.dismiss();
-
-
-
 
                         String value = String.valueOf(input.getText());
                         // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
@@ -321,7 +315,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
-                        // TODO nodig? dialog.dismiss();
 
 
                         TextView textViewGeneric = (TextView) getView().findViewById(R.id.textView_generic);
@@ -377,21 +370,16 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     private void saveIPIfInserted(int enumerator, String value) {
 
 
-
-        // !! Patterns.IP_ADDRESS only applies to IPv4, so it's misleading.
-        // http://blog.danlew.net/2014/05/22/why-i-dont-use-patterns/
-        // TODO bedenken hoe IPv6 ook kan ondersteund worden? WRSL VIA CHECKBOX dat user kan aanvinken en afhankelijk daarvan wordt andere matcher gekozen.
-        // dus google op "android verify ipv6" ofzo
+        // Note it only works with IPv4 addresses; not IPv6.
         Matcher matcher = Patterns.IP_ADDRESS.matcher(value);
 
         if (matcher.matches()) {
+
             // Only when the value is not empty, the value gets saved.
 
-            // TODO SERVICE MOET NU GEHERSTART WORDEN - OF BEDENK ANDERE WERKWIJZE ZODAT SERVICE NOG NIET IS GESTART VOORALEER JUISTE IP IN SYSTEEM ZIT.
             SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
             SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
             editorUserDetector.putString("ip_address_broker_" + (enumerator-1), value); // Because here we still counted from 1 onwards. Not 0 onwards.
-            // editor.putString("topic",  "accelstream/state"); // TODO dit hoeft op zich niet in Preference want is altijd hetzelfde? OF WEL DOEN OMDAT ZO GENERIEK IS?
             editorUserDetector.commit();
 
 
@@ -474,12 +462,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         ToggleButton toggleBT = (ToggleButton) returnedView.findViewById(R.id.toggle_BT);
         bundleEnableDisableStates.putBoolean("R.id.toggle_BT", toggleBT.isEnabled());
 
-        ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
-        bundleEnableDisableStates.putBoolean("R.id.toggle_communication_test", toggleCommunicationTest.isEnabled());
-        ToggleButton togglePebbleStream = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_stream);
-        bundleEnableDisableStates.putBoolean("R.id.toggle_pebble_acceldata_stream", togglePebbleStream.isEnabled());
-        ToggleButton togglePebbleDataLogging = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-        bundleEnableDisableStates.putBoolean("R.id.toggle_pebble_acceldata_datalogging", togglePebbleDataLogging.isEnabled());
         ToggleButton toggleGeneric = (ToggleButton) returnedView.findViewById(R.id.toggle_generic);
         bundleEnableDisableStates.putBoolean("R.id.toggle_generic", toggleGeneric.isEnabled());
 
@@ -493,12 +475,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         bundleToggleStates.putBoolean("R.id.toggle_BT", toggleBT.isChecked());
         // hier niets voor buttonBTDiscoverable want heeft die functie niet he.
 
-        ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
-        bundleToggleStates.putBoolean("R.id.toggle_communication_test", toggleCommunicationTest.isChecked());
-        ToggleButton togglePebbleStream = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_stream);
-        bundleToggleStates.putBoolean("R.id.toggle_pebble_acceldata_stream", togglePebbleStream.isChecked());
-        ToggleButton togglePebbleDataLogging = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-        bundleToggleStates.putBoolean("R.id.toggle_pebble_acceldata_datalogging", togglePebbleDataLogging.isChecked());
         ToggleButton toggleGeneric = (ToggleButton) returnedView.findViewById(R.id.toggle_generic);
         bundleToggleStates.putBoolean("R.id.toggle_generic", toggleGeneric.isChecked());
 
@@ -523,12 +499,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         ToggleButton toggleBT = (ToggleButton) returnedView.findViewById(R.id.toggle_BT);
         toggleBT.setEnabled(bundleEnableDisableStates.getBoolean("R.id.toggle_BT"));
 
-        ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
-        toggleCommunicationTest.setEnabled(bundleEnableDisableStates.getBoolean("R.id.toggle_communication_test"));
-        ToggleButton togglePebbleStream = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_stream);
-        togglePebbleStream.setEnabled(bundleEnableDisableStates.getBoolean("R.id.toggle_pebble_acceldata_stream"));
-        ToggleButton togglePebbleDataLogging = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-        togglePebbleDataLogging.setEnabled(bundleEnableDisableStates.getBoolean("R.id.toggle_pebble_acceldata_datalogging"));
         ToggleButton toggleGeneric = (ToggleButton) returnedView.findViewById(R.id.toggle_generic);
         toggleGeneric.setEnabled(bundleEnableDisableStates.getBoolean("R.id.toggle_generic"));
 
@@ -543,12 +513,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         toggleBT.setChecked(bundleToggleStates.getBoolean("R.id.toggle_BT"));
         // NVT op buttonBTDiscoverable
 
-        ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
-        toggleCommunicationTest.setChecked(bundleToggleStates.getBoolean("R.id.toggle_communication_test"));
-        ToggleButton togglePebbleStream = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_stream);
-        togglePebbleStream.setChecked(bundleToggleStates.getBoolean("R.id.toggle_pebble_acceldata_stream"));
-        ToggleButton togglePebbleDataLogging = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-        togglePebbleDataLogging.setChecked(bundleToggleStates.getBoolean("R.id.toggle_pebble_acceldata_datalogging"));
         ToggleButton toggleGeneric = (ToggleButton) returnedView.findViewById(R.id.toggle_generic);
         toggleGeneric.setChecked(bundleToggleStates.getBoolean("R.id.toggle_generic"));
 
@@ -586,12 +550,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         Button buttonConnectGeneric = (Button) returnedView.findViewById(R.id.button_connect_generic);
         buttonConnectGeneric.setOnClickListener(this);
 
-        ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
-        toggleCommunicationTest.setOnClickListener(this);
-        ToggleButton togglePebbleStream = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_stream);
-        togglePebbleStream.setOnClickListener(this);
-        ToggleButton togglePebbleDataLogging = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-        togglePebbleDataLogging.setOnClickListener(this);
         ToggleButton toggleGeneric = (ToggleButton) returnedView.findViewById(R.id.toggle_generic);
         toggleGeneric.setOnClickListener(this);
 
@@ -659,15 +617,7 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 //        ToggleButton toggleBT = (ToggleButton) returnedView.findViewById(R.id.toggle_BT);
 //        toggleBT.setEnabled(state);
 //        bundleEnableDisableStates.putBoolean("R.id.toggle_BT", state);
-        ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
-        toggleCommunicationTest.setEnabled(state);
-        bundleEnableDisableStates.putBoolean("R.id.toggle_communication_test", state);
-        ToggleButton togglePebbleStream = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_stream);
-        togglePebbleStream.setEnabled(state);
-        bundleEnableDisableStates.putBoolean("R.id.toggle_pebble_acceldata_stream", state);
-        ToggleButton togglePebbleDataLogging = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-        togglePebbleDataLogging.setEnabled(state);
-        bundleEnableDisableStates.putBoolean("R.id.toggle_pebble_acceldata_datalogging", state);
+
         ToggleButton toggleGeneric = (ToggleButton) returnedView.findViewById(R.id.toggle_generic);
         toggleGeneric.setEnabled(state);
         bundleEnableDisableStates.putBoolean("R.id.toggle_generic", state);
@@ -680,15 +630,7 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 //        ToggleButton toggleBT = (ToggleButton) returnedView.findViewById(R.id.toggle_BT);
 //        toggleBT.setChecked(state);
 //        bundleToggleStates.putBoolean("R.id.toggle_BT", state);
-        ToggleButton toggleCommunicationTest = (ToggleButton) returnedView.findViewById(R.id.toggle_communication_test);
-        toggleCommunicationTest.setChecked(state);
-        bundleToggleStates.putBoolean("R.id.toggle_communication_test", state);
-        ToggleButton togglePebbleStream = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_stream);
-        togglePebbleStream.setChecked(state);
-        bundleToggleStates.putBoolean("R.id.toggle_pebble_acceldata_stream", state);
-        ToggleButton togglePebbleDataLogging = (ToggleButton) returnedView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-        togglePebbleDataLogging.setChecked(state);
-        bundleToggleStates.putBoolean("R.id.toggle_pebble_acceldata_datalogging", state);
+
         ToggleButton toggleGeneric = (ToggleButton) returnedView.findViewById(R.id.toggle_generic);
         toggleGeneric.setChecked(state);
         bundleToggleStates.putBoolean("R.id.toggle_generic", state);
@@ -723,32 +665,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
                 // Launch the DeviceListActivity to see devices and do scan
                 Intent serverIntent = new Intent(getActivity(), DeviceListActivity.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
-
-                break;
-
-            case R.id.toggle_communication_test:
-
-                ToggleButton togglePebbleCommunicationTest = (ToggleButton) v.findViewById(R.id.toggle_communication_test);
-
-                if (togglePebbleCommunicationTest.isChecked()) {
-
-
-                } else {
-
-                }
-
-                break; // NOT "return true/false" since return type is now VOID.
-
-            case R.id.toggle_pebble_acceldata_datalogging:
-
-                ToggleButton togglePebbleDataLogging = (ToggleButton) v.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-
-                if (togglePebbleDataLogging.isChecked()) {
-
-
-                } else {
-
-                }
 
                 break;
 
@@ -898,20 +814,7 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
             startBT();
         }*/
 
-        ToggleButton toggleCommunicationTest = (ToggleButton) theView.findViewById(R.id.toggle_communication_test);
-        if (toggleCommunicationTest.isEnabled() && toggleCommunicationTest.isChecked()) {
 
-        } else {
-            // Do NOTHING since the service should have been disabled already when the fragment arrived in onPause().
-        }
-        ToggleButton togglePebbleStream = (ToggleButton) theView.findViewById(R.id.toggle_pebble_acceldata_stream);
-        if (togglePebbleStream.isEnabled() && togglePebbleStream.isChecked()) {
-            // TODO
-        }
-        ToggleButton togglePebbleDataLogging = (ToggleButton) theView.findViewById(R.id.toggle_pebble_acceldata_datalogging);
-        if (togglePebbleDataLogging.isEnabled() && togglePebbleDataLogging.isChecked()) {
-
-        }
         ToggleButton toggleGeneric = (ToggleButton) theView.findViewById(R.id.toggle_generic);
         if (toggleGeneric.isEnabled() && toggleGeneric.isChecked()) {
             // TODO

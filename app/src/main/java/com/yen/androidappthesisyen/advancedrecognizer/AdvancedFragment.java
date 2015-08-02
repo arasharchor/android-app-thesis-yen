@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -125,8 +126,8 @@ public class AdvancedFragment extends Fragment {
 
     private boolean RECORD_GESTURE = false;
 
-    // ff public
-    public boolean DEBUG = false; // stond default op TRUE
+    // TODO wegdoen?
+    private boolean DEBUG = false;
     private boolean VERBOSE = false;
 
 
@@ -138,15 +139,8 @@ public class AdvancedFragment extends Fragment {
     final Handler alertHandler = new Handler();
     public String detected_gid = "Unknown";
 
-    // mag wrsl weg
-//    final Runnable showAlert = new Runnable() {
-//        public void run() {
-//            show_alert_box();
-//        }
-//    };
 
-    // ff public
-    public com.yen.androidappthesisyen.advancedrecognizer.App.STATES state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.STATE_LEARN;
+    private com.yen.androidappthesisyen.advancedrecognizer.App.STATES state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.STATE_LEARN;
 
 
     // private MENUITEMS menuitems;
@@ -310,7 +304,7 @@ public class AdvancedFragment extends Fragment {
     // Values related to gesture spotting.
     // TODO ============ met MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING oppassen want 1300 was te hoog en dan werd CIRCLE nooit herkend en kwam er altijd UNKNOWN!
     float MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING = 1250; // was lange tijd 1050.
-    float MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING = 1150;
+    float MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING = 1100;
     int stepsSinceNoMovement; // TODO default op 0 zetten of niet?
     final int MINIMUM_GESTURE_LENGTH = 5; // default 8
     // als te hoog is moet de user te lang stilstaan met Pebble:
@@ -496,7 +490,11 @@ public class AdvancedFragment extends Fragment {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    outputWindow.append(detected_gid + "\n");
+                                    // OUD
+//                                    outputWindow.append(detected_gid + "\n");
+                                    // NIEUW
+                                    outputWindow.append(Html.fromHtml("<b>" + detected_gid + "</b>" + "<br />"));
+
                                     ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
                                     Toast.makeText(getActivity(), detected_gid, Toast.LENGTH_LONG).show();
                                 }
@@ -621,10 +619,10 @@ public class AdvancedFragment extends Fragment {
                         String IPAddress = "192.168.1.1";
                         if (actionDeviceToSendTo.equalsIgnoreCase("yen-asus")) {
                             // TODO momenteel nog hardgecodeerde mapping yen-asus naar enum 1
-                            IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                            IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1");
                         } else if (actionDeviceToSendTo.equalsIgnoreCase("yen-medion")) {
                             // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
-                            IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
+                            IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1");
                         } else {
                             Log.w("pushnotificationlistener", "SystemID unknown so no mapped IP address for Gesture Handler found");
                         }
@@ -883,11 +881,11 @@ public class AdvancedFragment extends Fragment {
 
 
             // TODO je hebt hier TRY CATCH rond gezet want gaf error over SQL en close(): to fix.
-            try {
+            // TODO 02-08: ff uitgezet. Zien of het nog voorvalt! =============== OFWEL BEST ZETTEN VOOR ZEKERHEID HE.
+//            try {
                 myGestureLibrary = new GestureLibrary("GESTURES", getActivity());
-            } catch (Exception ex) {
-
-            }
+//            } catch (Exception ex) {
+//            }
 
             Log.w(LOG_TAG, "--------------------- nu gemaakt ---------------------");
 
@@ -1490,8 +1488,7 @@ public class AdvancedFragment extends Fragment {
             disableAccelStreamForTraining();
         }
 
-        // TODO mag dit wel pauzeren of niet?
-        // voor PEBBLE ACCEL STREAM
+
         disableAllServices();
 
         PebbleKit.closeAppOnPebble(getActivity(), uuid);

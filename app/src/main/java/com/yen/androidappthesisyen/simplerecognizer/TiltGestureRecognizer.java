@@ -1,5 +1,6 @@
 package com.yen.androidappthesisyen.simplerecognizer;
 
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
@@ -53,7 +54,8 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
                 public void run() {
 // Although the following line of code gets duplicated int the following methods, we can't initialize it once in the constructor, since at that time, the View hasn't yet been fully initialized.
                     TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
-                    gestureWindow.append("wrist LEFT <--" + "\n");
+//                    gestureWindow.append("wrist LEFT <--" + "\n");
+                    gestureWindow.append(Html.fromHtml("<b>" + "wrist LEFT <--" + "</b>" + "<br />"));
                     ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
                     Toast.makeText(theAdvancedFragment.getActivity(), "wrist LEFT <--", Toast.LENGTH_LONG).show();
                 }
@@ -82,7 +84,8 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
                 @Override
                 public void run() {
                     TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
-                    gestureWindow.append("wrist RIGHT -->" + "\n");
+//                    gestureWindow.append("wrist RIGHT -->" + "\n");
+                    gestureWindow.append(Html.fromHtml("<b>" + "wrist RIGHT -->" + "</b>" + "<br />"));
                     ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
                     Toast.makeText(theAdvancedFragment.getActivity(), "wrist RIGHT -->", Toast.LENGTH_LONG).show();
                 }
@@ -106,7 +109,8 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
                 @Override
                 public void run() {
                     TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
-                    gestureWindow.append("wrist UP ^^" + "\n");
+//                    gestureWindow.append("wrist UP ^^" + "\n");
+                    gestureWindow.append(Html.fromHtml("<b>" + "wrist UP ^^" + "</b>" + "<br />"));
                     ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
                     Toast.makeText(theAdvancedFragment.getActivity(), "wrist UP ^^", Toast.LENGTH_LONG).show();
                 }
@@ -130,7 +134,8 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
                 @Override
                 public void run() {
                     TextView gestureWindow = (TextView) theAdvancedFragment.getView().findViewById(R.id.textView_gestures);
-                    gestureWindow.append("wrist DOWN __" + "\n");
+//                    gestureWindow.append("wrist DOWN __" + "\n");
+                    gestureWindow.append(Html.fromHtml("<b>" + "wrist DOWN __" + "</b>" + "<br />"));
                     ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
                     // TODO is theAdvancedFragment.getActivity() OK of toch ApplicationContext usen?
                     Toast.makeText(theAdvancedFragment.getActivity(), "wrist DOWN __", Toast.LENGTH_LONG).show();

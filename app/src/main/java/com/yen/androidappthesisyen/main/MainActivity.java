@@ -308,19 +308,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     @Override
     protected void onDestroy() {
 
-        // ...
-
-        // MQTT SERVICE IS GEKILLED IN THREE DOLLAR GESTURE ACTIVITY (niet fragment!)
-        // UPDATE: toch niet want bij orientatie change wordt service dan gekilled! (en daarnaast start ze precies niet meer automatisch op!)
-        // UPDATE: toch NIET gezet want bij orientatie verandering in mainactivity wordt service gekilled dan!
-//        Intent svc = new Intent(getApplicationContext(), MQTTService.class);
-//        stopService(svc);
-
-
         unregisterReceiver(statusUpdateIntentReceiver);
         unregisterReceiver(messageIntentReceiver);
         unregisterReceiver(BTReceiver);
-
 
         super.onDestroy();
 
@@ -550,7 +540,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         // Replace whatever is in the fragment_container view with this fragment,
 // and add the transaction to the back stack if needed
-        transaction.replace(R.id.framelayout_container_main_activity, fragment);
+        transaction.replace(R.id.framelayout_container_main_activity, fragment, "gesturelibrary");
         /*Note: When you remove or replace a fragment and add the transaction to the back stack, the fragment that is removed is stopped (not destroyed). If the user navigates back to restore the fragment, it restarts. If you do not add the transaction to the back stack, then the fragment is destroyed when removed or replaced. To allow the user to navigate backward
         through the fragment transactions, you must call addToBackStack() before you commit the FragmentTransaction.*/
 //        http://sapandiwakar.in/replacing-fragments/
