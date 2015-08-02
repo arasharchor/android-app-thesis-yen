@@ -118,6 +118,7 @@
     <string name="button_scan">Scan for Bluetooth devices</string>
     <string name="choose_gesture_to_train">Choose gesture to train</string>
     <string name="description_choose_gesture">Choose the gesture to train from the following list of gestures supported by the connected Action Devices.</string>
+    <string name="no_connected_AD_supports">No currently connected Action Device supports this gesture\n</string>
 
 
 </resources>

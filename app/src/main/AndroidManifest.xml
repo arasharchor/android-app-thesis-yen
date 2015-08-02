@@ -95,7 +95,7 @@
         -->
 
         <activity
-            android:name=".advancedrecognizer.DBManagerUIActivity"
+            android:name=".gesturelibrary.DBManagerUIActivity"
             android:configChanges="orientation"
             android:label="dbmanager"
             android:screenOrientation="landscape" >

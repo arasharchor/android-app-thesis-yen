@@ -14,7 +14,6 @@ import android.widget.ListView;
 
 import com.yen.androidappthesisyen.R;
 import com.yen.androidappthesisyen.advancedrecognizer.App;
-import com.yen.androidappthesisyen.advancedrecognizer.GestureLibrary;
 
 /**
  * A fragment representing a list of Items.
@@ -82,13 +81,8 @@ public class GestureLibraryFragment extends ListFragment {
         }
 
 
-
-
-
         // initialize the list view
         this.initListView();
-
-
 
 
         // weet niet of in deze klasse ook nodig is but better safe than sorry.
@@ -132,16 +126,16 @@ public class GestureLibraryFragment extends ListFragment {
     public void initListView() {
         /* Inits the list view displaying gesture ids and counts */
         // see if we have a gesture library instance
-        String[] gestureIDStrings;
+        String[] arrayGestureTitles;
         if (this.glibrary_instance != null) {
             /* initialize the list view */
-            gestureIDStrings = this.glibrary_instance.getAllGestureTitles();
+            arrayGestureTitles = this.glibrary_instance.getAllGestureTitles();
         } else {
             // WE SHOULD NEVER ARRIVE HERE.
-            gestureIDStrings = new String[]{getResources().getString(R.string.error_gesture_library)};
+            arrayGestureTitles = new String[]{getResources().getString(R.string.error_gesture_library)};
         }
 
-        setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, gestureIDStrings));
+        setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, arrayGestureTitles));
     }
 
 

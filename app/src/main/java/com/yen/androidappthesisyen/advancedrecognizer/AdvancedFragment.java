@@ -28,6 +28,7 @@ import android.widget.ToggleButton;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.yen.androidappthesisyen.R;
+import com.yen.androidappthesisyen.gesturelibrary.GestureLibrary;
 import com.yen.androidappthesisyen.simplerecognizer.PebbleGestureModel;
 import com.yen.androidappthesisyen.simplerecognizer.TiltGestureRecognizer;
 
@@ -307,7 +308,8 @@ public class AdvancedFragment extends Fragment {
     ArrayList<float[]> gestureValues = new ArrayList<float[]>();
 
     // Values related to gesture spotting.
-    float MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING = 1300; // was lange tijd 1050.
+    // TODO ============ met MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING oppassen want 1300 was te hoog en dan werd CIRCLE nooit herkend en kwam er altijd UNKNOWN!
+    float MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING = 1250; // was lange tijd 1050.
     float MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING = 1150;
     int stepsSinceNoMovement; // TODO default op 0 zetten of niet?
     final int MINIMUM_GESTURE_LENGTH = 5; // default 8
@@ -486,40 +488,42 @@ public class AdvancedFragment extends Fragment {
                         detected_gid = gid;
 
 
-                        // TODO eventueel gebruiken: if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
-                        final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_gestures);
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                outputWindow.append(detected_gid + "\n");
-                                ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
-                                Toast.makeText(getActivity(), detected_gid, Toast.LENGTH_LONG).show();
+
+                        if (!detected_gid.equalsIgnoreCase("not recognized!")) {
+
+                            // TODO =================== eventueel gebruiken zodat dan niets getoond: if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
+                            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_gestures);
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    outputWindow.append(detected_gid + "\n");
+                                    ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                                    Toast.makeText(getActivity(), detected_gid, Toast.LENGTH_LONG).show();
+                                }
+                            });
+
+
+
+                            if (detected_gid.equalsIgnoreCase("unknown") || detected_gid.equalsIgnoreCase("unknown gesture")) {
+                                // Niet nodig. En hebben gemerkt dat de nu nog te krijgen "unknown gesture" berichten mogen genegeerd worden.
+                                // Het is precies niet meer het geval dat we een gesture uitvoeren en dat die niet wordt herkend.
+                                // doTwoShortPebbleVibrations();
+                            } else {
+
+                                sendGestureIfMatchFound(detected_gid);
+
                             }
-                        });
 
 
-                        // TODO "  && !detected_gid.equalsIgnoreCase("not recognized!") " ook in IF steken?
-                        // of dat net niet om te zien wann er NOG GEEN GESTURES in DB zitten?
-                        // maar dat wrsl op betere manier tonen dan via dialog na uitvoeren gebaar?
-                        // show the alert
-                        /*if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
-                            alertHandler.post(showAlert); // showAlert is een RUNNABLE met daarin een RUN methode.
-                        }*/
-
-
-                        if (detected_gid.equalsIgnoreCase("unknown") || detected_gid.equalsIgnoreCase("unknown gesture")) { // TODO nodig of niet? && gid.equalsIgnoreCase("unknown gesture")
-
-                            // Niet nodig. En hebben gemerkt dat de nu nog te krijgen "unknown gesture" berichten mogen genegeerd worden.
-                            // Het is precies niet meer het geval dat we een gesture uitvoeren en dat die niet wordt herkend.
-                            // doTwoShortPebbleVibrations();
 
                         } else {
-
-
-                            sendGestureIfMatchFound(detected_gid);
-
-
+                            // TODO moeten we via scrollview users melden dat er geen gestures naast up/down/left/right zijn?
+                            // WRSL NIET?
                         }
+
+
+
+
 
 
                     }
@@ -577,8 +581,6 @@ public class AdvancedFragment extends Fragment {
 
 
             // Do cross check of action devices which accel stream is running and that support the gesture.
-
-
             List<String> listActionDevicesToSendTo = new ArrayList<>();
             Log.w(LOG_TAG, "=================================== listActionDevicesToSendTo.size() " + listActionDevicesToSendTo.size());
 
@@ -684,12 +686,12 @@ public class AdvancedFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        outputWindow.append("No cross match found\n");
+                        outputWindow.append(getResources().getString(R.string.no_connected_AD_supports));
                         ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
                     }
                 });
 
-                Log.w(LOG_TAG, "No cross match found");
+                Log.w(LOG_TAG, "No currently connected Action Device supports this gesture");
             }
 
 
