@@ -110,7 +110,7 @@
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/relative_layout_three_dollar_gesture_detection"
         android:layout_alignRight="@+id/relative_layout_three_dollar_gesture_detection"
-        android:layout_alignTop="@+id/info_manual"
+        android:layout_alignTop="@+id/tutorial"
         android:layout_marginEnd="85dp"
         android:layout_marginRight="85dp"
         android:text="Use gesture spotting." />
@@ -136,7 +136,7 @@
     </ScrollView>
 
     <TextView
-        android:id="@+id/info_manual"
+        android:id="@+id/tutorial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -144,7 +144,7 @@
         android:layout_alignTop="@+id/toggle_accel_stream"
         android:layout_toLeftOf="@+id/toggle_accel_stream"
         android:layout_toStartOf="@+id/toggle_accel_stream"
-        android:text="The face detectors on the connected Action Devices allow for automatic enabling &amp; disabling of the Pebble™ accelerometer data stream. Manual toggle:"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <!-- android:checked="true" -->

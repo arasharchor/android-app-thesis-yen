@@ -8,7 +8,7 @@ android {
         applicationId "com.yen.androidappthesisyen"
         minSdkVersion 11
         // TODO nog verhogen? check https://developer.android.com/about/dashboards/index.html
-        targetSdkVersion 22 // was 21
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
@@ -33,11 +33,11 @@ dependencies {
     // niet compatibel met bepaalde methodes:
     //    compile 'com.jjoe64:graphview:4.0.0'
     // voor ACCEL_STREAM
-    compile 'com.jjoe64:graphview:3.1.4'
-    // voor PEBBLEPOINTER
+//    compile 'com.jjoe64:graphview:3.1.4'
+//     voor PEBBLEPOINTER
     //    compile files('libs/androidplot-core-0.6.1.jar')
-    compile 'com.androidplot:androidplot-core:0.6.1'
-    compile 'com.thetransactioncompany:jsonrpc2-client:1.15'
+//    compile 'com.androidplot:androidplot-core:0.6.1'
+//    compile 'com.thetransactioncompany:jsonrpc2-client:1.15'
     //    compile 'com.thetransactioncompany:jsonrpc2-base:1.38'
     //    compile 'net.minidev:json-smart:2.1.1'
     compile files('libs/wmqtt.jar')

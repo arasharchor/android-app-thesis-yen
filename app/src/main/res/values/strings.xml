@@ -7,13 +7,11 @@
     <string name="pebble_not_connected_toast">Pebble™ disconnected</string>
     <string name="pebble_connected">Pebble™ CONNECTED. (Use Bluetooth toggle when connection lost.)</string>
     <string name="pebble_connected_toast">Pebble™ connected</string>
-    <string name="acceldata_stream">Accel Data Stream</string>
-    <string name="acceldata_datalogging">Accel Data DataLogging</string>
+
+
     <string name="generic_not_connected">Action Device(s) (face detector + gesture handler) not connected.</string>
     <string name="generic_connected">Action Device(s) (face detector + gesture handler) CONNECTED.</string>
     <string name="generic_toggle">Action Device(s) toggle</string>
-    <string name="label_toggle_2">Toggle 2</string>
-    <string name="label_toggle_3">Toggle 3</string>
     <string name="label_mqtt_service_toggle">TODO BENAMING toggle</string>
 
     <string name="title_masterdetailitem_list">MasterDetailItems</string>
@@ -48,11 +46,6 @@
     <string name="pebble_companion_app_found">Official Pebble™ Companion App found. Now opening.</string>
     <string name="connect_your_pebble">Connect your Pebble™ through the official Pebble™ Companion App.</string>
     <string name="download_and_retry">Download the official Pebble™ Companion App and retry.</string>
-
-    <string name="start_pebble_data_logging">START PEBBLE™ DATA LOGGING</string>
-    <string name="stop_pebble_data_logging">STOP PEBBLE™ DATA LOGGING</string>
-
-    <string name="sending_data_log_finished">Sending data log FINISHED</string>
 
     <string name="icon_content_description">Mobile Device</string>
     <string name="connect_generic">Connect Action Device(s)</string>
@@ -119,6 +112,10 @@
     <string name="choose_gesture_to_train">Choose gesture to train</string>
     <string name="description_choose_gesture">Choose the gesture to train from the following list of gestures supported by the connected Action Devices.</string>
     <string name="no_connected_AD_supports">No currently connected Action Device supports this gesture\n</string>
+
+    <string name="tutorial_train">1) Choose gesture to train. \n2) Hold the record button while executing the gesture. \n3) Redo 2) for TODO hoeveel keer nodig. \n4) Train another gesture by starting from 1).</string>
+    <string name="tutorial_recognize"><![CDATA[The face detectors on the connected Action Devices allow for automatic enabling & disabling of the Pebble™ accelerometer data stream. Manual toggle:]]></string>
+    <string name="official_app">Official Pebble™ Companion App</string>
 
 
 </resources>

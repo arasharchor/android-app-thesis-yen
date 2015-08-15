@@ -73,7 +73,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.getpebble/pebblekit/2.6.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.jjoe64/graphview/3.1.4/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
@@ -91,15 +90,10 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="json-smart-1.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
-    <orderEntry type="library" exported="" name="jsonrpc2-base-1.36" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="pebblekit-2.6.0" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.4" level="project" />
-    <orderEntry type="library" exported="" name="androidplot-core-0.6.1" level="project" />
-    <orderEntry type="library" exported="" name="jsonrpc2-client-1.15" level="project" />
-    <orderEntry type="library" exported="" name="graphview-3.1.4" level="project" />
     <orderEntry type="library" exported="" name="wmqtt" level="project" />
   </component>
 </module>

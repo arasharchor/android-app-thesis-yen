@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -144,6 +145,11 @@ public class AdvancedFragment extends Fragment {
 
 
     // private MENUITEMS menuitems;
+
+
+    private PowerManager pmGlobal = null;
+    private PowerManager.WakeLock wlGlobal = null;
+    private PowerManager.WakeLock wlTrainingGlobal = null;
 
 
 
@@ -908,6 +914,11 @@ public class AdvancedFragment extends Fragment {
         // update nu 900 maar mag nog wat lager indien nuttig! nu is 850 - nu terug 900 MAAR IS 875 testen
         theTiltGestureRecognizer = new TiltGestureRecognizer(this, 900, 1000, PebbleGestureModel.MODE_TILT);
 
+
+        pmGlobal = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
+        wlGlobal = pmGlobal.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "accelstream");
+        wlTrainingGlobal = pmGlobal.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "accelstreamtraining");
+
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
     }
@@ -975,52 +986,59 @@ public class AdvancedFragment extends Fragment {
         // Button TRAIN gesture.
         final Button btnRecordGesture = (Button) returnedView.findViewById(R.id.btn_record_gesture);
         btnRecordGesture.setOnTouchListener(new View.OnTouchListener() {
-                                          public boolean onTouch(View v, MotionEvent event) {
+                                                public boolean onTouch(View v, MotionEvent event) {
 
-                                              if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                                                  // button pressed, start recording the trace!
-                                                  Log.w("OnTouch", "Down!");
-                                                  startRecordingGesture();
-                                              } else if (event.getAction() == MotionEvent.ACTION_UP)
+                                                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                                                        // button pressed, start recording the trace!
+                                                        Log.w("OnTouch", "Down!");
+                                                        startRecordingGesture();
+                                                    } else if (event.getAction() == MotionEvent.ACTION_UP)
 
-                                              {
-                                                  Log.w("OnTouch", "Up!");
-                                                  stopRecordingGesture();
-                                              } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
-                                                  Log.w("OnTouch", "Cancel!");
-                                                  stopRecordingGesture();
-                                              }
+                                                    {
+                                                        Log.w("OnTouch", "Up!");
+                                                        // Disabling the button for a short moment to make sure processing fully completes before the user records again.
+                                                        btnRecordGesture.setEnabled(false);
+                                                        stopRecordingGesture();
+                                                        btnRecordGesture.setEnabled(true);
 
-                                              if (VERBOSE)
-                                                  Log.w("Ontouch", "Touched:" + event.getX() + " " + event.getY() + " " + event.getPressure() + " " + event.getAction());
+                                                    } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
+                                                        Log.w("OnTouch", "Cancel!");
+                                                        stopRecordingGesture();
+                                                    }
+
+                                                    if (VERBOSE)
+                                                        Log.w("Ontouch", "Touched:" + event.getX() + " " + event.getY() + " " + event.getPressure() + " " + event.getAction());
 
 
-                                              return false;
-                                          }
-                                      }
+                                                    return false;
+                                                }
+                                            }
         );
 
-        // TODO vereist of?
-        btnRecordGesture.setOnClickListener(new View.OnClickListener()
+        // TODO vereist of? 04-08 weg
+        /*btnRecordGesture.setOnClickListener(new View.OnClickListener()
 
                                       {
                                           public void onClick(View v) {
                                               // clicked
                                               //Log.w("onClick", "Clicked");
-                        /*if (btnRecordGesture.isFocused())
+                        *//*if (btnRecordGesture.isFocused())
                         {
     						Log.w("onClick", "InFocus");
     					}
     					else
     					{
     						Log.w("onClick", "NotInFocus");
-    					}*/
+    					}*//*
 
                                           }
 
 
                                       }
-        );
+        );*/
+
+
+        TextView tutorial = (TextView) returnedView.findViewById(R.id.tutorial);
 
         Bundle bundle = this.getArguments();
         String state = bundle.getString("state");
@@ -1029,10 +1047,13 @@ public class AdvancedFragment extends Fragment {
             lblRecordedGesture.setVisibility(View.INVISIBLE);
             btnChooseGesture.setVisibility(View.INVISIBLE);
             btnRecordGesture.setVisibility(View.INVISIBLE);
+            tutorial.setText(getResources().getString(R.string.tutorial_recognize));
         } else if (state.equalsIgnoreCase("learn")) {
             toggleAccelStream.setVisibility(View.INVISIBLE);
-            checkboxGestureSpotting.setVisibility(View.INVISIBLE);
+            tutorial.setText(getResources().getString(R.string.tutorial_train));
         }
+        // Don't need to show it anymore but still available if necessary.
+        checkboxGestureSpotting.setVisibility(View.INVISIBLE);
 
 
         // We also place it here, since in case there is already text in the ScrollView when arriving there, we immediately scroll.
@@ -1072,8 +1093,12 @@ public class AdvancedFragment extends Fragment {
 
 
     // ----------- KOPIE OOK TE VINDEN IN MQTTSERVICE.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
+    // we protect against the phone switching off while we're doing this
+    //  by requesting a wake lock - we request the minimum possible wake
+    //  lock - just enough to keep the CPU running until we've finished
     private void enableAccelStream(String systemID) {
 
+        wlGlobal.acquire();
 
         String previousList = getEnabledAccelStreamDevices();
         Log.w(LOG_TAG, "previousList " + previousList);
@@ -1116,10 +1141,19 @@ public class AdvancedFragment extends Fragment {
         } else {
             // The NEW list is NOT empty. This means we keep the accel stream alive. So we do nothing.
         }
+
+
+
+        // we're finished - if the phone is switched off, it's okay for the CPU
+        //  to sleep now
+        wlGlobal.release();
     }
 
 
+
     private void enableAccelStreamForTraining() {
+
+        wlTrainingGlobal.acquire();
 
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
@@ -1139,6 +1173,10 @@ public class AdvancedFragment extends Fragment {
         isTrainingAccelStreamEnabled = false;
 
         Log.w(LOG_TAG, "stream disabled");
+
+        // we're finished - if the phone is switched off, it's okay for the CPU
+        //  to sleep now
+        wlTrainingGlobal.release();
     }
 
 
@@ -1350,12 +1388,6 @@ public class AdvancedFragment extends Fragment {
 
 
         if (receiver == null) {
-
-
-//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-//            // Without "getResources()." it also seems to work, but better to USE IT!
-//            outputWindow.append("--- " + getResources().getString(R.string.start_communication_test) + " ---" + "\n");
-//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
 
             receiver = new PebbleKit.PebbleDataReceiver(uuid) {
@@ -1683,5 +1715,10 @@ public class AdvancedFragment extends Fragment {
         }
         return outputMap;
     }
+
+
+
+
+
 
 }

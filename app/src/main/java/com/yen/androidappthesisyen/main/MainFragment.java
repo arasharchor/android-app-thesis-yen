@@ -10,13 +10,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
 import android.util.Patterns;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,7 +102,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     // Intent request code for BT dialog
     private static final int REQUEST_CONNECT_DEVICE = 7;
 
-
+    private View theView = null;
 
 
     public MainFragment() {
@@ -218,11 +216,26 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         // of toch behouden wat we hebben: anders wordt het te complex.
         setBTRelatedStates(returnedView);
 
+        theView = returnedView;
 
         return returnedView;
     }
 
 
+    public void pebbleGotConnected() {
+        TextView textViewPebble = (TextView) theView.findViewById(R.id.textView_pebble);
+        // Without "getResources()." it also seems to work, but recommended to use it
+        textViewPebble.setText(getResources().getString(R.string.pebble_connected));
+        textViewPebble.invalidate();
+        bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_connected));
+    }
+
+    public void pebbleGotDisconnected() {
+        TextView textViewPebble = (TextView) theView.findViewById(R.id.textView_pebble);
+        textViewPebble.setText(getResources().getString(R.string.pebble_not_connected));
+        textViewPebble.invalidate();
+        bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_not_connected));
+    }
 
 
     private void showIPDialog(final int enumerator) {
@@ -292,14 +305,17 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         saveIPIfInserted(enumerator, value);
 
 
-                        // TODO feitelijk moeten we EERST service starten, DIE ZEGT dan of de connecties allemaal goed zijn, EN DAN PAS LABELS AANPASSEN
-                        // START
-                        setLabelStates(getView(), true);
+                        // ======= START
+
+//                        OUD: setLabelStates(getView(), true);
+                        // NIEUW: vervangen door meer granulair:
+                        TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
+                        textViewActionDevice.setText(getResources().getString(R.string.generic_connected));
+                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
+
                         setEnableDisableStates(getView(), true);
-                        // When clicking REFRESH we for now simulate the behavior that several (2) devices get detected.
-                        // So their toggles get enabled but we don't set it on ON automatically. (That would be insane)
                         setToggleStates(getView(), false);
-                        // END
+                        // ======= END
 
 
 
@@ -317,13 +333,16 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                     public void onClick(DialogInterface dialog, int arg1) {
 
 
-                        TextView textViewGeneric = (TextView) getView().findViewById(R.id.textView_generic);
-                        textViewGeneric.setText(getResources().getString(R.string.generic_not_connected));
+                        TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
+                        textViewActionDevice.setText(getResources().getString(R.string.generic_not_connected));
                         bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
 
+                        setToggleStates(getView(), false);
+                        setEnableDisableStates(getView(), false);
 
-                        // TODO We stoppen service in het geval die draaide.
-                        // OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
+
+                        // We stop the mqtt service
+                        // TODO OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
                         Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
                         getActivity().stopService(svcOld);
 
@@ -447,7 +466,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         // we use the IDs as KEYs in the Bundle: you know they are always unique and traceable to the view object.
 
         TextView textViewPebble = (TextView) returnedView.findViewById(R.id.textView_pebble);
-        TextView textViewGeneric = (TextView) returnedView.findViewById(R.id.textView_generic);
+        TextView textViewGeneric = (TextView) returnedView.findViewById(R.id.textView_action_device);
 
         // retrieves the DEFAULT values from XML. So when we change the XML file, the following code adapts.
         bundleLabelStates.putString("R.id.textView_pebble", (String) textViewPebble.getText());
@@ -484,7 +503,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     private void setLabelStatesFromBundle(View returnedView) {
 
         TextView textViewPebble = (TextView) returnedView.findViewById(R.id.textView_pebble);
-        TextView textViewGeneric = (TextView) returnedView.findViewById(R.id.textView_generic);
+        TextView textViewGeneric = (TextView) returnedView.findViewById(R.id.textView_action_device);
 
         // we use the IDs as KEYs in the Bundle: you know they are always unique and traceable to the view object.
         textViewPebble.setText(bundleLabelStates.getString("R.id.textView_pebble"));
@@ -597,16 +616,16 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
     public void setLabelStates(View returnedView, boolean isFound) {
         TextView textViewPebble = (TextView) returnedView.findViewById(R.id.textView_pebble);
-        TextView textViewGeneric = (TextView) returnedView.findViewById(R.id.textView_generic);
+        TextView textViewActionDevice = (TextView) returnedView.findViewById(R.id.textView_action_device);
         if (isFound) {
             textViewPebble.setText(getResources().getString(R.string.pebble_connected));
             bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_connected));
-            textViewGeneric.setText(getResources().getString(R.string.generic_connected));
+            textViewActionDevice.setText(getResources().getString(R.string.generic_connected));
             bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
         } else {
             textViewPebble.setText(getResources().getString(R.string.pebble_not_connected));
             bundleLabelStates.putString("R.id.textView_pebble", getResources().getString(R.string.pebble_not_connected));
-            textViewGeneric.setText(getResources().getString(R.string.generic_not_connected));
+            textViewActionDevice.setText(getResources().getString(R.string.generic_not_connected));
             bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
         }
     }

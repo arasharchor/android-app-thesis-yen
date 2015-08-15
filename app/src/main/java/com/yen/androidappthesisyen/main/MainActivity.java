@@ -20,6 +20,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yen.androidappthesisyen.R;
@@ -44,10 +45,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     private MQTTMessageReceiver messageIntentReceiver;
 
 
+    // TODO als je via deze var de view objecten niet kunt accessen, probeer via een tag bij .add() bij transaction stuff.
+    // UPDATE nu via TAG, voor zekerheid
+//    private MainFragment theMainFragment = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
 
         setContentView(R.layout.activity_main);
@@ -59,9 +63,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
             // DONT PLACE THIS FRAGMENT IN A GLOBAL VARIABLE. Since fragments get made and remade upon orientation changes and stuff!
             // So that variable could become NULL at some point!
-            Fragment aPlaceholderFragment = new MainFragment();
+            MainFragment theMainFragment = new MainFragment();
             getFragmentManager().beginTransaction()
-                    .add(R.id.framelayout_container_main_activity, aPlaceholderFragment)
+                    .add(R.id.framelayout_container_main_activity, theMainFragment, "main")
                     .commit();
         }
 
@@ -72,7 +76,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         // Only when the screen is large enough do we show the app title in the ActionBar.
         // On smaller screens the tabs would otherwise be shown as a drop-down list.
-        if(!isLargeScreen()){
+        if (!isLargeScreen()) {
             theActionBar.setDisplayShowTitleEnabled(false);
         }
 
@@ -106,10 +110,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         registerReceiver(BTReceiver, filter3);
 
 
-        // Certain apps need to keep the screen turned on, such as games or movie apps.
-        // The best way to do this is to use the FLAG_KEEP_SCREEN_ON in your activity (and only in an activity, never in a service or other app component).
-        // From https://developer.android.com/training/scheduling/wakelock.html
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // We keep the screen on continuously while running the app so the recognized gestures scrollview can be seen all the time.
+        // TODO OF BETER UIT WNT NIET ECHT NODIG?
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     }
 
@@ -121,32 +124,41 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             String action = intent.getAction();
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
+
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Device found
-                // TODO?
-            }
-            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                // Device is now connected
+            } else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                // Device got connected
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        // Change Pebble™ connection label
+                        MainFragment myFragment = (MainFragment)getFragmentManager().findFragmentByTag("main");
+                        if (myFragment != null) {
+                            myFragment.pebbleGotConnected();
+                        }
+
                         Toast.makeText(context, R.string.pebble_connected_toast, Toast.LENGTH_LONG).show();
                     }
                 });
-            }
-            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 // Done searching
-                // TODO?
-            }
-            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
                 // Device is about to disconnect
-                // TODO?
-            }
-            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 // Device has disconnected
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        // Change Pebble™ connection label
+                        MainFragment myFragment = (MainFragment)getFragmentManager().findFragmentByTag("main");
+                        if (myFragment != null) {
+                            myFragment.pebbleGotDisconnected();
+                        }
+
                         Toast.makeText(context, R.string.pebble_not_connected_toast, Toast.LENGTH_LONG).show();
                     }
                 });
@@ -208,14 +220,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     }
 
 
-
-
     private void switchToAdvancedRecognizerFragment(ActionBar.Tab tab, String requestedState) {
 
 
 //        ActionBar actionbar = (ActionBar) getActionBar();
 //        actionbar.selectTab(tab);
-
 
 
         // Create new fragment and transaction
@@ -369,9 +378,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         if (intent != null) {
 
 
-
-
-            firstButton.setTitle("Official Pebble™ Companion App");
+            firstButton.setTitle(R.string.official_app);
             firstButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -550,28 +557,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         transaction.commit();
 
     }
-
-
-    // OLD CODE: fragment is now standalone instead of line.
-    /*public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-            // If you do it in onCreate it seems to crash! (Even though the view has been inflated using setContentView(...) beforehand.
-            ToggleButton testToggle = (ToggleButton) rootView.findViewById(R.id.toggle_pebble_acceldata_stream);
-            testToggle.setEnabled(false);
-
-
-
-            return rootView;
-        }
-    }*/
 
 
     @Override

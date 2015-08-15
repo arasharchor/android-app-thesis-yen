@@ -13,16 +13,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
@@ -66,6 +63,9 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     private static final String LOG_TAG = MQTTService.class.getName();
 
     private static int enumeratorTotal = -1;
+
+    private PowerManager pmGlobal = null;
+    private PowerManager.WakeLock wlGlobal = null;
 
 
     // TODO
@@ -399,6 +399,10 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             defineConnectionToBroker(i, listBrokerHostName.get(i));
         }
 
+
+        pmGlobal = (PowerManager) getSystemService(POWER_SERVICE);
+        wlGlobal = pmGlobal.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "accelstream");
+
     }
 
     private void clearListStreamEnabledActionDevices() {
@@ -446,7 +450,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
 
         // return START_NOT_STICKY - we want this Service to be left running
-        //  unless explicitly stopped, and it's process is killed, we want it to
+        //  unless explicitly stopped, and its process is killed, we want it to
         //  be restarted
         return START_STICKY;
     }
@@ -832,8 +836,12 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
 
     // ----------- KOPIE OOK TE VINDEN IN ADVANCEDFRAGMENT.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
+    // we protect against the phone switching off while we're doing this
+    //  by requesting a wake lock - we request the minimum possible wake
+    //  lock - just enough to keep the CPU running until we've finished
     private void enableAccelStream(String systemID) {
 
+        wlGlobal.acquire();
 
         String previousList = getEnabledAccelStreamDevices();
         Log.w(LOG_TAG, "previousList " + previousList);
@@ -876,6 +884,10 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             // The NEW list is NOT empty. This means we keep the accel stream alive. So we do nothing.
         }
 
+
+        // we're finished - if the phone is switched off, it's okay for the CPU
+        //  to sleep now
+        wlGlobal.release();
 
     }
 
