@@ -28,6 +28,11 @@ import com.yen.androidappthesisyen.advancedrecognizer.AdvancedFragment;
 import com.yen.androidappthesisyen.gesturelibrary.GestureLibraryFragment;
 import com.yen.androidappthesisyen.pushnotificationlistener.MQTTService;
 
+import java.util.List;
+
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.getListSystemIDsToConnectTo;
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.removeSystemIDFromListSystemIDsToConnectTo;
+
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
 
@@ -316,6 +321,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     @Override
     protected void onDestroy() {
+
+        // Clear the list
+        List<String> theList = getListSystemIDsToConnectTo(this);
+        for (String systemIDToRemove : theList) {
+            removeSystemIDFromListSystemIDsToConnectTo(this, systemIDToRemove);
+        }
+
 
         unregisterReceiver(statusUpdateIntentReceiver);
         unregisterReceiver(messageIntentReceiver);

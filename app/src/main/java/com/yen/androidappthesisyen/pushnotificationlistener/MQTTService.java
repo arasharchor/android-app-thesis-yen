@@ -50,6 +50,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.getListSystemIDsToConnectTo;
+
 /*
  * An example of how to implement an MQTT client in Android, able to receive
  *  push notifications from an MQTT message broker server.
@@ -368,10 +370,19 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 //        brokerHostName_1 = settings.getString("ip_address_broker_1", "192.168.1.1"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
 //        brokerHostName_2 = settings.getString("ip_address_broker_2", "192.168.1.2"); // OF HIER dus checken of er al waarde is: INDIEN NIET: TOON DIALOOG VENSTER.
 
+        // NIEUWE REGEL
+        List<String> listSystemIDsToConnectTo = getListSystemIDsToConnectTo(getApplicationContext());
         for (int i = 0; i < enumeratorTotal; i++) {
-            String search = "ip_address_broker_" + i;
+            // Internally in the MQTT service code we still work with enumerators: the service don't need to know the exact systemIDs of the brokers.
+            // All it needs to know are the number of connected brokers, each identified by an enumerator.
+
+            // OUD
+//            String search = "ip_address_broker_" + i;
+            // NIEUW
+            String systemID = listSystemIDsToConnectTo.get(i);
+            String preferenceKey = "ip_address_broker_" + systemID;
             String defaultIP = "192.168.1." + (i + 2); // We do +2 so the first IP is 192.168.1.2 and above. 192.168.1.1 is in a lot of cases the network gateway.
-            listBrokerHostName.set(i, settings.getString(search, defaultIP));
+            listBrokerHostName.set(i, settings.getString(preferenceKey, defaultIP));
         }
 
         topicNameAccelStream = settings.getString("topic_accelstream", "accelstream/state"); // TODO hardcoden? of behouden want is zo meer generiek?
@@ -810,10 +821,13 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
             } else {
 
-                // TODO zien of niet met ";" direct moet.
-                newConcatenatedString = systemID;
+                // TODO =================== klopt dat hier niets moet doen?
 
-                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+
+                // TODO zien of niet met ";" direct moet.
+//                newConcatenatedString = systemID;
+//
+//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
             }
 
 

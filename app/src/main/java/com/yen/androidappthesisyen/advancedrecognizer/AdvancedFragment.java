@@ -615,23 +615,26 @@ public class AdvancedFragment extends Fragment {
 
                     // fetch data
 
-                    // TODO je moet op basis van de systemID de overeenkomstige enumerator weten, zodat je hier de enumerator kunt concateren.
-                    // momenteel hardcodeer je nog de link tussen de systemID (tot nu toe enkel yen-asus en yen-medion) naar de enumerators (tot nu toe enkel 1 en 2)
-                    // OFWEL direct een mapping tussen systemID en IP adres gesture handler opslaan, maar WRSL BEST MET ENUMERATOR WERKEN OMDAT JE OVERAL IN JE SHAREDPREF ZO WERKT!
                     SharedPreferences gestureHandlersettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
 
                     for (String actionDeviceToSendTo : listActionDevicesToSendTo) {
 
                         String IPAddress = "192.168.1.1";
-                        if (actionDeviceToSendTo.equalsIgnoreCase("yen-asus")) {
-                            // TODO momenteel nog hardgecodeerde mapping yen-asus naar enum 1
-                            IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1");
-                        } else if (actionDeviceToSendTo.equalsIgnoreCase("yen-medion")) {
-                            // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
-                            IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1");
-                        } else {
-                            Log.w("pushnotificationlistener", "SystemID unknown so no mapped IP address for Gesture Handler found");
-                        }
+                        String preferenceKey = "ip_address_" + actionDeviceToSendTo;
+
+                        // OUD
+//                        if (actionDeviceToSendTo.equalsIgnoreCase("yen-asus")) {
+//                            // TODO momenteel nog hardgecodeerde mapping yen-asus naar enum 1
+//                            IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1");
+//                        } else if (actionDeviceToSendTo.equalsIgnoreCase("yen-medion")) {
+//                            // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
+//                            IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1");
+//                        } else {
+//                            Log.w("pushnotificationlistener", "SystemID unknown so no mapped IP address for Gesture Handler found");
+//                        }
+
+                        // NIEUW
+                        IPAddress = gestureHandlersettings.getString(preferenceKey, "192.168.1.1");
 
 
                         Log.w(LOG_TAG, "saved IP is " + IPAddress);

@@ -37,6 +37,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.addSystemIDToListSystemIDsToConnectTo;
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.getListSavedSystemIDs;
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.getListSystemIDsToConnectTo;
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.removeSystemIDFromListSystemIDsToConnectTo;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -238,26 +243,19 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     }
 
 
-    private void showIPDialog(final int enumerator) {
-        // 16-07 Tot nu toe enkel 1 en 2 gebruikt als parameter "enumerator".
-//        HOE HET WERD AANGESPROKEN INDERTIJD:
-//        else if (value == App.MENUITEMS.ITEM_INSERT_IP_1.ordinal()) {
-//
-//            showIPDialog(1);
-//
-//        } else if (value == App.MENUITEMS.ITEM_INSERT_IP_2.ordinal()) {
-//
-//            showIPDialog(2);
-
+    private void showIPDialog(final int currentEnumInSystemIDList, final String systemID) {
 
         SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
-        String searchString = "ip_address_broker_" + (enumerator-1); // TODO FIX -1
-        String savedBrokerIP = settings.getString(searchString, "None");
+        // OUD
+//        String searchString = "ip_address_broker_" + (enumerator-1); // TODO FIX -1
+        // NIEUW
+        String preferenceKey = "ip_address_broker_" + systemID;
+        String savedBrokerIP = settings.getString(preferenceKey, "None");
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Location of Face Detector and Gesture Handler");
-        builder.setMessage("Insert the current IPv4 address for Action Device " + (enumerator-1) + ". Use saved location (" + savedBrokerIP + ") by leaving the field blank.");
+        builder.setMessage("Insert the current IPv4 address for Action Device " + systemID + ". Use saved location (" + savedBrokerIP + ") by leaving the field blank.");
 
         // TODO dit toepassen? WEL ALS WE BV. 2x EDITTEXT WENSEN ALS USER VERSCHILLENDE IPs ZOU KUNNEN INGEVEN.
 //        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -283,10 +281,15 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         String value = String.valueOf(input.getText());
                         // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
                         // Wordt verondersteld dat dit in toekomst ook zo is of niet?
-                        saveIPIfInserted(enumerator, value);
+                        saveIPIfInserted(systemID, value);
 
 
-                        showIPDialog(enumerator + 1);
+                        // NIEUW
+                        addSystemIDToListSystemIDsToConnectTo(getActivity(), systemID);
+
+
+                        List<String> listSavedSystemIDs = getListSavedSystemIDs(getActivity());
+                        showIPDialog(currentEnumInSystemIDList + 1, listSavedSystemIDs.get(currentEnumInSystemIDList + 1));
 
 
                     }
@@ -302,7 +305,10 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         String value = String.valueOf(input.getText());
                         // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
                         // Wordt verondersteld dat dit in toekomst ook zo is of niet?
-                        saveIPIfInserted(enumerator, value);
+                        saveIPIfInserted(systemID, value);
+
+                        // NIEUW
+                        addSystemIDToListSystemIDsToConnectTo(getActivity(), systemID);
 
 
                         // ======= START
@@ -318,9 +324,10 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         // ======= END
 
 
-
-                        Log.w(LOG_TAG, "enumerator net voor starten service " + enumerator); // TODO enumerator-1 ?
-                        startOrRestartService(enumerator);
+                        // TODO zien of dus alle ingegeven brokers worden gestart: dat er niet 1 te kort is.
+                        int enumForService = currentEnumInSystemIDList +1;
+                        Log.w(LOG_TAG, "enumerator net voor starten service: enumForService == " + enumForService);
+                        startOrRestartService(enumForService);
 
 
                     }
@@ -345,6 +352,13 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         // TODO OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
                         Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
                         getActivity().stopService(svcOld);
+
+                        // NIEUW
+                        // Clear the list
+                        List<String> theList = getListSystemIDsToConnectTo(getActivity());
+                        for (String systemIDToRemove : theList) {
+                            removeSystemIDFromListSystemIDsToConnectTo(getActivity(), systemIDToRemove);
+                        }
 
                     }
                 });
@@ -386,7 +400,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
     }
 
-    private void saveIPIfInserted(int enumerator, String value) {
+    private void saveIPIfInserted(String systemID, String value) {
 
 
         // Note it only works with IPv4 addresses; not IPv6.
@@ -398,13 +412,19 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
             SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
             SharedPreferences.Editor editorUserDetector = settingsUserDetector.edit();
-            editorUserDetector.putString("ip_address_broker_" + (enumerator-1), value); // Because here we still counted from 1 onwards. Not 0 onwards.
+            // OUD
+//            editorUserDetector.putString("ip_address_broker_" + (enumerator-1), value); // Because here we still counted from 1 onwards. Not 0 onwards.
+            // NIEUW
+            String preferenceKey = "ip_address_broker_" + systemID;
+            editorUserDetector.putString(preferenceKey, value);
             editorUserDetector.commit();
 
 
             SharedPreferences settingsGestureHandler = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_handler", Context.MODE_PRIVATE);
             SharedPreferences.Editor editorGestureHandler = settingsGestureHandler.edit();
-            editorGestureHandler.putString("ip_address_" + (enumerator-1), value); // Because here we still counted from 1 onwards. Not 0 onwards.
+//            editorGestureHandler.putString("ip_address_" + (enumerator-1), value); // Because here we still counted from 1 onwards. Not 0 onwards.
+            String preferenceKey2 = "ip_address_" + systemID;
+            editorGestureHandler.putString(preferenceKey2, value);
             editorGestureHandler.commit();
         }
 
@@ -689,7 +709,18 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
             case R.id.button_connect_generic:
 
-                showIPDialog(1);
+                List<String> listSavedSystemIDs = getListSavedSystemIDs(getActivity());
+
+                // OUD
+//                showIPDialog(1);
+                // NIEUW
+                if(listSavedSystemIDs == null || listSavedSystemIDs.size() == 0){
+                    // TODO ========== schoner afhandelen of? via custom tekst ofzo?
+                    showIPDialog(0, "[No saved systemIDs found]");
+                } else {
+                    showIPDialog(0, listSavedSystemIDs.get(0));
+                }
+
 
                 break;
 
