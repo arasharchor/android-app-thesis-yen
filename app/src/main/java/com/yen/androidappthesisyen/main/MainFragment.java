@@ -115,8 +115,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     }
 
 
-
-
     // onCreate wasn't displayed by default.
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -279,6 +277,10 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
                         String value = String.valueOf(input.getText());
+
+                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
+//                        if(!value.equalsIgnoreCase("0")){
+
                         // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
                         // Wordt verondersteld dat dit in toekomst ook zo is of niet?
                         saveIPIfInserted(systemID, value);
@@ -287,6 +289,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         // NIEUW
                         addSystemIDToListSystemIDsToConnectTo(getActivity(), systemID);
 
+//                        }
 
                         List<String> listSavedSystemIDs = getListSavedSystemIDs(getActivity());
                         showIPDialog(currentEnumInSystemIDList + 1, listSavedSystemIDs.get(currentEnumInSystemIDList + 1));
@@ -303,6 +306,12 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                     public void onClick(DialogInterface dialog, int arg1) {
 
                         String value = String.valueOf(input.getText());
+
+                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
+//                        if(!value.equalsIgnoreCase("0")){
+//
+//                        }
+
                         // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
                         // Wordt verondersteld dat dit in toekomst ook zo is of niet?
                         saveIPIfInserted(systemID, value);
@@ -325,7 +334,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
                         // TODO zien of dus alle ingegeven brokers worden gestart: dat er niet 1 te kort is.
-                        int enumForService = currentEnumInSystemIDList +1;
+                        int enumForService = currentEnumInSystemIDList + 1;
                         Log.w(LOG_TAG, "enumerator net voor starten service: enumForService == " + enumForService);
                         startOrRestartService(enumForService);
 
@@ -429,8 +438,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         }
 
     }
-
-
 
 
     private void setBTRelatedStates(View returnedView) {
@@ -714,7 +721,7 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
                 // OUD
 //                showIPDialog(1);
                 // NIEUW
-                if(listSavedSystemIDs == null || listSavedSystemIDs.size() == 0){
+                if (listSavedSystemIDs == null || listSavedSystemIDs.size() == 0) {
                     // TODO ========== schoner afhandelen of? via custom tekst ofzo?
                     showIPDialog(0, "[No saved systemIDs found]");
                 } else {
@@ -793,7 +800,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 //            ListView listViewMain = (ListView) getView().findViewById(R.id.listView_main);
 
 
-
         } else {
 
             getActivity().runOnUiThread(new Runnable() {
@@ -806,7 +812,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
         }
 
     }
-
 
 
     private void stopBT() {
@@ -830,9 +835,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
         }
 
     }
-
-
-
 
 
     @Override
@@ -872,7 +874,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
 
     }
-
 
 
     @Override

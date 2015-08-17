@@ -147,12 +147,6 @@ public class AdvancedFragment extends Fragment {
     // private MENUITEMS menuitems;
 
 
-    private PowerManager pmGlobal = null;
-    private PowerManager.WakeLock wlGlobal = null;
-    private PowerManager.WakeLock wlTrainingGlobal = null;
-
-
-
     private void showChooseGestureDialog() {
 
         // Get a list of all the distinct gestures by checking which gestures all the Action Devices reported.
@@ -163,7 +157,7 @@ public class AdvancedFragment extends Fragment {
 
             List<String> listGestures = new ArrayList<>();
 
-            //iterating over values only. Values = concatenated string of gestures using ";".
+            // Iterating over values only. Values = concatenated string of gestures using ";".
             for (String concatenatedString : savedMap.values()) {
                 String[] arrayGestures = concatenatedString.split(";");
                 List<String> newList = Arrays.asList(arrayGestures);
@@ -918,9 +912,6 @@ public class AdvancedFragment extends Fragment {
         theTiltGestureRecognizer = new TiltGestureRecognizer(this, 900, 1000, PebbleGestureModel.MODE_TILT);
 
 
-        pmGlobal = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
-        wlGlobal = pmGlobal.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "accelstream");
-        wlTrainingGlobal = pmGlobal.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "accelstreamtraining");
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
@@ -1101,14 +1092,12 @@ public class AdvancedFragment extends Fragment {
     //  lock - just enough to keep the CPU running until we've finished
     private void enableAccelStream(String systemID) {
 
-        wlGlobal.acquire();
-
         String previousList = getEnabledAccelStreamDevices();
         Log.w(LOG_TAG, "previousList " + previousList);
 
         addNewAccelStreamState(systemID, "enable"); // List has now been updated.
 
-        if (previousList.equalsIgnoreCase("") || previousList.equalsIgnoreCase(";")) {
+        if (systemID.equalsIgnoreCase("triggered-by-user") || previousList.equalsIgnoreCase("") || previousList.equalsIgnoreCase(";")) {
             // The previous list was empty. This means we deliberately need to send a signal to start the accel stream.
 
             PebbleDictionary dict = new PebbleDictionary();
@@ -1134,7 +1123,7 @@ public class AdvancedFragment extends Fragment {
         String newList = getEnabledAccelStreamDevices();
         Log.w(LOG_TAG, "newList " + newList);
 
-        if (newList.equalsIgnoreCase("") || newList.equalsIgnoreCase(";")) {
+        if (systemID.equalsIgnoreCase("triggered-by-user") || newList.equalsIgnoreCase("") || newList.equalsIgnoreCase(";")) {
             // The NEW list is empty. This means the just removed device was the only device where it was running. Stop the accel stream.
 
             PebbleDictionary dict = new PebbleDictionary();
@@ -1145,18 +1134,11 @@ public class AdvancedFragment extends Fragment {
             // The NEW list is NOT empty. This means we keep the accel stream alive. So we do nothing.
         }
 
-
-
-        // we're finished - if the phone is switched off, it's okay for the CPU
-        //  to sleep now
-        wlGlobal.release();
     }
 
 
 
     private void enableAccelStreamForTraining() {
-
-        wlTrainingGlobal.acquire();
 
         PebbleDictionary dict = new PebbleDictionary();
         dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
@@ -1177,9 +1159,6 @@ public class AdvancedFragment extends Fragment {
 
         Log.w(LOG_TAG, "stream disabled");
 
-        // we're finished - if the phone is switched off, it's okay for the CPU
-        //  to sleep now
-        wlTrainingGlobal.release();
     }
 
 
@@ -1217,7 +1196,6 @@ public class AdvancedFragment extends Fragment {
 
             } else {
 
-                // TODO zien of niet met ";" direct moet.
                 newConcatenatedString = systemID;
 
                 Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
@@ -1235,14 +1213,11 @@ public class AdvancedFragment extends Fragment {
                 setEnabledActionDevices.remove(systemID);
                 // recreate concatenated string from new set
                 newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
-                // TODO ========= zeker zijn dat als set nu LEEG zou zijn, dat er geen problemen zijn, bv. dat er een ";" instaat en dat dat problemen zou geven.
 
                 Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
 
             } else {
 
-                // TODO zien of niet met ";" direct moet.
-                newConcatenatedString = systemID;
 
                 Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
             }
@@ -1649,13 +1624,13 @@ public class AdvancedFragment extends Fragment {
 
         Map<String, String> savedMap = getMapSupportedGestures();
         if (savedMap == null) {
-            Log.w("pushnotificationlistener", "SAVEDMAP IS NULL");
+            Log.w(LOG_TAG, "SAVEDMAP IS NULL");
         }
 
 
         String concatenatedGestures = savedMap.get(systemID);
 //        if(concatenatedGestures == null){
-//            Log.w("pushnotificationlistener", "concatenatedGestures IS NULL");
+//            Log.w(LOG_TAG, "concatenatedGestures IS NULL");
 //        }
 
         String newConcatenatedString = "";
@@ -1669,14 +1644,13 @@ public class AdvancedFragment extends Fragment {
             // recreate concatenated string from new set
             newConcatenatedString = TextUtils.join(";", setGestures);
 
-            Log.w("pushnotificationlistener", "newConcatenatedString " + newConcatenatedString);
+            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
 
         } else {
 
-            // TODO zien of niet met ";" direct moet.
             newConcatenatedString = gestureToBeAdded;
 
-            Log.w("pushnotificationlistener", "newConcatenatedString " + newConcatenatedString);
+            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
         }
 
 

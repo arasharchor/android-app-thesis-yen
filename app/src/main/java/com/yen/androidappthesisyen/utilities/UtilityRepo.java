@@ -129,12 +129,8 @@ public class UtilityRepo {
 
         } else {
 
-            // TODO ============= niets doen klopt wrsl?
+            // Do nothing!
 
-//            // TODO zien of niet met ";" direct moet.
-//            newConcatenatedString = systemID;
-//
-//            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
         }
 
 

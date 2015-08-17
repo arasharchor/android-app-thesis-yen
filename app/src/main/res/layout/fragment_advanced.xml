@@ -115,6 +115,8 @@
         android:layout_marginRight="85dp"
         android:text="Use gesture spotting." />
 
+
+    <!-- android:background="@drawable/border_ui"-->
     <ScrollView
         android:id="@+id/scrollView_gestures"
         android:layout_width="wrap_content"
@@ -125,7 +127,6 @@
         android:layout_alignRight="@+id/checkBoxGestureSpotting"
         android:layout_alignStart="@+id/checkBoxGestureSpotting"
         android:layout_below="@+id/rate_view"
-        android:background="@drawable/border_ui"
         android:padding="16dp">
 
         <TextView

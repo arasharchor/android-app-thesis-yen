@@ -27,11 +27,11 @@
 
     <!-- COULD BE USEFUL FOR SOME BUTTONS: style="?android:attr/borderlessButtonStyle"-->
 
+    <!-- android:background="@drawable/border_ui" -->
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView_main_fragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_ui"
         android:padding="16dp"
         android:layout_marginBottom="16dp"
         android:layout_alignParentRight="true"
@@ -169,24 +169,22 @@
 
     </HorizontalScrollView>
 
-
+<!--android:background="@drawable/border_ui"-->
     <ListView
         android:id="@+id/listView_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_ui"
         android:padding="16dp"
         android:layout_alignTop="@+id/horizontalScrollView_main_fragment"
         android:layout_alignBottom="@+id/horizontalScrollView_main_fragment"
         android:layout_toStartOf="@+id/horizontalScrollView_main_fragment"
         android:layout_toLeftOf="@+id/horizontalScrollView_main_fragment" />
 
-
+<!--android:background="@drawable/border_ui"-->
     <ScrollView
         android:id="@+id/scrollView_output_window"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/border_ui"
         android:padding="16dp"
         android:layout_below="@+id/horizontalScrollView_main_fragment"
         android:layout_alignParentLeft="true"

@@ -66,9 +66,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
     private static int enumeratorTotal = -1;
 
-    private PowerManager pmGlobal = null;
-    private PowerManager.WakeLock wlGlobal = null;
-
 
     // TODO
 //    momenteel is de hashmap nog opgeslaan in het MQTTSERVICE OBJECT gewoon: bij orientatieaanpassing of HEROPSTART SERVICE zal het verdwijnen!
@@ -91,26 +88,34 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
         String newConcatenatedString = "";
 
-        if (concatenatedGestures != null) {
 
-            String[] arrayGestures = concatenatedGestures.split(";");
-            Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
-            // adding new gesture
-            setGestures.add(gestureToBeAdded);
-            // recreate concatenated string from new set
-            newConcatenatedString = TextUtils.join(";", setGestures);
+        // Receiving a gesture called "clear" means the locally saved supported gesture set for this systemID should be wiped.
+        if(!gestureToBeAdded.equalsIgnoreCase("clear")){
 
-            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+
+            if (concatenatedGestures != null) {
+
+                String[] arrayGestures = concatenatedGestures.split(";");
+                Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
+                setGestures.add(gestureToBeAdded);
+                // Recreate concatenated string from new set.
+                newConcatenatedString = TextUtils.join(";", setGestures);
+
+
+            } else {
+
+                newConcatenatedString = gestureToBeAdded;
+
+            }
+
 
         } else {
 
-            // TODO zien of niet met ";" direct moet.
-            newConcatenatedString = gestureToBeAdded;
+            // Do nothing!
 
-            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
         }
 
-
+        Log.w(LOG_TAG, "===================================== newConcatenatedString " + newConcatenatedString);
         savedMap.put(systemID, newConcatenatedString);
 
 
@@ -385,8 +390,8 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             listBrokerHostName.set(i, settings.getString(preferenceKey, defaultIP));
         }
 
-        topicNameAccelStream = settings.getString("topic_accelstream", "accelstream/state"); // TODO hardcoden? of behouden want is zo meer generiek?
-        topicNameGesturePusher = settings.getString("topics_gesturepusher", "gesturepusher/#"); // TODO hardcoden? of behouden want is zo meer generiek?
+        topicNameAccelStream = settings.getString("topic_accelstream", "accelstream/state");
+        topicNameGesturePusher = settings.getString("topics_gesturepusher", "gesturepusher/#");
 
         // register to be notified whenever the user changes their preferences
         //  relating to background data use - so that we can respect the current
@@ -409,10 +414,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         for (int i = 0; i < enumeratorTotal; i++) {
             defineConnectionToBroker(i, listBrokerHostName.get(i));
         }
-
-
-        pmGlobal = (PowerManager) getSystemService(POWER_SERVICE);
-        wlGlobal = pmGlobal.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "accelstream");
 
     }
 
@@ -685,7 +686,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 registerReceiver(listNetConnReceiver.get(i),
                         new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-                Log.w(LOG_TAG, "NETCONRECEIVER 1 REGISTERED");
+                Log.w(LOG_TAG, "NETCONRECEIVER " + i + " REGISTERED");
 
             }
 
@@ -796,7 +797,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
             } else {
 
-                // TODO zien of niet met ";" direct moet.
                 newConcatenatedString = systemID;
 
                 Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
@@ -815,19 +815,13 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 setEnabledActionDevices.remove(systemID);
                 // recreate concatenated string from new set
                 newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
-                // TODO ========= zeker zijn dat als set nu LEEG zou zijn, dat er geen problemen zijn, bv. dat er een ";" instaat en dat dat problemen zou geven.
 
                 Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
 
             } else {
 
-                // TODO =================== klopt dat hier niets moet doen?
+                // Do nothing!
 
-
-                // TODO zien of niet met ";" direct moet.
-//                newConcatenatedString = systemID;
-//
-//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
             }
 
 
@@ -854,8 +848,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     //  by requesting a wake lock - we request the minimum possible wake
     //  lock - just enough to keep the CPU running until we've finished
     private void enableAccelStream(String systemID) {
-
-        wlGlobal.acquire();
 
         String previousList = getEnabledAccelStreamDevices();
         Log.w(LOG_TAG, "previousList " + previousList);
@@ -897,11 +889,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         } else {
             // The NEW list is NOT empty. This means we keep the accel stream alive. So we do nothing.
         }
-
-
-        // we're finished - if the phone is switched off, it's okay for the CPU
-        //  to sleep now
-        wlGlobal.release();
 
     }
 
@@ -1248,13 +1235,16 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             enableAccelStream(systemID);
         } else if (topic.equalsIgnoreCase("accelstream/state") && messageBody.endsWith("disable")) {
             disableAccelStream(systemID);
-        } else if (topic.equalsIgnoreCase("gesturepusher/state") && messageBody.endsWith("enable")) {
+        }
+
+        /* TODO ZAL WEGMOGEN WRSL.
+        else if (topic.equalsIgnoreCase("gesturepusher/state") && messageBody.endsWith("enable")) {
             // TODO dit ook in map opslaan? of is gans deze enable en disable bij gesturepusher OVERBODIG?
             Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/state en MESSAGE enable ========================");
         } else if (topic.equalsIgnoreCase("gesturepusher/state") && messageBody.endsWith("disable")) {
             // TODO dit ook in map opslaan? of is gans deze enable en disable bij gesturepusher OVERBODIG?
             Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/state en MESSAGE disable ========================");
-        }
+        }*/
 
         // OUD
         /*else if (topic.equalsIgnoreCase("gesturepusher/supportedgestures") && messageBody.endsWith("up")) {
