@@ -342,7 +342,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                     }
                 });
 
-        builder.setNegativeButton("Cancel",
+        builder.setNegativeButton("Cancel (and stop service if running)",
                 new DialogInterface.OnClickListener() {
 
                     @Override

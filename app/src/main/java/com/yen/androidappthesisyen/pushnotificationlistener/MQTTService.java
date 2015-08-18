@@ -67,12 +67,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     private static int enumeratorTotal = -1;
 
 
-    // TODO
-//    momenteel is de hashmap nog opgeslaan in het MQTTSERVICE OBJECT gewoon: bij orientatieaanpassing of HEROPSTART SERVICE zal het verdwijnen!
-//    HEROPSTART SERVICE gebeurt ook als een broker een nieuwe IP heeft en dat moet ingegeven worden!
-    // OVERBODIG WNT NU IN SHAREDPREFERENCES: private Map<String, Set<String>> mapSystemIDToSupportedGestures; // TODO gaan we dit bijhouden via SharedPreferences ofzo of niet? is wrsl niet nodig? OF TOCH WEL WANT KAN ER DAN AAN UIT ANDERE ACTIVITY/FRAGMENT
-    // key = system ID - value = comma separated list of supported gestures for the specific systemID
-    // STAAT OOK IN 3Dgesturefragment dus wijzingen BIJ ALLEBEI DOORVOEREN
     private void addSupportedGesture(String systemID, String gestureToBeAdded) {
 
         Map<String, String> savedMap = getMapSupportedGestures();

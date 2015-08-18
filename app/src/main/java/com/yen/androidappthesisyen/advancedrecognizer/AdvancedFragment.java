@@ -1268,20 +1268,6 @@ public class AdvancedFragment extends Fragment {
 
             case STATE_LEARN:
 
-                // OUD:
-//                Context ctx = getActivity();
-//                LayoutInflater li = LayoutInflater.from(getActivity());
-//                View dialog = li.inflate(R.layout.learngesturedialog, null);
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//                builder.setTitle("Enter Gesture ID");
-//                builder.setView(dialog);
-//                builder.setPositiveButton("OK", this);
-//                builder.setNegativeButton("Cancel", this);
-//                // show the actual dialog
-//                AlertDialog ad = builder.create();
-//                this.learning_dialog = ad;
-//                this.learning_dialog_view = dialog;
-//                ad.show();
 
                 break;
 

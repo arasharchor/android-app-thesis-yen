@@ -151,7 +151,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/label_mqtt_service_toggle"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:visibility="invisible"/>
 
                     <ToggleButton
                         android:id="@+id/toggle_generic"
@@ -159,7 +160,8 @@
                         android:layout_height="wrap_content"
                         android:checked="false"
                         android:text="@string/generic_toggle"
-                        android:enabled="false" />
+                        android:enabled="false"
+                        android:visibility="invisible"/>
 
                 </TableRow>
 

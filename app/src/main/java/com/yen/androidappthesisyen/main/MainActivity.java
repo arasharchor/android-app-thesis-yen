@@ -138,11 +138,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     @Override
                     public void run() {
 
+                        // TODO labels don't update dynamically
                         // Change Pebble™ connection label
-                        MainFragment myFragment = (MainFragment)getFragmentManager().findFragmentByTag("main");
-                        if (myFragment != null) {
-                            myFragment.pebbleGotConnected();
-                        }
+//                        MainFragment myFragment = (MainFragment)getFragmentManager().findFragmentByTag("main");
+//                        if (myFragment != null) {
+//                            myFragment.pebbleGotConnected();
+//                        }
 
                         Toast.makeText(context, R.string.pebble_connected_toast, Toast.LENGTH_LONG).show();
                     }
@@ -158,11 +159,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     @Override
                     public void run() {
 
+                        // TODO labels don't update dynamically
                         // Change Pebble™ connection label
-                        MainFragment myFragment = (MainFragment)getFragmentManager().findFragmentByTag("main");
-                        if (myFragment != null) {
-                            myFragment.pebbleGotDisconnected();
-                        }
+//                        MainFragment myFragment = (MainFragment)getFragmentManager().findFragmentByTag("main");
+//                        if (myFragment != null) {
+//                            myFragment.pebbleGotDisconnected();
+//                        }
 
                         Toast.makeText(context, R.string.pebble_not_connected_toast, Toast.LENGTH_LONG).show();
                     }
