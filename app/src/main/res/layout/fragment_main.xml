@@ -9,25 +9,8 @@
     tools:context="com.yen.androidappthesisyen.main.MainFragment"
     android:id="@+id/relative_layout_main_fragment">
 
-    <!-- the use of “android:layout_span” to span view in 2 cells, and “android:layout_column” to display the view in specified column. -->
 
 
-    <!-- kan handig zijn: android:layout_centerHorizontal
-    of
-    android:layout_centerInParent  :   If true, centers this child horizontally and vertically within its parent. -->
-
-
-    <!--android:layout_column="0" ETC probably only need when you want to SKIP certain places in a row-->
-
-    <!-- TODO change fill_parent to match_parent since it's the same but NEWER -->
-
-
-    <!--TODO deze button mag wrsl weg-->
-    <!--style="?android:attr/buttonStyleSmall"-->
-
-    <!-- COULD BE USEFUL FOR SOME BUTTONS: style="?android:attr/borderlessButtonStyle"-->
-
-    <!-- android:background="@drawable/border_ui" -->
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView_main_fragment"
         android:layout_width="wrap_content"
@@ -41,13 +24,11 @@
         android:layout_toRightOf="@+id/toggle_BT">
 
 
-        <!--of fill parent of match parent maken?-->
         <ScrollView
             android:id="@+id/scrollView_tableLayout_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!--layout height: wrap content maken? was een TOOLTIP TIP -->
             <TableLayout
                 android:id="@+id/tableLayout_main"
                 android:layout_width="match_parent"
@@ -57,8 +38,6 @@
                     android:id="@+id/tableRow_0_main"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
-                    <!--empty tablerow atm-->
 
 
                     <TextView
@@ -76,7 +55,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <!--style="?android:attr/buttonStyleSmall"-->
                     <Button
                         android:id="@+id/button_connect_pebble"
 
@@ -84,8 +62,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/connect_pebble" />
 
-
-                    <!-- perhaps use android:layout_span="4"-->
 
                 </TableRow>
 
@@ -196,7 +172,6 @@
         android:layout_toLeftOf="@+id/horizontalScrollView_main_fragment">
 
 
-        <!--TODO Eventueel aanpassen naar EditText als dit meer opties zou bieden? -->
         <TextView
             android:id="@+id/textView_output_window"
             android:layout_width="match_parent"
@@ -206,19 +181,7 @@
 
     </ScrollView>
 
-    <!-- mag weg -->
-    <!--<TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/BT"
-        android:id="@+id/textView_BT"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textStyle="bold"
-        android:layout_above="@+id/horizontalScrollView_main_fragment"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />-->
 
-    <!--android:enabled="false"-->
     <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -242,11 +205,5 @@
         android:layout_marginStart="87dp" />
 
 
-    <!-- android:onClick="" bij BUTTON laat toe om methode in FRAGMENT te specifiëren.
-    Maar bij TOGGLEBUTTON kan je enkel methode uit ACTIVITY kiezen?!
-     Dus als je in FRAGMENT je behavior code wilt plaatsen, blijf je werken met: programmatorisch listener toevoegen bij maken fragment. -->
-
-
-    <!--android:layout_marginTop="@dimen/activity_vertical_margin"-->
 
 </RelativeLayout>

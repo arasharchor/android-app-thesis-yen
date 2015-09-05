@@ -44,68 +44,17 @@ public abstract class PebbleGestureModel {
     // only when BOTH are TRUE do with start "from zero" = checking for a new gesture, either via the simple recognizer (here) or the advanced recognizer.
     public Boolean[] update(int[] accelData) {
 
-        //Get time
+        // Get time
         long now = System.currentTimeMillis();
 
-        //Check min duration elapsed
+        // Check min duration elapsed
         if (now - lastActionTime > duration) {
+
+            /*
             switch (mode) {
 
-                // TODO mag weg want niet gebruikt
-//                case MODE_FLICK:
-//
-//                    //Check left
-//                    if (!triggers[0] && accelData[1] < (-1 * accelThreshold)) {
-//                        triggers[0] = true;
-//                        onWristLeft();
-//                        lastActionTime = now;
-//                        actionYetToEnd = true;
-//                        Boolean[] booleanArray = {true, false};
-//                        return booleanArray;
-//                    } else {
-//                        triggers[0] = false;
-//                    }
-//
-//                    //Check right
-//                    if (!triggers[1] && accelData[1] > accelThreshold) {
-//                        triggers[1] = true;
-//                        onWristRight();
-//                        lastActionTime = now;
-//                        actionYetToEnd = true;
-//                        Boolean[] booleanArray = {true, false};
-//                        return booleanArray;
-//                    } else {
-//                        triggers[1] = false;
-//                    }
-//
-//                    //Check up
-//                    if (!triggers[2] && accelData[2] < ((-1 * G) - accelThreshold)) {
-//                        triggers[2] = true;
-//                        onWristUp();
-//                        lastActionTime = now;
-//                        actionYetToEnd = true;
-//                        Boolean[] booleanArray = {true, false};
-//                        return booleanArray;
-//                    } else {
-//                        triggers[2] = false;
-//                    }
-//
-//                    //Check down
-//                    if (!triggers[3] && accelData[2] > ((-1 * G) + accelThreshold)) {
-//                        triggers[3] = true;
-//                        onWristDown();
-//                        lastActionTime = now;
-//                        actionYetToEnd = true;
-//                        Boolean[] booleanArray = {true, false};
-//                        return booleanArray;
-//                    } else {
-//                        triggers[3] = false;
-//                    }
-//
-//                    break;
-
-
                 case MODE_TILT:
+                */
 
                     // Check left
                     if (!triggers[0] && accelData[1] > accelThreshold) {
@@ -158,8 +107,10 @@ public abstract class PebbleGestureModel {
                         triggers[3] = false;
                     }
 
+            /*
                     break;
             }
+            */
 
             if (actionYetToEnd) {
                 actionYetToEnd = false;

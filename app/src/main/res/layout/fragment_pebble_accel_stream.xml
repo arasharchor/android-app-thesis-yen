@@ -56,9 +56,6 @@
         android:layout_height="300dp"
         android:orientation="vertical">
 
-        <!--<com.jjoe64.graphview.GraphView>-->
-        <!--TODO werken met dit element: zie http://www.android-graphview.org/documentation/how-to-create-a-simple-graph-->
-        <!--</com.jjoe64.graphview.GraphView>-->
 
     </LinearLayout>
 

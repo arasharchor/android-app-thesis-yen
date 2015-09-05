@@ -59,7 +59,6 @@ public class DeviceListActivity extends Activity {
     /**
      * Return Intent extra
      */
-    // TODO usen? bv. weergeven via label in GUI?
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
 
     private BluetoothAdapter mBtAdapter;

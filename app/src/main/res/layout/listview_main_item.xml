@@ -43,14 +43,6 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@android:style/TextAppearance.Medium" />
 
-            <!-- TODO eventueel toe te passen: the description view -->
-            <!--<TextView
-                android:id="@+id/list_main_subtitle"
-                android:layout_below="@id/list_main_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@android:style/TextAppearance.Small"
-                android:text="Subtitle" />-->
 
         </RelativeLayout>
 

@@ -50,10 +50,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     private MQTTMessageReceiver messageIntentReceiver;
 
 
-    // TODO als je via deze var de view objecten niet kunt accessen, probeer via een tag bij .add() bij transaction stuff.
-    // UPDATE nu via TAG, voor zekerheid
-//    private MainFragment theMainFragment = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +82,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         }
 
 
-        // TODO inflate the tab layout by using XML files instead of coding it here.
         addNavigationTabs(theActionBar);
 
 
@@ -99,13 +94,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         registerReceiver(messageIntentReceiver, intentCFilter);
 
 
-        // SERVICE NU PAS GESTART NADAT IP ADRES WERD INGEGEVEN.
-//        Intent svc = new Intent(this, MQTTService.class);
-//        startService(svc);
-//        Log.w(LOG_TAG, "--------- arriveerden in MainActivity net na startService(svc)");
-
-
-        // TODO dit wrsl WEL goede plek want moet werken globaal over alle fragments?
 //        To detect Pebble being (dis)connected.
         IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
         IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
@@ -114,10 +102,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         registerReceiver(BTReceiver, filter2);
         registerReceiver(BTReceiver, filter3);
 
-
-        // We keep the screen on continuously while running the app so the recognized gestures scrollview can be seen all the time.
-        // TODO OF BETER UIT WNT NIET ECHT NODIG?
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     }
 
@@ -180,11 +164,9 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     }
 
 
-    // Following 3 methods are due to "implements ActionBar.TabListener"
-    // TODO tabs are probably meant to CHANGE THE LAYOUT (change activity or fragment) while the BUTTONS on the left of the OVERFLOW BUTTON are probably for ACTIONS on the current layout
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // TODO dit aangewezen manier voor vinden juiste tab?
+
         // Don't check == 0 because that tab 0 is SELECTED by DEFAULT when starting the app.
         // So tab 0 corresponds with the MainActivity!
         if (tab.getPosition() == 0) {
@@ -245,7 +227,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             bundle.putString("state", "learn");
         } else if (requestedState.equalsIgnoreCase("recognize")) {
             bundle.putString("state", "recognize");
-        } else if (requestedState.equalsIgnoreCase("library")) { // TODO dit mag weg want komt toch nooit voor hier?
+        } else if (requestedState.equalsIgnoreCase("library")) {
             bundle.putString("state", "library");
         } else {
             // JA wel zetten want nu bij getString GEEN default waarde systeem (vereiste API groter dan 21)
@@ -268,19 +250,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
     }
 
-    // TODO enkel nog nodig als we uiteindelijk CursorListActivity gebruiken.
-//    public void toCursorListActivity() {
-//        Intent intent = new Intent(this, CursorListActivity.class);
-//        startActivity(intent);
-//    }
-
 
     // TODO ALS JE HIER IETS AANPAST, OOK IN ZELFDE METHODE IN ADVANCEDACTIVITY.JAVA
     private void addNavigationTabs(ActionBar theActionBar) {
 
         // Only recently gotten deprecated: since Android 5.0
         theActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        // TODO perhaps work with LIST instead of TABS if you want to.
 
         for (int i = 1; i <= 3; i++) {
             // Only recently gotten deprecated: since Android 5.0
@@ -460,39 +435,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
-
-        /*int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.actionbar_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);*/
-
-
-        // TODO of dit gebruiken. MJA, LIJKT OP ZELFDE SYSTEEM ALS HIER DUS MSS BETER NIET.
-        /*Tip: Android 3.0 adds the ability for you to define the on-click behavior for a menu item in XML, using the android:onClick attribute. The value for the attribute must be the name of a method defined by the activity using the menu.
-        The method must be public and accept a single MenuItem parameter—when the system calls this method, it passes the menu item selected. For more information and an example, see the Menu Resource document.*/
-
         switch (item.getItemId()) {
 
             case android.R.id.home:
-                // TODO handle clicking the app icon/logo
-                return false; // TODO wrom 'false'?
-
-//            case R.id.action_button_refresh:
-//                // switch to a progress animation
-//                // THIS CODE TRIGGERS THE ANIMATION. AND THE CODE ABOVE (with handler.postDelayed) STOPS the animation after 1 sec.
-//                item.setActionView(R.layout.indeterminate_progress_action);
-//
-//                return true;
-
+                // Handle clicking the app icon/logo
+                return false;
 
             case R.id.action_button_1:
-                Log.w(LOG_TAG, "clicked action button 1");
-
-                // TODO doe iets
 
                 return true;
 
@@ -504,34 +453,26 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
             case R.id.action_set_1_opt_1:
                 item.setChecked(true);
-                // TODO doe iets
                 return true;
 
             case R.id.action_set_1_opt_3:
                 item.setChecked(true);
-                // TODO doe iets
                 return true;
 
             case R.id.action_set_1_opt_2:
                 item.setChecked(true);
-                // TODO doe iets
                 return true;
 
             case R.id.action_set_2_opt_1:
                 item.setChecked(true);
-                // TODO doe iets
-//                getActionBar().setBackgroundDrawable(null);
                 return true;
 
             case R.id.action_set_2_opt_2:
                 item.setChecked(true);
-                // TODO doe iets
-//                getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ad_action_bar_gradient_bak));
                 return true;
 
 
             case R.id.action_settings:
-                // TODO doe iets
                 return true;
 
 
@@ -604,12 +545,12 @@ Note: When your activity is paused, the Activity instance is kept resident in me
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // TODO doe iets?
+
     }
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // TODO doe iets?
+
     }
 
 

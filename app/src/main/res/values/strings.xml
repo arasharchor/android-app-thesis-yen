@@ -13,7 +13,7 @@
     <string name="generic_not_connected">Action Device(s) not connected.</string>
     <string name="generic_connected">Action Device(s) CONNECTED.</string>
     <string name="generic_toggle">Action Device(s) toggle</string>
-    <string name="label_mqtt_service_toggle">TODO BENAMING toggle</string>
+    <string name="label_mqtt_service_toggle">A toggle</string>
 
     <string name="title_masterdetailitem_list">MasterDetailItems</string>
     <string name="title_masterdetailitem_detail">MasterDetailItem Detail</string>
@@ -114,7 +114,7 @@
     <string name="no_connected_AD_supports">No currently connected Action Device supports this gesture\n</string>
 
     <string name="tutorial_train">1) Choose gesture to train. \n2) Hold the record button while executing the gesture. \n
-        3) Redo 2) for TODO hoeveel keer nodig. \n4) Train another gesture by starting from 1).</string>
+        3) Redo 2) for 10 times. \n4) Train another gesture by starting from 1).</string>
     <string name="tutorial_recognize"><![CDATA[The face detectors on the connected Action Devices
     allow for automatic enabling & disabling of the Pebble™ accelerometer data stream. Manual toggle available on the right. \n\n1x
     Vibration = A gesture was recognized and this gesture is supported by at least 1 currently connected Action Device. \n\n2x Vibration = No currently connected Action Device supports this gesture OR No network connection.]]></string>

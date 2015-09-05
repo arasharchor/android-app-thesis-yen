@@ -14,15 +14,10 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!-- TODO stond aan maar is toch niet nodig? -->
-    <!-- <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> -->
-
-
     <!-- For network access so gesture commands can be sent to Action Devices (= Linux (Ubuntu) servers) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- For MQTT service. Used in several methods. TODO meer info hier zetten? -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!--
@@ -51,44 +46,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".eventueelnognuttig.MasterDetailItemListActivity"
-            android:label="@string/title_masterdetailitem_list"
-            android:parentActivityName=".main.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".main.MainActivity" />
-            <meta-data
-                android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-        </activity>
-        <activity
-            android:name=".eventueelnognuttig.MasterDetailItemDetailActivity"
-            android:label="@string/title_masterdetailitem_detail"
-            android:parentActivityName=".eventueelnognuttig.MasterDetailItemListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".eventueelnognuttig.MasterDetailItemListActivity" />
-            <meta-data
-                android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-        </activity>
-
-        <!-- TODO eventueel nog te gebruiken: -->
-        <!-- <activity -->
-        <!-- android:name=".eventueelnognuttig.CursorListActivity" -->
-        <!-- android:label="@string/title_activity_cursor_list" -->
-        <!-- android:parentActivityName=".main.MainActivity" > -->
-        <!-- <meta-data -->
-        <!-- android:name="android.support.PARENT_ACTIVITY" -->
-        <!-- android:value=".main.MainActivity" /> -->
-        <!-- <meta-data -->
-        <!-- android:name="android.support.UI_OPTIONS" -->
-        <!-- android:value="splitActionBarWhenNarrow" /> -->
-        <!-- </activity> -->
 
 
-        <!-- portrait mode wordt geforceerd! -->
+        <!-- TODO USE MSS: portrait mode wordt geforceerd! -->
         <!--
              android:configChanges="orientation"
             android:screenOrientation="portrait"

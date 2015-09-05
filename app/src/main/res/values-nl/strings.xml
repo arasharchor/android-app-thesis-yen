@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
-    <!--TODO deze file dan wrsl wissen?-->
-
-
-
-
     <string name="app_name">Android App Thesis Yen</string>
     <string name="action_settings">Instellingen</string>
     <string name="hello_world">Hallo wereld!</string>

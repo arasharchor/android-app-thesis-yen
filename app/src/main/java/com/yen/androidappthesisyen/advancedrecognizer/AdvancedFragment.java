@@ -77,9 +77,6 @@ public class AdvancedFragment extends Fragment {
 //    private OnFragmentInteractionListener mListener;
 
 
-    // voor ACCEL DATA STREAM
-    // TODO zien of alle lidattributen gebruikt worden. Anders verwijderen.
-    // Want code is deels copy/paste van PebbleAccelStreamFragment.
     private static final int NUM_SAMPLES = 15;
 
     private int sampleCount = 0;
@@ -126,7 +123,6 @@ public class AdvancedFragment extends Fragment {
 
     private boolean RECORD_GESTURE = false;
 
-    // TODO wegdoen?
     private boolean DEBUG = false;
     private boolean VERBOSE = false;
 
@@ -187,7 +183,7 @@ public class AdvancedFragment extends Fragment {
                         lblRecordedGesture.setText("Gesture being trained: " + chosenGesture);
 //                        Toast.makeText(getActivity(), chosenGesture, Toast.LENGTH_LONG).show();
 
-                        if(!isTrainingAccelStreamEnabled){
+                        if (!isTrainingAccelStreamEnabled) {
                             enableAccelStreamForTraining();
                         }
 
@@ -202,38 +198,8 @@ public class AdvancedFragment extends Fragment {
     }
 
 
-
     public void sendAccelDataToFragment(float[] values) {
 
-        //Retrieve the values from the float array values which contains sensor data
-        // TODO wrom met hoofdletter? is een wrapper class voor de primitieve klasse float.
-        // MAAR verderop gebruik je precies toch gewone float dus mag het hier ook gewone float zijn? TO TEST.
-        Float dataX = values[0];
-
-        Float dataY = values[1];
-
-        Float dataZ = values[2];
-
-        //	Context c = getApplicationContext();
-
-
-        // TODO mag weg:
-//        TextView tv1 = (TextView) getView().findViewById(R.id.accX);
-//        TextView tv2 = (TextView) getView().findViewById(R.id.accY);
-//        TextView tv3 = (TextView) getView().findViewById(R.id.accZ);
-//
-//        tv1.setText(dataX.toString());
-//        tv2.setText(dataY.toString());
-//        tv3.setText(dataZ.toString());
-
-
-        // ------
-        // hier bepalen welke data behoort tot een gesture en welke niet.
-        // door vinden start en stop via checken van thresholds ofzo.
-        // en dan moet ergens startRecordingGesture() aangeroepen woren wanneer zo'n start werd gevonden, en stop... bij vinden van een stop.
-
-
-        // Boolean useGestureSpotting = false; // ==================================================================
 
         SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_spotting", Context.MODE_PRIVATE);
         Boolean useGestureSpotting = settings.getBoolean("use", true);
@@ -243,12 +209,10 @@ public class AdvancedFragment extends Fragment {
         String state = bundle.getString("state");
         if (state.equalsIgnoreCase("recognize")) {
 
-            if (useGestureSpotting) {
+
                 // Gesture spotting
                 findBoundariesGesture(values);
-            } else {
-                // TODO eigenlijk mag IF weg want doen niets bij ELSE?
-            }
+
 
 
         } else if (state.equalsIgnoreCase("learn")) {
@@ -256,37 +220,19 @@ public class AdvancedFragment extends Fragment {
 
             if (RECORD_GESTURE) {
 
-                float[] traceItem = {dataX.floatValue(),
-                        dataY.floatValue(),
-                        dataZ.floatValue()};
+                float[] traceItem = {values[0],
+                        values[1],
+                        values[2]};
                 if (recordingGestureTrace != null) {
                     recordingGestureTrace.add(traceItem);
                 }
 
             } else {
-                // TODO eigenlijk mag IF weg want doen niets bij ELSE?
+
             }
 
         }
 
-
-        // OUDER
-//        if (useGestureSpotting) {
-//            findBoundariesGesture(values);
-//        } else {
-//
-//            if (RECORD_GESTURE) {
-//
-//                float[] traceItem = {dataX.floatValue(),
-//                        dataY.floatValue(),
-//                        dataZ.floatValue()};
-//                if (recordingGestureTrace != null) {
-//                    recordingGestureTrace.add(traceItem);
-//                }
-//
-//            }
-//
-//        }
 
 
     }
@@ -316,10 +262,12 @@ public class AdvancedFragment extends Fragment {
     public Boolean isAdvancedRecording() {
         return isAdvancedRecording;
     }
-    public ArrayList<float[]> getGestureValues (){
+
+    public ArrayList<float[]> getGestureValues() {
         return gestureValues;
     }
-    public int getStepsSinceNoMovement(){
+
+    public int getStepsSinceNoMovement() {
         return stepsSinceNoMovement;
     }
     // einde 3 mogelijke methodes
@@ -331,81 +279,84 @@ public class AdvancedFragment extends Fragment {
         Log.w(LOG_TAG, "X " + values[0] + " Y " + values[1] + " Z " + values[2]);
 
 
+        /*
         switch (recordMode) {
 
-            case MOTION_DETECTION: // TODO WE KOMEN ALTIJD HIER. IS DIT GOED? IS recordmode overbodig want de originele app past dat precies ook niet meer toe?
+            case MOTION_DETECTION:
+
+        */
+        if (isAdvancedRecording) {
+
+            gestureValues.add(values);
+
+            if (calcVectorNorm(values) < MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING) {
+
+                Log.w(LOG_TAG, "========================= Gesture NOT recorded anymore ============= stepsSinceNoMovement++");
+                stepsSinceNoMovement++;
+
+            } else {
+
+                Log.w(LOG_TAG, "===================== Still IN gesture ======= stepsSinceNoMovement = 0");
+                stepsSinceNoMovement = 0;
+
+            }
+
+        } else if (calcVectorNorm(values) >= MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING) {
+
+            Log.w(LOG_TAG, "========================================================== STARTING recording gesture");
+
+            isAdvancedRecording = true;
+            stepsSinceNoMovement = 0;
+            gestureValues = new ArrayList<float[]>();
+            gestureValues.add(values);
+        }
 
 
-                if (isAdvancedRecording) { // TODO initializen maar WAAR? (UPDATE: op FALSE in begin) of niet nodig deze if check?
+        if (stepsSinceNoMovement == MINIMUM_STEPS_SINCE_NO_MOVEMENT) {
 
-                    gestureValues.add(values);
+            Log.w(LOG_TAG, "============================ Detection POSSIBLE gesture");
 
-                    if (calcVectorNorm(values) < MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING) {
-
-                        Log.w(LOG_TAG, "========================= Gesture NOT recorded anymore ============= stepsSinceNoMovement++");
-                        stepsSinceNoMovement++;
-
-                    } else {
-
-                        Log.w(LOG_TAG, "===================== Still IN gesture ======= stepsSinceNoMovement = 0");
-                        stepsSinceNoMovement = 0;
-
-                    }
-
-                } else if (calcVectorNorm(values) >= MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING) {
-
-                    Log.w(LOG_TAG, "========================================================== STARTING recording gesture");
-
-                    isAdvancedRecording = true;
-                    stepsSinceNoMovement = 0;
-                    gestureValues = new ArrayList<float[]>();
-                    gestureValues.add(values);
-                }
-
-
-                if (stepsSinceNoMovement == MINIMUM_STEPS_SINCE_NO_MOVEMENT) {
-
-                    Log.w(LOG_TAG, "============================ Detection POSSIBLE gesture");
-
-                    int length = gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT;
-                    if (length > MINIMUM_GESTURE_LENGTH) { // TODO ============================= MINIMUM_GESTURE_LENGTH wrsl verhogen?
+            int length = gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT;
+            if (length > MINIMUM_GESTURE_LENGTH) { // TODO ============================= MINIMUM_GESTURE_LENGTH wrsl verhogen?
 //                         listener.onGestureRecorded(gestureValues.subList(0, gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT));
-                        // FYI ArrayList<float[]> gestureValues;
+                // FYI ArrayList<float[]> gestureValues;
 
-                        Log.w(LOG_TAG, "============= It was INDEED a gesture =============== STOPPED with RECORDING gesture and the gesture length was GREATER THAN MINIMUM. length = " + length);
-                        // TODO de gesture is nu gedaan en de geldige waardes zitten in index 0 tem index gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT
-                        // The gesture is done and the valid values are within index 0 to gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT
+                Log.w(LOG_TAG, "============= It was INDEED a gesture =============== STOPPED with RECORDING gesture and the gesture length was GREATER THAN MINIMUM. length = " + length);
 
-                        recordingGestureTrace = new ArrayList<float[]>(250);
-                        // opvullen met de juiste accel data.
-                        // maken kopie van subList van subList geeft VIEW terug en niet iets dat je kan casten naar ArrayList.
-                        recordingGestureTrace = new ArrayList<>(gestureValues.subList(0, gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT));
+                // The gesture is done and the valid values are within index 0 to gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT
+
+                recordingGestureTrace = new ArrayList<float[]>(250);
+                // opvullen met de juiste accel data.
+                // maken kopie van subList van subList geeft VIEW terug en niet iets dat je kan casten naar ArrayList.
+                recordingGestureTrace = new ArrayList<>(gestureValues.subList(0, gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT));
 
 
-                        // If we were in TRAIN mode: save the recorded data and link it to the right gesture.
-                        // If we were in RECOGNIZE mode: recognize the gesture, update the UI using a separate thread, and send the gesture
-                        // to the connected Action Device(s) that support(s) it if any.
-                        doRemainingTasksAfterRecording();
+                // If we were in TRAIN mode: save the recorded data and link it to the right gesture.
+                // If we were in RECOGNIZE mode: recognize the gesture, update the UI using a separate thread, and send the gesture
+                // to the connected Action Device(s) that support(s) it if any.
+                doRemainingTasksAfterRecording();
 
-                    }
+            }
 
-                    Log.w(LOG_TAG, "============================ Starting back FROM ZERO");
-                    gestureValues = new ArrayList<float[]>(); // TODO stond eerst = null; maar dit wrsl veiliger?
-                    stepsSinceNoMovement = 0;
-                    isAdvancedRecording = false;
-                }
+            Log.w(LOG_TAG, "============================ Starting back FROM ZERO");
+            gestureValues = new ArrayList<float[]>();
+            stepsSinceNoMovement = 0;
+            isAdvancedRecording = false;
+        }
+
+
+        /*
                 break;
 
 
-            case PUSH_TO_GESTURE: // TODO is dit nu nodig of niet? wrsl niet?
-
-                // Log.w(LOG_TAG, "============================ arrived in CASE PUSH_TO_GESTURE");
+            case PUSH_TO_GESTURE:
 
                 if (isAdvancedRecording) {
                     gestureValues.add(values);
                 }
                 break;
         }
+        */
 
     }
 
@@ -444,9 +395,7 @@ public class AdvancedFragment extends Fragment {
         // traces = recordingGestureTrace.toArray(traces);
 
 
-
         doRemainingTasksAfterRecording();
-
 
 
     }
@@ -487,24 +436,30 @@ public class AdvancedFragment extends Fragment {
                         detected_gid = gid;
 
 
-
                         if (!detected_gid.equalsIgnoreCase("not recognized!")) {
 
-                            // TODO =================== eventueel gebruiken zodat dan niets getoond: if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
-                            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_gestures);
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // OUD
+                            if (!detected_gid.equalsIgnoreCase("unknown") && !detected_gid.equalsIgnoreCase("unknown gesture")) {
+
+
+                                final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_gestures);
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // OUD
 //                                    outputWindow.append(detected_gid + "\n");
-                                    // NIEUW
-                                    outputWindow.append(Html.fromHtml("<b>" + detected_gid + "</b>" + "<br />"));
+                                        // NIEUW
+                                        outputWindow.append(Html.fromHtml("<b>" + detected_gid + "</b>" + "<br />"));
 
-                                    ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
-                                    Toast.makeText(getActivity(), detected_gid, Toast.LENGTH_LONG).show();
-                                }
-                            });
+                                        ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
+                                        Toast.makeText(getActivity(), detected_gid, Toast.LENGTH_LONG).show();
+                                    }
+                                });
 
+                            } else {
+
+                                // Do nothing.
+
+                            }
 
 
                             if (detected_gid.equalsIgnoreCase("unknown") || detected_gid.equalsIgnoreCase("unknown gesture")) {
@@ -518,15 +473,11 @@ public class AdvancedFragment extends Fragment {
                             }
 
 
-
                         } else {
-                            // TODO moeten we via scrollview users melden dat er geen gestures naast up/down/left/right zijn?
-                            // WRSL NIET?
+
+                            // Do nothing.
+
                         }
-
-
-
-
 
 
                     }
@@ -618,31 +569,16 @@ public class AdvancedFragment extends Fragment {
 
                     for (String actionDeviceToSendTo : listActionDevicesToSendTo) {
 
-                        // TODO beter vanaf .2 starten of wordt al erders aan gedacht?
                         String IPAddress = "192.168.1.1";
                         String preferenceKey = "ip_address_" + actionDeviceToSendTo;
 
-                        // OUD
-//                        if (actionDeviceToSendTo.equalsIgnoreCase("yen-asus")) {
-//                            // TODO momenteel nog hardgecodeerde mapping yen-asus naar enum 1
-//                            IPAddress = gestureHandlersettings.getString("ip_address_1", "192.168.1.1");
-//                        } else if (actionDeviceToSendTo.equalsIgnoreCase("yen-medion")) {
-//                            // TODO momenteel nog hardgecodeerde mapping yen-medion naar enum 2
-//                            IPAddress = gestureHandlersettings.getString("ip_address_2", "192.168.1.1");
-//                        } else {
-//                            Log.w("pushnotificationlistener", "SystemID unknown so no mapped IP address for Gesture Handler found");
-//                        }
 
-                        // NIEUW
-                        // TODO beter vanaf .2 starten of wordt al erders aan gedacht?
                         IPAddress = gestureHandlersettings.getString(preferenceKey, "192.168.1.1");
 
 
                         Log.w(LOG_TAG, "saved IP is " + IPAddress);
 
-                        // TODO met of zonder slash?
                         final String stringURL = "http://" + IPAddress + ":8080/RESTWithJAXB/rest/handlegesture/invoer";
-                        // TODO KAN DIE NIET ALTIJD WIJZIGEN DUS VIA DIALOOGVENSTER AAN USER VRAGEN?
 
 
                         // Network actions not allowed on main thread (= UI thread) so starting a new thread.
@@ -658,17 +594,12 @@ public class AdvancedFragment extends Fragment {
                         t.start();
 
 
-                        // DIT DUS NIET MEER NODIG:
-//                            nieuweTestcode(stringURL, gid);
-
                     }
 
 
                 } else {
 
                     // Arriving here if no network connection.
-                    // TODO iets doen: bv. melden aan user of zelfs direct terug IP insert dialog tonen!
-                    // MAAR stel dat er netwerk is, maar een broker is niet meer verbonden, wordt dat hier niet ontdekt dus moet dat ook ontdekken!
                     // TODO 05/09 FF UIT ============================================== doTwoShortPebbleVibrations();
 
                     getActivity().runOnUiThread(new Runnable() {
@@ -706,7 +637,7 @@ public class AdvancedFragment extends Fragment {
 
         } else {
 
-            // TODO of mag deze sectie volledig weg? want ook in scriptie deze NIET vermeld want kan eigenlijk nooit gebeuren!
+            // We should never arrive here anyway...
 
             // The accel stream isn't running. This means we don't need to do any processing.
             // TODO 05/09 FF UIT ============================================== doTwoShortPebbleVibrations();
@@ -752,46 +683,26 @@ public class AdvancedFragment extends Fragment {
 
         try {
 
-//Connect
             httpcon = (HttpURLConnection) ((new URL(stringURL).openConnection()));
-            // TODO nodig? Best enablen zeker.
             httpcon.setDoInput(true); // Sets the flag indicating whether this URLConnection allows input. It cannot be set after the connection is established.
             httpcon.setDoOutput(true);
             httpcon.setRequestProperty("Content-Type", "application/json");
-            // TODO nodig? UPDATE: JA voor mogelijke problemen te voorkomen.
             httpcon.setRequestProperty("charset", "utf-8");
-            // TODO dit enablen ALS JSON ONTVANGEN! ipv gewoon een code?
-//            httpcon.setRequestProperty("Accept", "application/json");
             httpcon.setRequestMethod("POST");
             httpcon.setUseCaches(false);
-            // TODO EVENTUEEL MEE SPELEN:
-            httpcon.setConnectTimeout(10000);
-            httpcon.setReadTimeout(10000);
-
-
-            // TODO is testen: (dan moet JSON object hier gemaakt worden ipv verderop)
-            // REDEN: http://www.evanjbrunner.info/posts/json-requests-with-httpurlconnection-in-android/
-//            String message = new JSONObject().toString();
-//            conn.setFixedLengthStreamingMode(message.getBytes().length)
+            httpcon.setConnectTimeout(5000);
+            httpcon.setReadTimeout(5000);
 
             httpcon.connect();
 
-            Log.w(LOG_TAG, "arrived after .connect()");
 
-            // JSON
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("gesture", stringGesture);
-            // TODO NOG ANDERE DATA STUREN?
-//            jsonObject.put("description", "Real");
-//            jsonObject.put("enable", "true");
 
 
-//Write
             OutputStream os = httpcon.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             writer.write(jsonObject.toString());
-            // TODO TEST OF NODIG:
-//            OS IPV WRITER.write(jsonObject.toString().getBytes("UTF-8"));
             writer.close(); // Closes this writer. The contents of the buffer are flushed, the target writer is closed, and the buffer is released. Only the first invocation of close has any effect.
             os.close();
 
@@ -807,7 +718,6 @@ public class AdvancedFragment extends Fragment {
 
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
-                    // TODO test: andere tut had: sb.append(line + "\n");
                 }
 
                 br.close();
@@ -829,10 +739,6 @@ public class AdvancedFragment extends Fragment {
 
                 System.out.println("RESPONSE WAS NOT CODE HTTP_OK BUT: " + httpcon.getResponseMessage());
             }
-
-
-            // TODO  test of nodig:
-//            httpcon.disconnect();
 
 
         } catch (UnsupportedEncodingException e) {
@@ -871,37 +777,20 @@ public class AdvancedFragment extends Fragment {
         setRetainInstance(true);
 
 
-        // voor THREE DOLLAR gestures
-        // acc sensor update rate
-        /*
-        TextView statusText = (TextView) findViewById(R.id.statusText);
-		statusText.setText("Press button to train gesture");*/
-
-        // create database test code
-        /*Log.w("main", "will create database");
-        GestureLibraryDBAdapter db = new GestureLibraryDBAdapter(getApplicationContext());
-        Log.w("main", "created database");
-        Log.w("main", "test Gesture"+ db.testGesture());*/
-
         // create gesture library
-
-
         // see if we have a gesture library
-        // TODO eventueel deze if binnen de try/catch zetten indien nodig.
         if (GestureLibrary.GLibrarySingleInstance == null) {
 
-            Log.w(LOG_TAG, "--------------------- NO GESTURE LIBRARY YET AdvancedFragment ---------------------");
-            // TODO iets doen? popup? leeg venster met tekst? etc.
+            Log.w(LOG_TAG, "--------------------- NO GESTURE LIBRARY YET ---------------------");
 
 
-            // TODO je hebt hier TRY CATCH rond gezet want gaf error over SQL en close(): to fix.
-            // TODO 02-08: ff uitgezet. Zien of het nog voorvalt! =============== OFWEL BEST ZETTEN VOOR ZEKERHEID HE.
-//            try {
+            try {
                 myGestureLibrary = new GestureLibrary("GESTURES", getActivity());
-//            } catch (Exception ex) {
-//            }
+            } catch (Exception ex) {
 
-            Log.w(LOG_TAG, "--------------------- nu gemaakt ---------------------");
+            }
+
+            Log.w(LOG_TAG, "--------------------- Made gesture library instance ---------------------");
 
         } else {
 
@@ -911,17 +800,9 @@ public class AdvancedFragment extends Fragment {
 
         myGestureRecognizer = new GestureRec3D(myGestureLibrary, 50);
 
-        /**
-         * Object that manages Pebble wrist movement gestures.
-         * The user should extend their wrist with the fist pointing directly out from the chest as if to punch, with the watch's face pointing upwards
-         *
-         * For parameter details, see the source class.
-         */
-        // TODO finetuning
         // threshold param was lange tijd 700
         // update nu 900 maar mag nog wat lager indien nuttig! nu is 850 - nu terug 900 MAAR IS 875 testen
         theTiltGestureRecognizer = new TiltGestureRecognizer(this, 900, 1000, PebbleGestureModel.MODE_TILT);
-
 
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -959,8 +840,7 @@ public class AdvancedFragment extends Fragment {
         });
 
 
-        // TODO die checkbox mag eigenlijk weg he, want user zal nooit toch manueel gesture spotting aan/uit zetten?
-        // Of houden en gewoon in comments zetten.
+        // May be removed. Only for debugging purposes.
         checkboxGestureSpotting = (CheckBox) returnedView.findViewById(R.id.checkBoxGestureSpotting);
         SharedPreferences gestureSpottingSettings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.gesture_spotting", Context.MODE_PRIVATE);
         Boolean useGestureSpotting = gestureSpottingSettings.getBoolean("use", true);
@@ -1060,17 +940,10 @@ public class AdvancedFragment extends Fragment {
         } else if (state.equalsIgnoreCase("library")) {
             this.state = UsedConstants.STATES.STATE_LIBRARY;
         } else if (state.equalsIgnoreCase("default")) {
-            // TODO iets doen?
+
         }
 
-        stateChanged(); // FYI: dit doet niets concreets als het state "library" is.
-
-        // 16-07 OUD
-//        if(state.equalsIgnoreCase("library")){
-//            // start library activity
-//            Intent i = new Intent(getActivity(), DBManagerUIActivity.class);
-//            startActivityForResult(i, 0);
-//        }
+        // TODO 05/09 OUD WNT NIET MEER RELEVANT WRSL stateChanged();
 
     }
 
@@ -1124,7 +997,6 @@ public class AdvancedFragment extends Fragment {
         }
 
     }
-
 
 
     private void enableAccelStreamForTraining() {
@@ -1229,38 +1101,37 @@ public class AdvancedFragment extends Fragment {
     }
 
 
-    // TODO 31-07 mag merkelijk nu weg want elke case is nu LEEG?
-    public void stateChanged() {
+    // TODO 05/09 May be removed.
+//    public void stateChanged() {
+//
+//
+//        switch (this.state) {
+//
+//            case STATE_LEARN:
+//
+//                break;
+//
+//            case STATE_RECOGNIZE:
+//                break;
+//
+//            case STATE_LIBRARY:
+//
+//                break;
+//
+//            default:
+//
+//                break;
+//        }
+//    }
 
 
-        switch (this.state) {
-
-            case STATE_LEARN:
-
-
-                break;
-
-            case STATE_RECOGNIZE:
-                break;
-
-            case STATE_LIBRARY:
-                // njet: en logisch want we komen hier nooit als Gesture Library action button wordt geklikt: er wordt dan direct naar ander Fragment gesprongen,
-                // ipv DIT fragment met z'n learn en recognize states.
-                break;
-
-            default:
-
-                break;
-        }
-    }
-
-
-    // TODO DEZE GANSE METHOD + LOGICA ERIN MAG WRSL ZOMAAR WEG WANT IS VAN EEN OUD SYSTEEM VIA GESTURELIBRARY DAT IN GANS APARTE ACTIVITY ZAT.
+    // TODO Check if can be deleted.
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // change state and map to enum value
         this.state = UsedConstants.STATES.values()[resultCode];
         //update activity's state
-        this.stateChanged();
+
+        // TODO 05/09 OUD WNT NIET MEER RELEVANT WRSL this.stateChanged();
     }
 
 
@@ -1268,51 +1139,16 @@ public class AdvancedFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-
-        // TODO stond zeer lange tijd in onCreate maar hier is wrsl beter?
-        // voor starten app voor ACCEL DATA STREAM.
         PebbleKit.startAppOnPebble(getActivity(), uuid);
 
-
-        // voor (o.a.) PEBBLE ACCEL STREAM
         getToggleStatesAndEnableServices();
-
-
-        // 31-07 uit want enablen nu pas wann een eerste gesture is geselecteerd.
-        // ONLY when we are in the TRAIN tab do we automatically enable the data stream.
-//        Bundle bundle = this.getArguments();
-//        String state = bundle.getString("state");
-//        if (state.equalsIgnoreCase("learn")) {
-//
-//            Log.w(LOG_TAG, "======================= net voor enableAccelStreamForTraining");
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//
-//                    try {
-//                        Thread.sleep(1000); // TODO default 5000. Als problemen geeft, verhoog.
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    enableAccelStreamForTraining();
-//
-//                }
-//            }).start();
-//
-//
-//        }
 
     }
 
 
     private void getToggleStatesAndEnableServices() {
 
-        // TODO zien hoe je dus kunt communiceren MET ANDERE FRAGMENTS...
-//        ToggleButton togglePebbleStream = (ToggleButton) getView().findViewById(R.id.toggle_pebble_acceldata_stream);
-//        if (togglePebbleStream.isEnabled() && togglePebbleStream.isChecked()) {
         startPebbleDataStream();
-//        }
 
     }
 
@@ -1332,7 +1168,7 @@ public class AdvancedFragment extends Fragment {
                     PebbleKit.sendAckToPebble(getActivity(), transactionId);
 
                     // Count total data
-                    totalData += 3 * NUM_SAMPLES * 4; // TODO betekenis? 3 wegens XYZ, en 4 wegens 4-byte int?
+                    totalData += 3 * NUM_SAMPLES * 4;
 
                     // Get data
                     latest_data = new int[3 * NUM_SAMPLES];
@@ -1374,8 +1210,6 @@ public class AdvancedFragment extends Fragment {
                     // If NO tilt gesture was detected, we pass the accel data to the more advanced recognizer.
                     if (results[0] == false && results[1] == false) {
 
-// TODO we werken nu met INTs maar de gesture recognizer werkt eigenlijk met FLOATs
-//                    is het nuttig om met FLOATs te werken? to test...
                         float[] floatArray = {latest_data[0], latest_data[1], latest_data[2]};
                         sendAccelDataToFragment(floatArray);
 
@@ -1384,7 +1218,7 @@ public class AdvancedFragment extends Fragment {
 
 
 
-
+                    // TODO dit mag wrsl weg?
                     /*// ------ TEST - voor MOEILIJKERE gesture detection
 
                     // TODO we werken nu met INTs maar de gesture recognizer werkt eigenlijk met FLOATs
@@ -1392,7 +1226,6 @@ public class AdvancedFragment extends Fragment {
                     float[] floatArray = {latest_data[0], latest_data[1], latest_data[2]};
 
                     try {
-                        Log.w("CHECK", "---------- net voor aanroep giveNewAccelDataToService");
                         // TODO ZIEN WANNEER recognitionService wordt aangemaakt/gecalled!
                         recognitionService.giveNewAccelDataToService(floatArray);
                     } catch (RemoteException e) {
@@ -1465,38 +1298,21 @@ public class AdvancedFragment extends Fragment {
 
     private void disableAllServices() {
         stopPebbleDataStream();
-        // TODO voeg stop-methods van andere services toe.
     }
 
     private void stopPebbleDataStream() {
 
         if (receiver != null) {
 
-
-//            final TextView outputWindow = (TextView) getView().findViewById(R.id.textView_output_window);
-//            outputWindow.append("--- " + getResources().getString(R.string.stop_communication_test) + " ---" + "\n");
-//            ((ScrollView) getView().findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
-
-
-            // TODO zien of deze try/catch werkt voor fixen: Caused by: java.lang.IllegalArgumentException: Receiver not registered: com.yen.myfirstapp.MainActivity$1@40fc03c0
             try {
 
-//                unregisterReceiver(receiver);
-                // Changed to following since we are in a FRAGMENT; not an ACTIVITY.
                 getActivity().unregisterReceiver(receiver);
 
-
-                // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
                 receiver = null;
 
 
             } catch (IllegalArgumentException ex) {
 
-
-                // TODO niets doen gewoon?
-
-
-                // TODO we gebruiken nu dit omdat anders de IF(... == NULL) soms te WEINIG wordt binnengegaan!
                 receiver = null;
             }
 
@@ -1526,13 +1342,6 @@ public class AdvancedFragment extends Fragment {
     @Override
     public void onDestroy() {
 
-
-        if (DEBUG) Log.w("onDestroy", "AdvancedFragment destroyed.");
-
-        // TODO mag dus weg?
-//        mSensorManager.unregisterListener(sensorListener);
-        // this.myGestureLibrary.onApplicationStop();
-
         super.onDestroy();
     }
 
@@ -1542,15 +1351,8 @@ public class AdvancedFragment extends Fragment {
     private void addSupportedGesture(String systemID, String gestureToBeAdded) {
 
         Map<String, String> savedMap = getMapSupportedGestures();
-        if (savedMap == null) {
-            Log.w(LOG_TAG, "SAVEDMAP IS NULL");
-        }
-
 
         String concatenatedGestures = savedMap.get(systemID);
-//        if(concatenatedGestures == null){
-//            Log.w(LOG_TAG, "concatenatedGestures IS NULL");
-//        }
 
         String newConcatenatedString = "";
 
@@ -1611,10 +1413,6 @@ public class AdvancedFragment extends Fragment {
         }
         return outputMap;
     }
-
-
-
-
 
 
 }

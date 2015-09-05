@@ -124,13 +124,10 @@ public class UtilityRepo {
             // recreate concatenated string from new set
             newConcatenatedString = TextUtils.join(";", setStructure);
 
-            // TODO check dat geen problemen geeft als de lijst nu leeg is, maar wrsl geen probs.
             Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
 
         } else {
-
-            // Do nothing!
-
+            // Do nothing.
         }
 
 

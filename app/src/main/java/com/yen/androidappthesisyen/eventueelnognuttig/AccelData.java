@@ -18,6 +18,9 @@ import java.util.TimeZone;
 
 public class AccelData {
 
+    // TODO MAG WEG WRSL
+
+    /*
     private static final String TAG = AccelData.class.getSimpleName();
 
     final private int x;
@@ -56,7 +59,6 @@ public class AccelData {
     }
 
 
-    // Added by Yen.
     public String getOneLineString() {
         return new String("X " + x + " Y " + y + " Z " + z);
     }
@@ -79,6 +81,9 @@ public class AccelData {
     public void applyTimezone(TimeZone tz) {
         timestamp -= tz.getOffset(timestamp);
     }
+
+    */
+
 }
 
 

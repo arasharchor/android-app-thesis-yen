@@ -34,9 +34,6 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
         super(threshold, durationMilliseconds, modeConstant);
 
         this.theAdvancedFragment = theAdvancedFragment;
-        if(this.theAdvancedFragment == null){
-            Log.w(LOG_TAG, "IS NOG NULL");
-        }
 
     }
 
@@ -137,7 +134,6 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
 //                    gestureWindow.append("wrist DOWN __" + "\n");
                     gestureWindow.append(Html.fromHtml("<b>" + "wrist DOWN __" + "</b>" + "<br />"));
                     ((ScrollView) theAdvancedFragment.getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
-                    // TODO is theAdvancedFragment.getActivity() OK of toch ApplicationContext usen?
                     Toast.makeText(theAdvancedFragment.getActivity(), "wrist DOWN __", Toast.LENGTH_LONG).show();
                 }
             });
@@ -155,7 +151,7 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
      */
     @Override
     public void onActionEnd() {
-        // TODO
+        // TODO usen?
         Log.w(LOG_TAG, "onActionEnd()");
     }
 

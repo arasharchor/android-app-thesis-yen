@@ -26,8 +26,7 @@ public class GestureLibraryFragment extends ListFragment {
 
     public UsedConstants.STATES stateChange = UsedConstants.STATES.STATE_LIBRARY;
 
-    // TODO uitzetten of zelfs wissen?
-    private boolean DEBUG = true;
+    private boolean DEBUG = false;
 
     private GestureLibrary glibrary_instance = null;
 
@@ -45,14 +44,7 @@ public class GestureLibraryFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO nodig in deze klasse?
         setRetainInstance(true);
-
-
-
-        // points to the XML file specifying the content
-        // UIT WNT PRECIES NIET NODIG IN EEN FRAGMENT (WEL IN EEN ACTIVITY) getActivity().setContentView(R.layout.dbui);
-
 
         stateChange = UsedConstants.STATES.STATE_LIBRARY;
 
@@ -62,8 +54,7 @@ public class GestureLibraryFragment extends ListFragment {
         // TODO eventueel deze if binnen de try/catch zetten indien nodig.
         if (GestureLibrary.GLibrarySingleInstance == null) {
 
-            Log.w(LOG_TAG, "--------------------- NO GESTURE LIBRARY YET GestureLibraryFragment ---------------------");
-            // TODO iets doen? popup? leeg venster met tekst? etc.
+            Log.w(LOG_TAG, "--------------------- NO GESTURE LIBRARY YET ---------------------");
 
 
             // TODO je hebt hier TRY CATCH rond gezet want gaf error over SQL en close(): to fix.
@@ -73,7 +64,7 @@ public class GestureLibraryFragment extends ListFragment {
 
             }
 
-            Log.w(LOG_TAG, "--------------------- nu gemaakt ---------------------");
+            Log.w(LOG_TAG, "--------------------- Created gesture library instance ---------------------");
 
         } else {
 
@@ -100,18 +91,16 @@ public class GestureLibraryFragment extends ListFragment {
 
         // button to delete all gestures
         final Button mainButton = (Button) returnedView.findViewById(R.id.deleteGesturesButton);
-        // TODO moet dat niet onClickListener zijn?
+
         mainButton.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_UP)
 
                 {
-                    // Later add a confirmation dialog here!
-//                    Log.w("OnTouch", "Deleting Gestures in Library");
 
                     glibrary_instance.removeAllGesturesFromLibrary();
                 }
-                // "return false" staat ook bij een ontouchlistener bij AdvancedFragment dus NIET WEGDOEN!
+
                 return false;
             }
         });
@@ -150,12 +139,6 @@ public class GestureLibraryFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-
-//        if (null != mListener) {
-//            // Notify the active callbacks interface (the activity, if the
-//            // fragment is attached to one) that an item has been selected.
-//            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-//        }
 
 
     }

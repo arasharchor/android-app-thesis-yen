@@ -67,12 +67,6 @@
         android:orientation="vertical"
         android:weightSum="1">
 
-<!--TODO mag zkr weg? -->
-        <!--<LinearLayout
-            android:id="@+id/LinearLayout01"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />-->
-
 
         <TextView
             android:layout_width="wrap_content"

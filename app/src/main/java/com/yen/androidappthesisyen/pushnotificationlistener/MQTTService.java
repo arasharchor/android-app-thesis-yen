@@ -70,9 +70,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     private void addSupportedGesture(String systemID, String gestureToBeAdded) {
 
         Map<String, String> savedMap = getMapSupportedGestures();
-        if (savedMap == null) {
-            Log.w(LOG_TAG, "SAVEDMAP IS NULL");
-        }
 
 
         String concatenatedGestures = savedMap.get(systemID);
@@ -319,14 +316,15 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 //            listBrokerHostName.add(i, "");
 //            listDataEnabledReceiver.add(i, null);
 //        }
+
         // NIEUW
         listOfBrokers = new ArrayList<>();
         Log.w(LOG_TAG, "=============== AMOUNT OF BROKERS " + enumeratorTotal);
-        // TODO check of voldoende aangemaakt
+
         for (int i = 0; i < enumeratorTotal; i++) {
             Broker newBroker = new Broker();
             listOfBrokers.add(newBroker);
-            Log.w(LOG_TAG, "broker aangemaakt");
+            Log.w(LOG_TAG, "broker made");
         }
 
 
@@ -369,7 +367,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         }
 
         // define the connection to the broker
-        Log.w(LOG_TAG, "enumeratorTotal op einde onCreate" + enumeratorTotal);
         for (int i = 0; i < enumeratorTotal; i++) {
             defineConnectionToBroker(i, listOfBrokers.get(i).getBrokerAddress());
         }
@@ -406,9 +403,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     @Override
     public int onStartCommand(final Intent intent, int flags, final int startId) {
 
-        /*int extra = intent.getIntExtra("enumerator", -1);
-        this.enumeratorTotal = extra;
-        Log.w(LOG_TAG, "enumeratorTotal in ONSTARTCOMMAND " + extra);*/
 
         new Thread(new Runnable() {
             @Override
@@ -417,7 +411,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             }
         }, "MQTTservice").start();
 
-        Log.w(LOG_TAG, "------------------------- SERVICE WERD GESTART");
+        Log.w(LOG_TAG, "------------------------- SERVICE STARTED");
 
 
         // return START_NOT_STICKY - we want this Service to be left running
@@ -429,21 +423,12 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     synchronized void handleStart(Intent intent, int startId) {
 
 
-        /*int extra = intent.getIntExtra("enumerator", -1);
-        this.enumeratorTotal = extra;
-        Log.w(LOG_TAG, "enum aan begin HANDLESTART " + extra);*/
-
         // before we start - check for a couple of reasons why we should stop
-
-
-        // TODO of toch door laten gaan zodra 1 broker connected is?
 
         for (int i = 0; i < enumeratorTotal; i++) {
             if (listOfBrokers.get(i).getMQTTClient() == null) {
                 // we were unable to define the MQTT client connection, so we stop
                 //  immediately - there is nothing that we can do
-                // TODO deze log tag mag weg straks.
-                Log.w(LOG_TAG, "========================== WE MOESTEN STOPPEN");
                 stopSelf();
                 return;
             }
@@ -520,7 +505,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 if (isOnline()) {
                     // we think we have an network connection, so try to connect
                     //  to the message broker
-                    Log.w(LOG_TAG, "connectToBroker in HANDLESTART");
                     if (connectToBroker(i)) {
                         // we subscribe to a topic - registering to receive push
                         //  notifications with a particular key
@@ -530,8 +514,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                         //  even just with one subscription, we could receive
                         //  messages for multiple topics
                         subscribeToTopic(i, topicNameAccelStream);
-                        // TODO dus hier nog zo'n subscribeToTopic toevoegen!
-                        // OFWEL topicnaam aanpassen zodat onder 1 hoofdcategorie alle nodige topics zitten en dan via wildcard werken.
                         subscribeToTopic(i, topicNameGesturePusher);
 
                     }
@@ -551,8 +533,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
         }
 
-
-        // ======================== voor BROKER 1
 
         // changes to the phone's network - such as bouncing between WiFi
         //  and mobile data networks - can break the MQTT connection
@@ -842,7 +822,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     public MQTTConnectionStatus getConnectionStatus(int enumerator) {
 
         if (enumerator == -1) {
-            Log.w(LOG_TAG, "WRONG ENUM");
+            Log.w(LOG_TAG, "Wrong enum");
             return MQTTConnectionStatus.INITIAL;
         } else {
             // return listConnectionStatus.get(enumerator);
@@ -957,12 +937,11 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             //  the network connection receiver will fire, and attempt another
             //  connection to the broker
         } else {
-            //
+
             // we are still online
             //   the most likely reason for this connectionLost is that we've
             //   switched from wifi to cell, or vice versa
             //   so we try to reconnect immediately
-            //
 
             for (int i = 0; i < enumeratorTotal; i++) {
                 // listConnectionStatus.set(i, MQTTConnectionStatus.NOTCONNECTED_UNKNOWNREASON);
@@ -1032,16 +1011,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         } else if (topic.equalsIgnoreCase("accelstream/state") && messageBody.endsWith("disable")) {
             disableAccelStream(systemID);
         }
-
-        /* TODO ZAL WEGMOGEN WRSL.
-        else if (topic.equalsIgnoreCase("gesturepusher/state") && messageBody.endsWith("enable")) {
-            // TODO dit ook in map opslaan? of is gans deze enable en disable bij gesturepusher OVERBODIG?
-            Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/state en MESSAGE enable ========================");
-        } else if (topic.equalsIgnoreCase("gesturepusher/state") && messageBody.endsWith("disable")) {
-            // TODO dit ook in map opslaan? of is gans deze enable en disable bij gesturepusher OVERBODIG?
-            Log.w(LOG_TAG, "======================== kreeg TOPIC gesturepusher/state en MESSAGE disable ========================");
-        }*/
-
 
         String[] splitArray2 = messageBody.split("\\+");
         if (splitArray2.length > 1) {
@@ -1139,19 +1108,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             Log.w(LOG_TAG, "------------------------- TRYING TO CONNECT TO BROKER " + brokerName);
 
             // try to connect
-
-            Log.w(LOG_TAG, "enumerator in connectToBroker " + brokerName);
-
-            if (listOfBrokers.get(enumerator).getMQTTClient() == null) {
-                Log.w(LOG_TAG, "listMQTTClient null");
-            } else if (listOfBrokers.get(enumerator).getCleanStart() == null) {
-                Log.w(LOG_TAG, "listCleanStart null");
-            }
-            // listMQTTClient.get(enumerator).connect(generateClientId(), listCleanStart.get(enumerator), keepAliveSeconds);
-            Log.w(LOG_TAG, "listOfBrokers.get(enumerator).getCleanStart() " + listOfBrokers.get(enumerator).getCleanStart());
-            String res = generateClientId();
-            Log.w(LOG_TAG, "res generateclientid " + res);
-
             listOfBrokers.get(enumerator).getMQTTClient().connect(generateClientId(), listOfBrokers.get(enumerator).getCleanStart(), keepAliveSeconds);
 
             // inform the app that the app has successfully connected
@@ -1174,7 +1130,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
         } catch (MqttException e) {
 
-            /*
+
             e.printStackTrace();
 
 
@@ -1204,7 +1160,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             // a failure is often an intermittent network issue, however, so
             //  some limited retry is a good idea
             scheduleNextPing();
-            */
+
 
 
             return false;
@@ -1241,7 +1197,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                     // listMQTTClient.get(enumerator).subscribe(topics, qualitiesOfService);
                     listOfBrokers.get(enumerator).getMQTTClient().subscribe(topics, qualitiesOfService);
                 } else {
-                    Log.w(LOG_TAG, "foute enumerator");
+                    Log.w(LOG_TAG, "wrong enum");
                 }
 
                 subscribed = true;
@@ -1428,7 +1384,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
                 // we have a network connection - have another try at connecting
                 if (enumerator != -1) {
-                    Log.w(LOG_TAG, "connectToBroker in ONRECEIVE in class NetworkConnectionIntentReceiver");
+                    Log.w(LOG_TAG, "connectToBroker in onReceive of class NetworkConnectionIntentReceiver");
                     if (connectToBroker(enumerator)) {
                         // we subscribe to a topic - registering to receive push
                         //  notifications with a particular key
@@ -1537,7 +1493,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                     }
 
                     // reconnect
-                    Log.w(LOG_TAG, "connectToBroker in ONRECEIVE van class PingSender");
+                    Log.w(LOG_TAG, "connectToBroker in onReceive of class PingSender");
                     if (connectToBroker(enumerator)) {
                         subscribeToTopic(enumerator, topicNameAccelStream);
                         subscribeToTopic(enumerator, topicNameGesturePusher);

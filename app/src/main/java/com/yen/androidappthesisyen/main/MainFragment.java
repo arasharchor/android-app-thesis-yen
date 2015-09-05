@@ -43,24 +43,10 @@ import static com.yen.androidappthesisyen.utilities.UtilityRepo.getListSystemIDs
 import static com.yen.androidappthesisyen.utilities.UtilityRepo.removeSystemIDFromListSystemIDsToConnectTo;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MainFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- */
-
-// TODO you have disabled some methods. Reenable them if you need them.
 
 public class MainFragment extends Fragment implements View.OnClickListener {
 
-    /*However, this is a bad idea on Android. Virtual method calls are expensive, much more so than instance field lookups. It's reasonable to follow common object-oriented programming practices and have getters and setters in the public interface, but within a class you should always access fields directly.
 
-Without a JIT, direct field access is about 3x faster than invoking a trivial getter. With the JIT (where direct field access is as cheap as accessing a local), direct field access is about 7x faster than invoking a trivial getter.
- https://developer.android.com/training/articles/perf-tips.html*/
-
-
-//    private OnFragmentInteractionListener mListener;
 
     /*Use Static Final For Constants
     * See https://developer.android.com/training/articles/perf-tips.html */
@@ -69,7 +55,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     public static final UUID WATCHAPP_UUID = UUID.fromString("7c5167e8-9df4-479f-9353-714481681af1");
 
 
-    // For Pebble communication test
+    // Pebble communication test
     private PebbleKit.PebbleDataReceiver myPebbleDataReceiver;
     private static final int KEY_BUTTON_EVENT = 2,
             BUTTON_EVENT_UP = 3,
@@ -78,7 +64,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
             KEY_VIBRATION = 6;
 
 
-    // For Pebble accel data logging
+    // Pebble accel data logging
     private static final int DATA_LOG_ACCEL_DATA_TAG = 42;
     private PebbleKit.PebbleDataLogReceiver myPebbleDataLOGReceiver;
     private StringBuilder resultBuilder = new StringBuilder();
@@ -86,13 +72,10 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
     private static boolean areDefaultsInserted = false;
-    // TODO testen of het STATIC moet/mag zijn!
-    // TODO of moet die = new in onCreate? TO TEST: want mss als fragment GANS opnieuw wordt gemaakt (wanneer?) zijn onze Bundles weer leeg?!
+
     private static Bundle bundleLabelStates = new Bundle();
     private static Bundle bundleEnableDisableStates = new Bundle();
     private static Bundle bundleToggleStates = new Bundle();
-    // je kon BOOLEAN ARRAY toepassen, maar nu heb je Bundle, voor het geval je TOCH met savedInstanceState gaat werken voor terugkrijgen van states.
-
 
     private BluetoothAdapter BTadapter = BluetoothAdapter.getDefaultAdapter();
     private static final int REQUEST_ENABLE_BT = 50;
@@ -124,34 +107,9 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
 
-        // TODO als je toch gaat werken met savedInstanceState.
-//        if(savedInstanceState == null){
-//            bundleLabelStates = new Bundle();
-//            bundleEnableDisableStates = new Bundle();
-//            bundleToggleStates = new Bundle();
-//        } else {
-//            // TODO haal de 2 bundles uit savedInstanceState en assign aan de vars.
-//        }
 
-
-
-        /*public void setRetainInstance (boolean retain)
-        * onCreate(Bundle) will not be called since the fragment is not being re-created.
-        * https://developer.android.com/reference/android/app/Fragment.html#setRetainInstance(boolean) */
-        // DUS HIER KOMEN WE ENKEL DE ALLEREERSTE KEER DAT FRAGMENT WORDT GEMAAKT.
-        // DUS HIER INITIALISEREN VAN DE BUNDLES?
-        // EN DIRECT DUS DE BEGIN STATES INVULLEN HIER ZEKER?!
-//        bundleLabelStates = new Bundle();
-//        bundleEnableDisableStates = new Bundle();
-//        bundleToggleStates = new Bundle();
-
-
-//        BTadapter = BluetoothAdapter.getDefaultAdapter();
-//        Log.w("BLUETOOTH", "name BT adapter: " + BTadapter.getName());
-
-        // direct ook die lijst van paired BT devices opvullen.
         // get a list of paired devices by calling getBondedDevices()
-        // maar lijst LEEG als BT uit staat!
+        // List empty if BT is off.
         setPairedBTDevices = BTadapter.getBondedDevices();
 
         // TODO of gaan we toch globaal landscape afdwingen? (als ja, doe dit via manifest)
@@ -167,21 +125,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         // Inflate the layout for this fragment
         View returnedView = inflater.inflate(R.layout.fragment_main, container, false);
 
-
-        // SYSTEEM DAT WE NU NIET TOEPASSEN
-//        if(savedInstanceState == null){
-//
-//            // If you do it in onCreate in MainActivity it seems to crash! (Even though the view has been inflated using setContentView(...) beforehand.
-//            // UPDATE: this is logical! Since the FRAGMENT inflates the View objects; not the ACTIVITY, in your case.
-//            setLabelStates(returnedView, false);
-//        setEnableDisableStatesFromBundle
-//            setEnableDisableStates(returnedView, false);
-//
-//        } else {
-//
-//            // TODO gebruik die bundle om de state eruit te halen van je buttons enzo.
-//
-//        }
 
         // SAVE THE DEFAULTS THE VERY FIRST TIME THE FRAGMENT GETS MADE. AND ONLY THEN.
         // We could use the second parameter in bundle.getString(...) to define a DEFAULT VALUE, but that means we have to add that 2nd parameter each time we call bundle.getString(...)
@@ -201,12 +144,8 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         setToggleStatesFromBundle(returnedView);
 
 
-        // hier moet geen if(==null) rond omdat bij creëren view dit ALTIJD moet gebeuren, terwijl hierboven niet steeds hetzelfde gedrag mag zijn!
-        // BEST SOLUTION TO COMPLETELY DECOUPLING THE GUI COMPONENTS AND THEIR LISTENERS FROM THE ACTIVITY THE FRAGMENT IS RESIDING IN.
-        // SEE https://stackoverflow.com/questions/6091194/how-to-handle-button-clicks-using-the-xml-onclick-within-fragments
-        // TODO via onClick in XML
+
         registerButtonAndToggleListeners(returnedView);
-        // TODO the above doesn't really belong here in onCreateView but for example in onViewCreated or similar.
 
         initListViewMain(returnedView);
 
@@ -214,9 +153,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         // We also place it here, since in case there is already text in the Output Window when arriving there, we immediately scroll.
         ((ScrollView) returnedView.findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
-
-        // TODO maar doen we nu geen overbodige enable/disable en on/off aanpassingen bij de toggle voor BT?
-        // of toch behouden wat we hebben: anders wordt het te complex.
         setBTRelatedStates(returnedView);
 
         theView = returnedView;
@@ -246,7 +182,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Location of Face Detector and Gesture Handler");
         // OUD builder.setMessage("Insert the current IPv4 address for Action Device " + systemID + ". Use previous location (" + savedBrokerIP + ") by leaving the field blank.");
-        builder.setMessage("This is a first-time setup since no previously used systemIDs and IP addresses are found. Insert the required information in the pattern 'systemID//IPaddress'. Example: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device runtime application and push this information to confirm the association. Otherwise, this new systemID won't be saved here.");
+        builder.setMessage("This is a first-time setup since no previously used systemIDs and IP addresses are found. Insert the required information in the pattern 'systemID//IPaddress'. Example: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device Runtime application and push this information to confirm the association. Otherwise, this new systemID won't be saved here.");
 
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -268,18 +204,11 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
 
 
-                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
-//                        if(!value.equalsIgnoreCase("0")){
-
-                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
-                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
                         saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
 
 
 
                         addSystemIDToListSystemIDsToConnectTo(getActivity(), systemIDandIPaddress[0]);
-
-//                        }
 
 
 
@@ -303,13 +232,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
                         Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
 
-                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
-//                        if(!value.equalsIgnoreCase("0")){
-//
-//                        }
-
-                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
-                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
                         saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
 
 
@@ -328,10 +250,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         setToggleStates(getView(), false);
                         // ======= END
 
-
-                        // TODO zien of dus alle ingegeven brokers worden gestart: dat er niet 1 te kort is.
                         int enumForService = currentEnumInSystemIDList + 1;
-                        Log.w(LOG_TAG, "enumerator net voor starten service: enumForService == " + enumForService);
                         startOrRestartService(enumForService);
 
 
@@ -353,12 +272,9 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         setEnableDisableStates(getView(), false);
 
 
-                        // We stop the mqtt service
-                        // TODO OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
                         Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
                         getActivity().stopService(svcOld);
 
-                        // NIEUW
                         // Clear the list
                         List<String> theList = getListSystemIDsToConnectTo(getActivity());
                         for (String systemIDToRemove : theList) {
@@ -382,7 +298,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Location of Face Detector and Gesture Handler");
         // OUD builder.setMessage("Insert the current IPv4 address for Action Device " + systemID + ". Use previous location (" + savedBrokerIP + ") by leaving the field blank.");
-        builder.setMessage("You have inserted the required information for all previously used systemIDs. If you want to add a new Action Device, insert the required information in the pattern 'systemID//IPaddress'. \nExample: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device runtime application and push this information to confirm the association. Otherwise, this new systemID won't be saved here. \nIf you didn't want to register a new Action Device, leave the field blank and simply choose 'Done: start service'.");
+        builder.setMessage("You have inserted the required information for all previously used systemIDs. If you want to add a new Action Device, insert the required information in the pattern 'systemID//IPaddress'. \nExample: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device Runtime application and push this information to confirm the association. Otherwise, this new systemID won't be saved here. \nIf you didn't want to register a new Action Device, leave the field blank and simply choose 'Done: start service'.");
 
         final EditText input = new EditText(getActivity());
         // OUD InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER
@@ -405,18 +321,13 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
 
 
-                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
-//                        if(!value.equalsIgnoreCase("0")){
 
-                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
-                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+                        // For our use case, the IP of Face Detector and IP of Gesture Handler are always one and the same.
                         saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
 
 
 
                         addSystemIDToListSystemIDsToConnectTo(getActivity(), systemIDandIPaddress[0]);
-
-//                        }
 
 
 
@@ -436,7 +347,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
                         String value = String.valueOf(input.getText());
-                        Log.w(LOG_TAG, "=========== LENGTE TEXT FIELD IS " + value.length());
+
 
                         if(value.length() >= 1){
 
@@ -444,13 +355,9 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
                             Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
 
-                            // TODO but requires to use yet another counter than currentEnumInSystemIDList.
-//                        if(!value.equalsIgnoreCase("0")){
-//
-//                        }
 
-                            // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
-                            // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+
+                            // For our use case, the IP of Face Detector and IP of Gesture Handler are always one and the same.
                             saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
 
 
@@ -470,9 +377,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                             // ======= END
 
 
-                            // TODO zien of dus alle ingegeven brokers worden gestart: dat er niet 1 te kort is.
                             int enumForService = currentEnumInSystemIDList + 1;
-                            Log.w(LOG_TAG, "enumerator net voor starten service: enumForService == " + enumForService);
                             startOrRestartService(enumForService);
 
 
@@ -494,9 +399,8 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                             // ======= END
 
 
-                            // TODO zien of dus alle ingegeven brokers worden gestart: dat er niet 1 te kort is.
-                            int enumForService = currentEnumInSystemIDList; // !! One less than the value in the value above. Since the field was empty, we have 1 less item.
-                            Log.w(LOG_TAG, "enumerator net voor starten service: enumForService == " + enumForService);
+                            // One less than the value in the value above. Since the field was empty, we have 1 less item.
+                            int enumForService = currentEnumInSystemIDList;
                             startOrRestartService(enumForService);
 
                         }
@@ -522,7 +426,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         setEnableDisableStates(getView(), false);
 
 
-                        // We stop the mqtt service
+                        // Stopping MQTT service
                         // TODO OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
                         Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
                         getActivity().stopService(svcOld);
@@ -547,9 +451,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     private void showIPDialog(final int currentEnumInSystemIDList, final String systemID) {
 
         SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
-        // OUD
-//        String searchString = "ip_address_broker_" + (enumerator-1); // TODO FIX -1
-        // NIEUW
+
         String preferenceKey = "ip_address_broker_" + systemID;
         String savedBrokerIP = settings.getString(preferenceKey, "None");
         Log.w(LOG_TAG, "systemID is " + systemID + " and IP is " + savedBrokerIP);
@@ -574,23 +476,14 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
                         String value = String.valueOf(input.getText());
 
-                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
-//                        if(!value.equalsIgnoreCase("0")){
 
-                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
-                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+                        // For our use case, the IP of Face Detector and IP of Gesture Handler are always one and the same.
                         saveIPIfInserted(systemID, value);
 
-
-                        // NIEUW
                         addSystemIDToListSystemIDsToConnectTo(getActivity(), systemID);
 
-//                        }
 
                         List<String> listSavedSystemIDs = getListSavedSystemIDs(getActivity());
-                        Log.w(LOG_TAG, "LOG INFO listSavedSystemIDs.size() " + listSavedSystemIDs.size());
-                        int res = currentEnumInSystemIDList + 1;
-                        Log.w(LOG_TAG, "LOG INFO currentEnumInSystemIDList + 1 " + res);
 
                         if (listSavedSystemIDs.size() > currentEnumInSystemIDList + 1){
                             showIPDialog(currentEnumInSystemIDList + 1, listSavedSystemIDs.get(currentEnumInSystemIDList + 1));
@@ -610,16 +503,9 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
                         String value = String.valueOf(input.getText());
 
-                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
-//                        if(!value.equalsIgnoreCase("0")){
-//
-//                        }
 
-                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
-                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
                         saveIPIfInserted(systemID, value);
 
-                        // NIEUW
                         addSystemIDToListSystemIDsToConnectTo(getActivity(), systemID);
 
 
@@ -636,9 +522,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         // ======= END
 
 
-                        // TODO zien of dus alle ingegeven brokers worden gestart: dat er niet 1 te kort is.
                         int enumForService = currentEnumInSystemIDList + 1;
-                        Log.w(LOG_TAG, "enumerator net voor starten service: enumForService == " + enumForService);
                         startOrRestartService(enumForService);
 
 
@@ -660,7 +544,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
                         setEnableDisableStates(getView(), false);
 
 
-                        // We stop the mqtt service
+                        // Stopping MQTT service
                         // TODO OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
                         Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
                         getActivity().stopService(svcOld);
@@ -685,23 +569,17 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
     private void startOrRestartService(int enumerator) {
 
-        Log.w(LOG_TAG, "enum int begin " + enumerator);
+        Log.w(LOG_TAG, "enum in beginning of service: " + enumerator);
 
-        // deze IF logica mag wrsl weg.
-        // if (enumerator == 2) {
-        // TODO doen we dit in alle gevallen? of moet er soms NIET gestopt worden na klikken op "save" bij bepaalde values?
-        // WE STOPPEN EERST DE SERVICE EN HERSTARTEN DAN. ZO KAN NIEUW IP DIRECT TOEGEPAST WORDEN :D
+        // We stop and restart the service so that the new IP addresses immediately get applied.
         Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
         getActivity().stopService(svcOld);
 
-        // Dit BUITEN de IF lus: zelfs als er geen tekst werd ingevuld, wordt service gestart: die gebruikt dan het eerder opgeslagen IP.
-        // STARTING THE SERVICE NOW THAT THE IP ADDRESS OF THE BROKER IS KNOWN
-        // TODO getApplicationContext()is hier wrsl WEL OK want service best niet gelinkt aan een bepaalde activity?
+        // getApplicationContext() instead of getActivity() because the service shouldn't be linked to a particular Activity.
         Intent svcNew = new Intent(getActivity().getApplicationContext(), MQTTService.class);
 
-        // TODO SYSTEEM VIA INTENTS LIJKT NIET TE WERKEN? DUS DOEN NU MET SHAREDPREF
-        // want onCreate van service werd eerder aangeroepen dan handleStart ?
-        Log.w(LOG_TAG, "enum net voor putExtra " + enumerator);
+
+        Log.w(LOG_TAG, "enum right before putExtra " + enumerator);
         svcNew.putExtra("enumerator", enumerator);
 
         SharedPreferences settingsUserDetector = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
@@ -710,7 +588,6 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         editorUserDetector.commit();
 
         getActivity().startService(svcNew);
-        // }
 
     }
 
@@ -870,28 +747,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     }
 
 
-    // TODO eventueel usen als je toch met ander systeem wilt werken.
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        outState.putBundle();
-//
-//        Boolean[] labelStates = { find, false };
-//
-//        // DESCRIPTION: communication test (enabled/disabled), communication test (on/off), data stream ..., data stream ..., data logging ..., data logging ..., generic stream ..., generic stream ...
-//        Boolean[] toggleStates = { find, false };
-////        outState.putBooleanArray();
-//
-//        super.onSaveInstanceState(outState);
-//    }
-
-    // TODO in XML met onClick werken.
     private void registerButtonAndToggleListeners(View returnedView) {
-
-        // Die LOG zie je dus bij elke orientation change. Maar das normaal want VIEW wordt HERMAAKT steeds.
-//        Log.w("MAIN FRAGMENT", "registered BUTTON TOGGLE LISTENERS");
-
-        // TODO zien voor optie om gewoon alle Buttons en ToggleButtons (+ nog?) te vinden in huidige interface?
-
 
         ToggleButton toggleBT = (ToggleButton) returnedView.findViewById(R.id.toggle_BT);
         toggleBT.setOnClickListener(this);
@@ -1023,14 +879,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
                 List<String> listSavedSystemIDs = getListSavedSystemIDs(getActivity());
 
-                // OUD
-//                showIPDialog(1);
-                // NIEUW
-                if(listSavedSystemIDs == null){
-                    Log.w(LOG_TAG, "list is NULL");
-                } else if (listSavedSystemIDs.size() == 0){
-                    Log.w(LOG_TAG, "list is SIZE 0");
-                }
                 if (listSavedSystemIDs == null || listSavedSystemIDs.size() == 0) {
 
                     // 05/09 OUD showIPDialog(0, "[No saved systemIDs found]");
@@ -1052,7 +900,7 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
 
 
-    // TODO en nu moet gezorgd worden dat lijst links in GUI wordt geupdate. maar gebeurt als sowieso na een pairing en na restart vd app.
+    // TODO en nu moet gezorgd worden dat lijst links in GUI wordt geupdate. maar gebeurt al sowieso na een pairing en na restart vd app.
     // Maar kan dit direct nu al gebeuren?
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1061,8 +909,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
                 // When DeviceListActivity returns with a device to connect
                 if (resultCode == Activity.RESULT_OK) {
                     // Get the device MAC address
-                    // TODO usen? bv. weergeven in subtitle van Pebble instantie in lijst?
-                    // Of wrsl geen toegevoegde waarde?
 //                    String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
                     // Get the BluetoothDevice object
 //                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
@@ -1091,11 +937,8 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
         if (!BTadapter.isEnabled()) {
 
-            // DO NOT USE BTadapter.enable(); HERE: that wouldn't show a dialog to the user. Bad practice!
 
             startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
-            // TODO eventueel: checken dat er geen error was bij enablen, via https://developer.android.com/training/basics/intents/result.html#ReceiveResult
-            // en dan daarop de Toast aanpassen.
 
 
             // TODO SYSTEEM LIJKT NIET TE WERKEN?
@@ -1167,23 +1010,11 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
     private void getToggleStatesAndEnableServices() {
 
-        // TODO of de states retrieven via de Bundles?
-
         View theView = getView();
-
-        // TODO doe dit anders! door te kijken naar de waarden die je hebt gesaved in je Preferences.
-        // UPDATE: maar Preferences is wrsl voor ECHTE preferenties van in keuzemenu? Dus via Bundles is beste optie hier?
-
-        // NIET NODIG OMDAT WE NOOIT BT GAAN DISABLEN BIJ ONPAUSE.
-        /*ToggleButton toggleBT = (ToggleButton) theView.findViewById(R.id.toggle_BT);
-        if (toggleBT.isEnabled() && toggleBT.isChecked()) {
-            startBT();
-        }*/
-
 
         ToggleButton toggleGeneric = (ToggleButton) theView.findViewById(R.id.toggle_generic);
         if (toggleGeneric.isEnabled() && toggleGeneric.isChecked()) {
-            // TODO
+
         }
 
 
@@ -1200,13 +1031,8 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
 
     private void disableAllServices() {
 
-        // NIET de BT service disablen he. Gebeurt expliciet als user het wilt en niet zomaar bij onPause ofzo.
+        // Stop methods here for any services.
 
-
-        // hier dus best NIET maar wel in de individuele methodes?
-//        PebbleKit.closeAppOnPebble(getActivity(), WATCHAPP_UUID);
-
-        // TODO voeg stop-methods van andere services toe.
     }
 
     @Override
@@ -1220,52 +1046,5 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
         }
 
     }
-
-
-    // TODO: Rename method, update argument and hook method into UI event
-    /*public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }*/
-
-
-
-
-   /* @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }*/
-
-
-
-
-    /*@Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }*/
-
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    /*public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
-    }*/
 
 }
