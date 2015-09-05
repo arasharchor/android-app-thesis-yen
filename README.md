@@ -10,7 +10,9 @@ Workflow:
 - TODO
 
 Remarks:
-- Don't look too much into the commit messages. Since this project has been implemented by a single person, Git versioning isn't really needed but it was useful as a backup cloud service out of safety or before major changes.
+- This application GUI has only been optimized for tablets. It will work on smartphones but won't look as expected.
+
+- Don't look too much into the commit messages. Since this project has been implemented by a single person, GitHub was mostly used as a simple backup cloud service.
 
 - When exercising the up/down/left/right gesture, the start position is the position where the wearable display looks towards the sky and is horizontally aligned.
 
@@ -30,3 +32,15 @@ Here they are briefly:
 2) On the Action Device, insert the same systemID within the Action Device Runtime application and push this information using the 'Send information to central hub' button. (You don't need yet to select any gestures you want to support, but you are allowed to.)
 3) The connection between systemID and IP address has now been confirmed and is immediately usable.
 This means the user does NOT have to reenter the IP Insertion dialog like the segment in the thesis states.
+
+
+Known issues:
+- It's important that your device's Auto-Rotate function is ON. (Otherwise some panels won't display properly.)
+
+- In very rare occasions, the application can crash while trying to record a gesture. When you then go to the Gesture Library section, the database won't be able to get loaded and you will encounter the message: "Error loading the gesture library. Clear the Application Data and retrain your gestures."
+This bug was already occuring in the used source code. I haven't been able to reproduce this bug and fix it.
+
+- Ideally, the list under the Bluetooth toggle button should display all paired BT devices when BT is on. When toggling BT off, the list gets cleared as expected, but when toggling on, the list doesn't get updated automatically. One has to go to another tab and then reenter the Connect tab.
+Same for when a completely new Pebble is getting paired through the 'Connect Pebble™' button. Only after switching GUI panels do the changes get reflected.
+
+- While pressing the Back button (bottom left corner) repeatedly, the currently selected tab doesn't get highlighted.
