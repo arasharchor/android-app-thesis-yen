@@ -44,3 +44,5 @@ This bug was already occuring in the used source code. I haven't been able to re
 Same for when a completely new Pebble is getting paired through the 'Connect Pebble™' button. Only after switching GUI panels do the changes get reflected.
 
 - While pressing the Back button (bottom left corner) repeatedly, the currently selected tab doesn't get highlighted.
+
+- When touching the 'Clear all trained gestures' button, the list's view doesn't get cleared immediately but only when going to another GUI panel and back to the Gesture Library panel.
