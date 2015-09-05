@@ -10,6 +10,10 @@ Workflow:
 - TODO
 
 Remarks:
+- This application GUI has only been optimized for tablets. It will work on smartphones though.
+
+- It's important that your device's Auto-Rotate function is ON. (Otherwise some panels won't display properly.)
+
 - Don't look too much into the commit messages. Since this project has been implemented by a single person, Git versioning isn't really needed but it was useful as a backup cloud service out of safety or before major changes.
 
 - When exercising the up/down/left/right gesture, the start position is the position where the wearable display looks towards the sky and is horizontally aligned.
