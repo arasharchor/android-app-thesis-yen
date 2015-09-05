@@ -39,3 +39,6 @@ Known issues:
 
 - In very rare occasions, the application can crash while trying to record a gesture. When you then go to the Gesture Library section, the database won't be able to get loaded and you will encounter the message: "Error loading the gesture library. Clear the Application Data and retrain your gestures."
 This bug was already occuring in the used source code. I haven't been able to reproduce this bug and fix it.
+
+- Ideally, the list under the Bluetooth toggle button should display all paired BT devices when BT is on. When toggling BT off, the list gets cleared as expected, but when toggling on, the list doesn't get updated automatically. One has to go to another tab and then reenter the Connect tab.
+Same for when a completely new Pebble is getting paired through the 'Connect Pebble™' button. Only after switching GUI panels do the changes get reflected.
