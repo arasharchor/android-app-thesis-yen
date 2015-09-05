@@ -10,11 +10,9 @@ Workflow:
 - TODO
 
 Remarks:
-- This application GUI has only been optimized for tablets. It will work on smartphones though.
+- This application GUI has only been optimized for tablets. It will work on smartphones but won't look as expected.
 
-- It's important that your device's Auto-Rotate function is ON. (Otherwise some panels won't display properly.)
-
-- Don't look too much into the commit messages. Since this project has been implemented by a single person, Git versioning isn't really needed but it was useful as a backup cloud service out of safety or before major changes.
+- Don't look too much into the commit messages. Since this project has been implemented by a single person, GitHub was mostly used as a simple backup cloud service.
 
 - When exercising the up/down/left/right gesture, the start position is the position where the wearable display looks towards the sky and is horizontally aligned.
 
@@ -34,3 +32,7 @@ Here they are briefly:
 2) On the Action Device, insert the same systemID within the Action Device Runtime application and push this information using the 'Send information to central hub' button. (You don't need yet to select any gestures you want to support, but you are allowed to.)
 3) The connection between systemID and IP address has now been confirmed and is immediately usable.
 This means the user does NOT have to reenter the IP Insertion dialog like the segment in the thesis states.
+
+
+Known issues:
+- It's important that your device's Auto-Rotate function is ON. (Otherwise some panels won't display properly.)
