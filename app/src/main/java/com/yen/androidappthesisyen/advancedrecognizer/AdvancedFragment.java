@@ -157,7 +157,13 @@ public class AdvancedFragment extends Fragment {
                 String[] arrayGestures = concatenatedString.split(";");
                 List<String> newList = Arrays.asList(arrayGestures);
                 for (int i = 0; i < newList.size(); i++) {
-                    newList.set(i, WordUtils.capitalize(newList.get(i)));
+                    // Remove up/down/left/right since those never need to be trained.
+                    if(newList.get(i).equalsIgnoreCase("up") || newList.get(i).equalsIgnoreCase("down") || newList.get(i).equalsIgnoreCase("left") || newList.get(i).equalsIgnoreCase("right")){
+                        newList.set(i, "");
+                    } else {
+                        newList.set(i, WordUtils.capitalize(newList.get(i)));
+                    }
+
                 }
                 listGestures.addAll(newList);
             }
@@ -165,27 +171,47 @@ public class AdvancedFragment extends Fragment {
             // Remove duplicates by converting to Set datatype.
             // More specific: using TreeSet so the gestures are sorted alphabetically.
             setSupportedGestures = new TreeSet<>(listGestures);
+
+
+
         }
 
         final String[] arraySupportedGestures = (String[]) setSupportedGestures.toArray(new String[setSupportedGestures.size()]);
 
+        Boolean caseEmpty = false;
+        if(arraySupportedGestures.length == 1 && arraySupportedGestures[0].equalsIgnoreCase("")){
+            arraySupportedGestures[0] = "No options available: none of your Action Devices support any gesture at the moment.";
+            caseEmpty = true;
+        }
+
+        Log.w(LOG_TAG, "arraySupportedGestures.length " + arraySupportedGestures.length);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        final Boolean finalCaseEmpty = caseEmpty;
+
         builder.setTitle(getResources().getString(R.string.description_choose_gesture))
                 .setItems(arraySupportedGestures, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        String chosenGesture = arraySupportedGestures[which];
-                        // Saved with NO uppercase: all internal processing works without uppercases.
-                        recordingGestureIDString = WordUtils.uncapitalize(chosenGesture);
-                        Log.w(LOG_TAG, "recording for " + recordingGestureIDString);
-                        TextView lblRecordedGesture = (TextView) getView().findViewById(R.id.lbl_recorded_gesture);
-                        lblRecordedGesture.setText("Gesture being trained: " + chosenGesture);
-//                        Toast.makeText(getActivity(), chosenGesture, Toast.LENGTH_LONG).show();
+                        if (!finalCaseEmpty && which != 0) {
 
-                        if (!isTrainingAccelStreamEnabled) {
-                            enableAccelStreamForTraining();
+                            String chosenGesture = arraySupportedGestures[which];
+                            // Saved with NO uppercase: all internal processing works without uppercases.
+                            recordingGestureIDString = WordUtils.uncapitalize(chosenGesture);
+                            Log.w(LOG_TAG, "recording for " + recordingGestureIDString);
+                            TextView lblRecordedGesture = (TextView) getView().findViewById(R.id.lbl_recorded_gesture);
+                            lblRecordedGesture.setText("Gesture being trained: " + chosenGesture);
+
+
+                            if (!isTrainingAccelStreamEnabled) {
+                                enableAccelStreamForTraining();
+                            }
+
+                        } else {
+                            // Do nothing.
                         }
+
 
                     }
                 });
@@ -193,6 +219,7 @@ public class AdvancedFragment extends Fragment {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+
 
 
     }

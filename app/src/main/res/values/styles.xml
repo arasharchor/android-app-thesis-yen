@@ -144,4 +144,81 @@
         <item name="android:dropDownListViewStyle">@style/DropDownListView.Lightdarkmixed</item>
     </style>
 
+
+
+
+
+
+
+
+
+
+    <style name="AutoCompleteTextViewExtraButtons" parent="android:Widget.Holo.Light.AutoCompleteTextView">
+        <item name="android:dropDownSelector">@drawable/extrabuttons_list_selector_holo_light</item>
+        <item name="android:background">@drawable/extrabuttons_edit_text_holo_light</item>
+    </style>
+
+    <style name="ButtonExtraButtons" parent="android:Widget.Holo.Light.Button">
+        <item name="android:background">@drawable/extrabuttons_btn_default_holo_light</item>
+    </style>
+
+    <style name="ImageButtonExtraButtons" parent="android:Widget.Holo.Light.ImageButton">
+        <item name="android:background">@drawable/extrabuttons_btn_default_holo_light</item>
+    </style>
+
+    <style name="SpinnerExtraButtons" parent="android:Widget.Holo.Light.Spinner">
+        <item name="android:background">@drawable/extrabuttons_spinner_background_holo_light</item>
+        <item name="android:dropDownSelector">@drawable/extrabuttons_list_selector_holo_light</item>
+    </style>
+
+    <style name="TabExtraButtons">
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:paddingLeft">16dip</item>
+        <item name="android:paddingRight">16dip</item>
+        <item name="android:background">@drawable/extrabuttons_tab_indicator_holo</item>
+        <item name="android:layout_width">0dip</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minWidth">80dip</item>
+    </style>
+
+    <style name="TabTextExtraButtons">
+        <item name="android:textColor">#000000</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <!-- v14 <item name="android:textAllCaps">true</item> -->
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:maxWidth">180dip</item>
+    </style>
+
+    <style name="ProgressBarExtraButtons" parent="android:Widget.Holo.Light.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/extrabuttons_progress_horizontal_holo_light</item>
+        <item name="android:indeterminateDrawable">@drawable/extrabuttons_progress_indeterminate_horizontal_holo_light</item>
+    </style>
+
+    <style name="SeekBarExtraButtons" parent="android:Widget.Holo.Light.SeekBar">
+        <item name="android:progressDrawable">@drawable/extrabuttons_scrubber_progress_horizontal_holo_light</item>
+        <item name="android:indeterminateDrawable">@drawable/extrabuttons_scrubber_progress_horizontal_holo_light</item>
+        <item name="android:thumb">@drawable/extrabuttons_scrubber_control_selector_holo_light</item>
+    </style>
+
+    <style name="RatingBarExtraButtons" parent="android:Widget.Holo.Light.RatingBar">
+        <item name="android:progressDrawable">@drawable/extrabuttons_ratingbar_full_holo_light</item>
+        <item name="android:indeterminateDrawable">@drawable/extrabuttons_ratingbar_full_holo_light</item>
+    </style>
+
+    <style name="RatingBarBigExtraButtons" parent="android:Widget.Holo.Light.RatingBar.Indicator">
+        <item name="android:progressDrawable">@drawable/extrabuttons_ratingbar_holo_light</item>
+        <item name="android:indeterminateDrawable">@drawable/extrabuttons_ratingbar_holo_light</item>
+    </style>
+
+    <style name="RatingBarSmallExtraButtons" parent="android:Widget.Holo.Light.RatingBar.Small">
+        <item name="android:progressDrawable">@drawable/extrabuttons_ratingbar_small_holo_light</item>
+        <item name="android:indeterminateDrawable">@drawable/extrabuttons_ratingbar_small_holo_light</item>
+    </style>
+
+    <style name="ToggleExtraButtons" parent="android:Widget.Holo.Light.Button.Toggle">
+        <item name="android:background">@drawable/extrabuttons_btn_toggle_holo_light</item>
+    </style>
+
 </resources>

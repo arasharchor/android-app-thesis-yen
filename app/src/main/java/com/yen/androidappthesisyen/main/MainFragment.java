@@ -182,7 +182,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Location of Face Detector and Gesture Handler");
         // OUD builder.setMessage("Insert the current IPv4 address for Action Device " + systemID + ". Use previous location (" + savedBrokerIP + ") by leaving the field blank.");
-        builder.setMessage("This is a first-time setup since no previously used systemIDs and IP addresses are found. Insert the required information in the pattern 'systemID//IPaddress'. Example: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device Runtime application and push this information to confirm the association. Otherwise, this new systemID won't be saved here.");
+        builder.setMessage("This is a first-time setup since no previously used systemIDs and IP addresses are found. Insert the required information in the pattern 'systemID//IPaddress'. Example: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device Runtime application and push this information to the hub to confirm the association.");
 
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_TEXT);

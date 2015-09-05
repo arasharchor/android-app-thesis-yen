@@ -25,12 +25,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    // for PEBBLE
     compile 'com.getpebble:pebblekit:2.6.0'
     compile 'com.android.support:support-v4:21.0.3'
-//    compile 'com.thetransactioncompany:jsonrpc2-client:1.15'
-    //    compile 'com.thetransactioncompany:jsonrpc2-base:1.38'
-    //    compile 'net.minidev:json-smart:2.1.1'
     compile files('libs/wmqtt.jar')
     compile files('libs/commons-lang3-3.4.jar')
 }
