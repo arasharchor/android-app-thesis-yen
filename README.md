@@ -12,6 +12,8 @@ Workflow:
 Remarks:
 - Don't look too much into the commit messages. Since this project has been implemented by a single person, Git versioning isn't really needed but it was useful as a backup cloud service out of safety or before major changes.
 
+- When exercising the up/down/left/right gesture, the start position is the position where the wearable display looks towards the sky and is horizontally aligned.
+
 - The below section in the thesis book, under section 5.2.1 (page 38) is out-of-date:
 START QUOTE
 Wanneer de Application Data van de mobiele app werd gewist, heeft de mobiele app geen weet van 
