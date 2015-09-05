@@ -42,3 +42,5 @@ This bug was already occuring in the used source code. I haven't been able to re
 
 - Ideally, the list under the Bluetooth toggle button should display all paired BT devices when BT is on. When toggling BT off, the list gets cleared as expected, but when toggling on, the list doesn't get updated automatically. One has to go to another tab and then reenter the Connect tab.
 Same for when a completely new Pebble is getting paired through the 'Connect Pebble™' button. Only after switching GUI panels do the changes get reflected.
+
+- While pressing the Back button (bottom left corner) repeatedly, the currently selected tab doesn't get highlighted.
