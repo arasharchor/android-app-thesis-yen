@@ -36,3 +36,6 @@ This means the user does NOT have to reenter the IP Insertion dialog like the se
 
 Known issues:
 - It's important that your device's Auto-Rotate function is ON. (Otherwise some panels won't display properly.)
+
+- In very rare occasions, the application can crash while trying to record a gesture. When you then go to the Gesture Library section, the database won't be able to get loaded and you will encounter the message: "Error loading the gesture library. Clear the Application Data and retrain your gestures."
+This bug was already occuring in the used source code. I haven't been able to reproduce this bug and fix it.
