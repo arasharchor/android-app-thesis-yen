@@ -12,7 +12,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -141,7 +140,7 @@ public class AdvancedFragment extends Fragment {
     public String detected_gid = "Unknown";
 
 
-    private com.yen.androidappthesisyen.advancedrecognizer.App.STATES state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.STATE_LEARN;
+    private UsedConstants.STATES state = UsedConstants.STATES.STATE_LEARN;
 
 
     // private MENUITEMS menuitems;
@@ -203,7 +202,7 @@ public class AdvancedFragment extends Fragment {
     }
 
 
-    // TODO TEST zelf gemaakt
+
     public void sendAccelDataToFragment(float[] values) {
 
         //Retrieve the values from the float array values which contains sensor data
@@ -245,6 +244,7 @@ public class AdvancedFragment extends Fragment {
         if (state.equalsIgnoreCase("recognize")) {
 
             if (useGestureSpotting) {
+                // Gesture spotting
                 findBoundariesGesture(values);
             } else {
                 // TODO eigenlijk mag IF weg want doen niets bij ELSE?
@@ -303,8 +303,8 @@ public class AdvancedFragment extends Fragment {
 
     // Values related to gesture spotting.
     // TODO ============ met MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING oppassen want 1300 was te hoog en dan werd CIRCLE nooit herkend en kwam er altijd UNKNOWN!
-    float MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING = 1250; // was lange tijd 1050.
-    float MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING = 1100;
+    float MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING = 1200; // was lange tijd 1050.
+    float MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING = 1050;
     int stepsSinceNoMovement; // TODO default op 0 zetten of niet?
     final int MINIMUM_GESTURE_LENGTH = 5; // default 8
     // als te hoog is moet de user te lang stilstaan met Pebble:
@@ -339,21 +339,22 @@ public class AdvancedFragment extends Fragment {
                 if (isAdvancedRecording) { // TODO initializen maar WAAR? (UPDATE: op FALSE in begin) of niet nodig deze if check?
 
                     gestureValues.add(values);
+
                     if (calcVectorNorm(values) < MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING) {
 
-                        Log.w(LOG_TAG, "========================= gesture NIET meer gedetecteerd ============= stepsSinceNoMovement++");
+                        Log.w(LOG_TAG, "========================= Gesture NOT recorded anymore ============= stepsSinceNoMovement++");
                         stepsSinceNoMovement++;
 
                     } else {
 
-                        Log.w(LOG_TAG, "===================== NOG STEEDS IN GESTURE ======= stepsSinceNoMovement = 0");
+                        Log.w(LOG_TAG, "===================== Still IN gesture ======= stepsSinceNoMovement = 0");
                         stepsSinceNoMovement = 0;
 
                     }
 
                 } else if (calcVectorNorm(values) >= MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING) {
 
-                    Log.w(LOG_TAG, "========================================================== STARTEN met recorden gesture");
+                    Log.w(LOG_TAG, "========================================================== STARTING recording gesture");
 
                     isAdvancedRecording = true;
                     stepsSinceNoMovement = 0;
@@ -364,16 +365,16 @@ public class AdvancedFragment extends Fragment {
 
                 if (stepsSinceNoMovement == MINIMUM_STEPS_SINCE_NO_MOVEMENT) {
 
-                    Log.w(LOG_TAG, "============================ detectie MOGELIJKE gesture ");
+                    Log.w(LOG_TAG, "============================ Detection POSSIBLE gesture");
 
                     int length = gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT;
                     if (length > MINIMUM_GESTURE_LENGTH) { // TODO ============================= MINIMUM_GESTURE_LENGTH wrsl verhogen?
 //                         listener.onGestureRecorded(gestureValues.subList(0, gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT));
                         // FYI ArrayList<float[]> gestureValues;
 
-                        Log.w(LOG_TAG, "============= het was IDD een gesture =============== GESTOPT MET RECORDEN GESTURE EN DE GESTURE SIZE IS GROTER DAN MINIMUM. size = " + length);
+                        Log.w(LOG_TAG, "============= It was INDEED a gesture =============== STOPPED with RECORDING gesture and the gesture length was GREATER THAN MINIMUM. length = " + length);
                         // TODO de gesture is nu gedaan en de geldige waardes zitten in index 0 tem index gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT
-
+                        // The gesture is done and the valid values are within index 0 to gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT
 
                         recordingGestureTrace = new ArrayList<float[]>(250);
                         // opvullen met de juiste accel data.
@@ -381,11 +382,14 @@ public class AdvancedFragment extends Fragment {
                         recordingGestureTrace = new ArrayList<>(gestureValues.subList(0, gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT));
 
 
+                        // If we were in TRAIN mode: save the recorded data and link it to the right gesture.
+                        // If we were in RECOGNIZE mode: recognize the gesture, update the UI using a separate thread, and send the gesture
+                        // to the connected Action Device(s) that support(s) it if any.
                         doRemainingTasksAfterRecording();
 
                     }
 
-                    Log.w(LOG_TAG, "============================ starten TERUG VAN NUL.");
+                    Log.w(LOG_TAG, "============================ Starting back FROM ZERO");
                     gestureValues = new ArrayList<float[]>(); // TODO stond eerst = null; maar dit wrsl veiliger?
                     stepsSinceNoMovement = 0;
                     isAdvancedRecording = false;
@@ -447,6 +451,7 @@ public class AdvancedFragment extends Fragment {
 
     }
 
+
     private void doRemainingTasksAfterRecording() {
 
         // clear the existing trace
@@ -455,7 +460,7 @@ public class AdvancedFragment extends Fragment {
             case STATE_LEARN:
                 // recordingGestureTrace = null;
                 // note that the arraylist is being copied
-                Gesture ng = new Gesture(recordingGestureIDString, new ArrayList<float[]>(recordingGestureTrace));
+                Gesture ng = new Gesture(recordingGestureIDString, new ArrayList<>(recordingGestureTrace));
 
                 // add gesture to library but prepare with recognizer settings first
                 myGestureLibrary.addGesture(ng.gestureID, this.myGestureRecognizer.prepare_gesture_for_library(ng), false);
@@ -466,7 +471,7 @@ public class AdvancedFragment extends Fragment {
             case STATE_RECOGNIZE:
 
                 // BUGFIX VIA https://code.google.com/p/three-dollar-gesture-recognizer/issues/detail?id=1
-                final Gesture candidate = new Gesture(null, new ArrayList<float[]>(recordingGestureTrace));
+                final Gesture candidate = new Gesture(null, new ArrayList<>(recordingGestureTrace));
 
 
                 // save a reference to activity for this context
@@ -595,12 +600,12 @@ public class AdvancedFragment extends Fragment {
                 // Sending feedback to the user:
                 // If a gesture detected + supported by at least one of the currently used action devices: do 1x short vibration.
                 // This detected gesture can still be a false positive, though.
-                doShortPebbleVibration();
+                // TODO 05/09 FF UIT ============================================== doShortPebbleVibration();
 
 
                 // ---- START EIGEN TOEVOEGING
                 // vóór showAlert gedaan want netwerktaken vragen toch wat tijd.
-                // UPDATE: toch showAlert eerst want als geen internet, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
+                // UPDATE: toch showAlert eerst want als geen netwerk, wordt alertbox pas getoond NA OVERSCHREIDEN TIME-OUT.
 
 
                 ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -613,6 +618,7 @@ public class AdvancedFragment extends Fragment {
 
                     for (String actionDeviceToSendTo : listActionDevicesToSendTo) {
 
+                        // TODO beter vanaf .2 starten of wordt al erders aan gedacht?
                         String IPAddress = "192.168.1.1";
                         String preferenceKey = "ip_address_" + actionDeviceToSendTo;
 
@@ -628,6 +634,7 @@ public class AdvancedFragment extends Fragment {
 //                        }
 
                         // NIEUW
+                        // TODO beter vanaf .2 starten of wordt al erders aan gedacht?
                         IPAddress = gestureHandlersettings.getString(preferenceKey, "192.168.1.1");
 
 
@@ -658,22 +665,23 @@ public class AdvancedFragment extends Fragment {
 
 
                 } else {
-                    // Arriving here if no internet connection.
+
+                    // Arriving here if no network connection.
                     // TODO iets doen: bv. melden aan user of zelfs direct terug IP insert dialog tonen!
-                    // MAAR stel dat er internet is, maar een broker is niet meer verbonden, wordt dat hier niet ontdekt dus moet dat ook ontdekken!
-                    doTwoShortPebbleVibrations();
+                    // MAAR stel dat er netwerk is, maar een broker is niet meer verbonden, wordt dat hier niet ontdekt dus moet dat ook ontdekken!
+                    // TODO 05/09 FF UIT ============================================== doTwoShortPebbleVibrations();
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            outputWindow.append("No internet connection\n");
+                            outputWindow.append("No network connection\n");
                             ((ScrollView) getView().findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
-                            Toast.makeText(getActivity(), "No internet connection", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "No network connection", Toast.LENGTH_LONG).show();
                         }
                     });
 
 
-                    Log.w(LOG_TAG, "No internet connection");
+                    Log.w(LOG_TAG, "No network connection");
                 }
 
 
@@ -682,7 +690,7 @@ public class AdvancedFragment extends Fragment {
 
             } else {
 
-                doTwoShortPebbleVibrations();
+                // TODO 05/09 FF UIT ============================================== doTwoShortPebbleVibrations();
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -697,8 +705,11 @@ public class AdvancedFragment extends Fragment {
 
 
         } else {
+
+            // TODO of mag deze sectie volledig weg? want ook in scriptie deze NIET vermeld want kan eigenlijk nooit gebeuren!
+
             // The accel stream isn't running. This means we don't need to do any processing.
-            doTwoShortPebbleVibrations();
+            // TODO 05/09 FF UIT ============================================== doTwoShortPebbleVibrations();
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -898,7 +909,7 @@ public class AdvancedFragment extends Fragment {
         }
 
 
-        myGestureRecognizer = new gesturerec3d(myGestureLibrary, 50);
+        myGestureRecognizer = new GestureRec3D(myGestureLibrary, 50);
 
         /**
          * Object that manages Pebble wrist movement gestures.
@@ -1009,28 +1020,6 @@ public class AdvancedFragment extends Fragment {
                                             }
         );
 
-        // TODO vereist of? 04-08 weg
-        /*btnRecordGesture.setOnClickListener(new View.OnClickListener()
-
-                                      {
-                                          public void onClick(View v) {
-                                              // clicked
-                                              //Log.w("onClick", "Clicked");
-                        *//*if (btnRecordGesture.isFocused())
-                        {
-    						Log.w("onClick", "InFocus");
-    					}
-    					else
-    					{
-    						Log.w("onClick", "NotInFocus");
-    					}*//*
-
-                                          }
-
-
-                                      }
-        );*/
-
 
         TextView tutorial = (TextView) returnedView.findViewById(R.id.tutorial);
 
@@ -1065,11 +1054,11 @@ public class AdvancedFragment extends Fragment {
         Bundle bundle = this.getArguments();
         String state = bundle.getString("state");
         if (state.equalsIgnoreCase("learn")) {
-            this.state = App.STATES.STATE_LEARN;
+            this.state = UsedConstants.STATES.STATE_LEARN;
         } else if (state.equalsIgnoreCase("recognize")) {
-            this.state = App.STATES.STATE_RECOGNIZE;
+            this.state = UsedConstants.STATES.STATE_RECOGNIZE;
         } else if (state.equalsIgnoreCase("library")) {
-            this.state = App.STATES.STATE_LIBRARY;
+            this.state = UsedConstants.STATES.STATE_LIBRARY;
         } else if (state.equalsIgnoreCase("default")) {
             // TODO iets doen?
         }
@@ -1240,26 +1229,6 @@ public class AdvancedFragment extends Fragment {
     }
 
 
-    // TODO mag weg: werd gebruikt bij oude dialog waarbij user gesture title kon ingeven.
-//    @Override
-//    public void onClick(DialogInterface dialog, int which) {
-//
-//        /*
-//         * android.content.DialogInterface.OnClickListener callback
-//		 *
-//		 */
-//        if (dialog == this.learning_dialog) {
-//            if (this.learning_dialog_view != null) {
-//                //this.recordingGestureIDString =
-//                EditText et = (EditText) learning_dialog_view.findViewById(R.id.EditText01);
-//                this.recordingGestureIDString = et.getText().toString();
-//
-//            }
-//        }
-//
-//    }
-
-
     // TODO 31-07 mag merkelijk nu weg want elke case is nu LEEG?
     public void stateChanged() {
 
@@ -1289,7 +1258,7 @@ public class AdvancedFragment extends Fragment {
     // TODO DEZE GANSE METHOD + LOGICA ERIN MAG WRSL ZOMAAR WEG WANT IS VAN EEN OUD SYSTEEM VIA GESTURELIBRARY DAT IN GANS APARTE ACTIVITY ZAT.
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // change state and map to enum value
-        this.state = com.yen.androidappthesisyen.advancedrecognizer.App.STATES.values()[resultCode];
+        this.state = UsedConstants.STATES.values()[resultCode];
         //update activity's state
         this.stateChanged();
     }
@@ -1383,20 +1352,23 @@ public class AdvancedFragment extends Fragment {
                     // We only allow tilt gesture detection in the RECOGNIZE PHASE. We don't need it in the LEARN PHASE since the system doesn't need to learn the up/down/left/right tilt gestures.
                     // Since there is no clear difference between different persons exercising these 4 gestures.
                     Boolean[] results = {false, false};
-                    if (state == App.STATES.STATE_RECOGNIZE) {
 
-                        // TILT GESTURE DETECTION
-                        // TODO is testen met float[] ipv int[]. want andere recognizer past float toe.
-                        // UPDATE: maar hierboven is de data vanuit een int[] gehaald dusja.
-                        int[] intArray = {latest_data[0], latest_data[1], latest_data[2]};
-                        results = theTiltGestureRecognizer.update(intArray);
-
-                    } else {
-                        // We are in the LEARN STATE or LIBRARY STATE
-
-                        results[0] = false;
-                        results[1] = false;
-                    }
+                    // TODO 26/08 ====================== FF UIT.
+//                    if (state == UsedConstants.STATES.STATE_RECOGNIZE) {
+//
+//                        // TILT GESTURE DETECTION
+//                        // TODO is testen met float[] ipv int[]. want andere recognizer past float toe.
+//                        // UPDATE: maar hierboven is de data vanuit een int[] gehaald dusja.
+//                        int[] intArray = {latest_data[0], latest_data[1], latest_data[2]};
+//                        results = theTiltGestureRecognizer.update(intArray);
+//
+//                    } else {
+//                        // We are in the LEARN STATE or LIBRARY STATE
+//
+//                        results[0] = false;
+//                        results[1] = false;
+//                    }
+                    // 26/08 FF UIT.
 
 
                     // If NO tilt gesture was detected, we pass the accel data to the more advanced recognizer.
@@ -1563,45 +1535,6 @@ public class AdvancedFragment extends Fragment {
 
         super.onDestroy();
     }
-
-    // TODO: Rename method, update argument and hook method into UI event
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-//    }
-
-//    @Override
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-//        try {
-//            mListener = (OnFragmentInteractionListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-//    }
-
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        mListener = null;
-//    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-//    public interface OnFragmentInteractionListener {
-//        // TODO: Update argument type and name
-//        public void onFragmentInteraction(Uri uri);
-//    }
 
 
     // key = system ID - value = comma separated list of supported gestures for the specific systemID

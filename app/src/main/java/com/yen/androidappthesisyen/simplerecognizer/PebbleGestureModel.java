@@ -1,9 +1,5 @@
 package com.yen.androidappthesisyen.simplerecognizer;
 
-/**
- * SOURCE: Partially based on https://gist.github.com/C-D-Lewis/ba1349bb0ebdee76b0cf#file-pebblegesturemodel-java
- */
-
 
 public abstract class PebbleGestureModel {
 
@@ -16,10 +12,10 @@ public abstract class PebbleGestureModel {
     private boolean actionYetToEnd = false;
 
 
-    private int threshold;
+    private int accelThreshold;
     private long duration, lastActionTime;
 
-    // We reduce the threshold for the right, up and down tilt gesture, since it's harder to recognize otherwise.
+    // We reduce the accelThreshold for the right, up and down tilt gesture, since it's harder to recognize otherwise.
     // This implies the Pebble™ wearer is right handed and hence wears the device on the left wrist.
     private final double REDUCTION_FACTOR = 0.75;
 
@@ -27,12 +23,12 @@ public abstract class PebbleGestureModel {
      * Object that manages Pebble wrist movement gestures.
      * The user should extend their wrist with the fist pointing directly out from the chest as if to punch, with the watch's face pointing upwards
      *
-     * @param threshold            Value from 0 to 4000 above which an action on an axis will be triggered
+     * @param accelThreshold            Value from 0 to 4000 above which an action on an axis will be triggered
      * @param durationMilliseconds Minimum time between gestures in milliseconds
      * @param modeConstant         Mode constant from this class for FLICK or TILT operation
      */
-    public PebbleGestureModel(int threshold, long durationMilliseconds, int modeConstant) {
-        this.threshold = threshold;
+    public PebbleGestureModel(int accelThreshold, long durationMilliseconds, int modeConstant) {
+        this.accelThreshold = accelThreshold;
         this.duration = durationMilliseconds;
         mode = modeConstant;
     }
@@ -46,7 +42,7 @@ public abstract class PebbleGestureModel {
     // first one is TRUE if a gesture was recognized, so a direction (left/right/up/down) was recognized.
     // second one is TRUE when the recognized gesture has ended.
     // only when BOTH are TRUE do with start "from zero" = checking for a new gesture, either via the simple recognizer (here) or the advanced recognizer.
-    public Boolean[] update(int[] intArray) {
+    public Boolean[] update(int[] accelData) {
 
         //Get time
         long now = System.currentTimeMillis();
@@ -59,7 +55,7 @@ public abstract class PebbleGestureModel {
 //                case MODE_FLICK:
 //
 //                    //Check left
-//                    if (!triggers[0] && intArray[1] < (-1 * threshold)) {
+//                    if (!triggers[0] && accelData[1] < (-1 * accelThreshold)) {
 //                        triggers[0] = true;
 //                        onWristLeft();
 //                        lastActionTime = now;
@@ -71,7 +67,7 @@ public abstract class PebbleGestureModel {
 //                    }
 //
 //                    //Check right
-//                    if (!triggers[1] && intArray[1] > threshold) {
+//                    if (!triggers[1] && accelData[1] > accelThreshold) {
 //                        triggers[1] = true;
 //                        onWristRight();
 //                        lastActionTime = now;
@@ -83,7 +79,7 @@ public abstract class PebbleGestureModel {
 //                    }
 //
 //                    //Check up
-//                    if (!triggers[2] && intArray[2] < ((-1 * G) - threshold)) {
+//                    if (!triggers[2] && accelData[2] < ((-1 * G) - accelThreshold)) {
 //                        triggers[2] = true;
 //                        onWristUp();
 //                        lastActionTime = now;
@@ -95,7 +91,7 @@ public abstract class PebbleGestureModel {
 //                    }
 //
 //                    //Check down
-//                    if (!triggers[3] && intArray[2] > ((-1 * G) + threshold)) {
+//                    if (!triggers[3] && accelData[2] > ((-1 * G) + accelThreshold)) {
 //                        triggers[3] = true;
 //                        onWristDown();
 //                        lastActionTime = now;
@@ -112,7 +108,7 @@ public abstract class PebbleGestureModel {
                 case MODE_TILT:
 
                     // Check left
-                    if (!triggers[0] && intArray[1] > threshold) {
+                    if (!triggers[0] && accelData[1] > accelThreshold) {
                         triggers[0] = true;
                         onWristLeft();
                         lastActionTime = now;
@@ -125,7 +121,7 @@ public abstract class PebbleGestureModel {
 
 
                     // Check right
-                    if (!triggers[1] && intArray[1] < (-1 * threshold * REDUCTION_FACTOR)) {
+                    if (!triggers[1] && accelData[1] < (-1 * accelThreshold * REDUCTION_FACTOR)) {
                         triggers[1] = true;
                         onWristRight();
                         lastActionTime = now;
@@ -138,7 +134,7 @@ public abstract class PebbleGestureModel {
 
 
                     // Check up
-                    if (!triggers[2] && intArray[0] < (-1 * threshold * REDUCTION_FACTOR)) {
+                    if (!triggers[2] && accelData[0] < (-1 * accelThreshold * REDUCTION_FACTOR)) {
                         triggers[2] = true;
                         onWristUp();
                         lastActionTime = now;
@@ -151,7 +147,7 @@ public abstract class PebbleGestureModel {
 
 
                     // Check down
-                    if (!triggers[3] && intArray[0] > threshold * REDUCTION_FACTOR) {
+                    if (!triggers[3] && accelData[0] > accelThreshold * REDUCTION_FACTOR) {
                         triggers[3] = true;
                         onWristDown();
                         lastActionTime = now;

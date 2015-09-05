@@ -68,7 +68,7 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
     public static final UUID WATCHAPP_UUID = UUID.fromString("7c5167e8-9df4-479f-9353-714481681af1");
 
-    // TODO use more useful name
+
     // For Pebble communication test
     private PebbleKit.PebbleDataReceiver myPebbleDataReceiver;
     private static final int KEY_BUTTON_EVENT = 2,
@@ -241,6 +241,309 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
     }
 
 
+    private void showIPDialogNoSavedSystemIDs(final int currentEnumInSystemIDList) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Location of Face Detector and Gesture Handler");
+        // OUD builder.setMessage("Insert the current IPv4 address for Action Device " + systemID + ". Use previous location (" + savedBrokerIP + ") by leaving the field blank.");
+        builder.setMessage("This is a first-time setup since no previously used systemIDs and IP addresses are found. Insert the required information in the pattern 'systemID//IPaddress'. Example: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device runtime application and push this information to confirm the association. Otherwise, this new systemID won't be saved here.");
+
+        final EditText input = new EditText(getActivity());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        builder.setView(input);
+
+
+        builder.setPositiveButton("Insert next IP",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+
+                        String value = String.valueOf(input.getText());
+
+                        String[] systemIDandIPaddress = value.split("//");
+
+                        Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
+
+
+                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
+//                        if(!value.equalsIgnoreCase("0")){
+
+                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
+                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+                        saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
+
+
+
+                        addSystemIDToListSystemIDsToConnectTo(getActivity(), systemIDandIPaddress[0]);
+
+//                        }
+
+
+
+                        showIPDialogNoSavedSystemIDs(currentEnumInSystemIDList + 1);
+
+
+
+                    }
+                });
+
+
+        builder.setNeutralButton("Done: start service",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+                        String value = String.valueOf(input.getText());
+
+                        String[] systemIDandIPaddress = value.split("//");
+
+                        Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
+
+                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
+//                        if(!value.equalsIgnoreCase("0")){
+//
+//                        }
+
+                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
+                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+                        saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
+
+
+                        addSystemIDToListSystemIDsToConnectTo(getActivity(), systemIDandIPaddress[0]);
+
+
+                        // ======= START
+
+//                        OUD: setLabelStates(getView(), true);
+                        // NIEUW: vervangen door meer granulair:
+                        TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
+                        textViewActionDevice.setText(getResources().getString(R.string.generic_connected));
+                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
+
+                        setEnableDisableStates(getView(), true);
+                        setToggleStates(getView(), false);
+                        // ======= END
+
+
+                        // TODO zien of dus alle ingegeven brokers worden gestart: dat er niet 1 te kort is.
+                        int enumForService = currentEnumInSystemIDList + 1;
+                        Log.w(LOG_TAG, "enumerator net voor starten service: enumForService == " + enumForService);
+                        startOrRestartService(enumForService);
+
+
+                    }
+                });
+
+        builder.setNegativeButton("Cancel (and stop service if running)",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+
+                        TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
+                        textViewActionDevice.setText(getResources().getString(R.string.generic_not_connected));
+                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
+
+                        setToggleStates(getView(), false);
+                        setEnableDisableStates(getView(), false);
+
+
+                        // We stop the mqtt service
+                        // TODO OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
+                        Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
+                        getActivity().stopService(svcOld);
+
+                        // NIEUW
+                        // Clear the list
+                        List<String> theList = getListSystemIDsToConnectTo(getActivity());
+                        for (String systemIDToRemove : theList) {
+                            removeSystemIDFromListSystemIDsToConnectTo(getActivity(), systemIDToRemove);
+                        }
+
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
+    private void askNextAction(final int currentEnumInSystemIDList) {
+
+
+        // SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Location of Face Detector and Gesture Handler");
+        // OUD builder.setMessage("Insert the current IPv4 address for Action Device " + systemID + ". Use previous location (" + savedBrokerIP + ") by leaving the field blank.");
+        builder.setMessage("You have inserted the required information for all previously used systemIDs. If you want to add a new Action Device, insert the required information in the pattern 'systemID//IPaddress'. \nExample: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device runtime application and push this information to confirm the association. Otherwise, this new systemID won't be saved here. \nIf you didn't want to register a new Action Device, leave the field blank and simply choose 'Done: start service'.");
+
+        final EditText input = new EditText(getActivity());
+        // OUD InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        builder.setView(input);
+
+
+        builder.setPositiveButton("Insert next IP",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+
+                        String value = String.valueOf(input.getText());
+
+                        String[] systemIDandIPaddress = value.split("//");
+
+                        Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
+
+
+                        // TODO but requires to use yet another counter than currentEnumInSystemIDList.
+//                        if(!value.equalsIgnoreCase("0")){
+
+                        // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
+                        // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+                        saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
+
+
+
+                        addSystemIDToListSystemIDsToConnectTo(getActivity(), systemIDandIPaddress[0]);
+
+//                        }
+
+
+
+                        askNextAction(currentEnumInSystemIDList + 1);
+
+
+
+                    }
+                });
+
+
+        builder.setNeutralButton("Done: start service",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+
+                        String value = String.valueOf(input.getText());
+                        Log.w(LOG_TAG, "=========== LENGTE TEXT FIELD IS " + value.length());
+
+                        if(value.length() >= 1){
+
+                            String[] systemIDandIPaddress = value.split("//");
+
+                            Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
+
+                            // TODO but requires to use yet another counter than currentEnumInSystemIDList.
+//                        if(!value.equalsIgnoreCase("0")){
+//
+//                        }
+
+                            // TODO IP Face Detector en IP Gesture Handler zijn op dit ogenblik STEEDS GELIJK.
+                            // Wordt verondersteld dat dit in toekomst ook zo is of niet?
+                            saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
+
+
+                            addSystemIDToListSystemIDsToConnectTo(getActivity(), systemIDandIPaddress[0]);
+
+
+                            // ======= START
+
+//                        OUD: setLabelStates(getView(), true);
+                            // NIEUW: vervangen door meer granulair:
+                            TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
+                            textViewActionDevice.setText(getResources().getString(R.string.generic_connected));
+                            bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
+
+                            setEnableDisableStates(getView(), true);
+                            setToggleStates(getView(), false);
+                            // ======= END
+
+
+                            // TODO zien of dus alle ingegeven brokers worden gestart: dat er niet 1 te kort is.
+                            int enumForService = currentEnumInSystemIDList + 1;
+                            Log.w(LOG_TAG, "enumerator net voor starten service: enumForService == " + enumForService);
+                            startOrRestartService(enumForService);
+
+
+                        } else {
+
+                            // The user inserted nothing.
+
+
+                            // ======= START
+
+//                        OUD: setLabelStates(getView(), true);
+                            // NIEUW: vervangen door meer granulair:
+                            TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
+                            textViewActionDevice.setText(getResources().getString(R.string.generic_connected));
+                            bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_connected));
+
+                            setEnableDisableStates(getView(), true);
+                            setToggleStates(getView(), false);
+                            // ======= END
+
+
+                            // TODO zien of dus alle ingegeven brokers worden gestart: dat er niet 1 te kort is.
+                            int enumForService = currentEnumInSystemIDList; // !! One less than the value in the value above. Since the field was empty, we have 1 less item.
+                            Log.w(LOG_TAG, "enumerator net voor starten service: enumForService == " + enumForService);
+                            startOrRestartService(enumForService);
+
+                        }
+
+
+
+
+                    }
+                });
+
+        builder.setNegativeButton("Cancel (and stop service if running)",
+                new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int arg1) {
+
+
+                        TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
+                        textViewActionDevice.setText(getResources().getString(R.string.generic_not_connected));
+                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
+
+                        setToggleStates(getView(), false);
+                        setEnableDisableStates(getView(), false);
+
+
+                        // We stop the mqtt service
+                        // TODO OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
+                        Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
+                        getActivity().stopService(svcOld);
+
+                        // NIEUW
+                        // Clear the list
+                        List<String> theList = getListSystemIDsToConnectTo(getActivity());
+                        for (String systemIDToRemove : theList) {
+                            removeSystemIDFromListSystemIDsToConnectTo(getActivity(), systemIDToRemove);
+                        }
+
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
+
+
     private void showIPDialog(final int currentEnumInSystemIDList, final String systemID) {
 
         SharedPreferences settings = getActivity().getSharedPreferences("com.yen.androidappthesisyen.user_detector", Context.MODE_PRIVATE);
@@ -249,32 +552,25 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
         // NIEUW
         String preferenceKey = "ip_address_broker_" + systemID;
         String savedBrokerIP = settings.getString(preferenceKey, "None");
-
+        Log.w(LOG_TAG, "systemID is " + systemID + " and IP is " + savedBrokerIP);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Location of Face Detector and Gesture Handler");
-        builder.setMessage("Insert the current IPv4 address for Action Device " + systemID + ". Use saved location (" + savedBrokerIP + ") by leaving the field blank.");
-
-        // TODO dit toepassen? WEL ALS WE BV. 2x EDITTEXT WENSEN ALS USER VERSCHILLENDE IPs ZOU KUNNEN INGEVEN.
-//        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        View view = inflater.inflate(R.layout.alert, null);
-//        final EditText ipfield = (EditText) view.findViewById(R.id.ipfield);
+        builder.setMessage("Insert the current IPv4 address for Action Device " + systemID + ". Use previous location (" + savedBrokerIP + ") by leaving the field blank.");
 
 
         final EditText input = new EditText(getActivity());
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER);
 
-//        builder.setView(view);
 
         builder.setView(input);
 
 
-        builder.setPositiveButton("Insert next",
+        builder.setPositiveButton("Insert next IP",
                 new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
-
 
                         String value = String.valueOf(input.getText());
 
@@ -292,14 +588,21 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 //                        }
 
                         List<String> listSavedSystemIDs = getListSavedSystemIDs(getActivity());
-                        showIPDialog(currentEnumInSystemIDList + 1, listSavedSystemIDs.get(currentEnumInSystemIDList + 1));
+                        Log.w(LOG_TAG, "LOG INFO listSavedSystemIDs.size() " + listSavedSystemIDs.size());
+                        int res = currentEnumInSystemIDList + 1;
+                        Log.w(LOG_TAG, "LOG INFO currentEnumInSystemIDList + 1 " + res);
 
+                        if (listSavedSystemIDs.size() > currentEnumInSystemIDList + 1){
+                            showIPDialog(currentEnumInSystemIDList + 1, listSavedSystemIDs.get(currentEnumInSystemIDList + 1));
+                        } else {
+                            askNextAction(currentEnumInSystemIDList + 1);
+                        }
 
                     }
                 });
 
 
-        builder.setNeutralButton("Done",
+        builder.setNeutralButton("Done: start service",
                 new DialogInterface.OnClickListener() {
 
                     @Override
@@ -377,6 +680,8 @@ Without a JIT, direct field access is about 3x faster than invoking a trivial ge
 
 
     }
+
+
 
     private void startOrRestartService(int enumerator) {
 
@@ -721,10 +1026,17 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
                 // OUD
 //                showIPDialog(1);
                 // NIEUW
+                if(listSavedSystemIDs == null){
+                    Log.w(LOG_TAG, "list is NULL");
+                } else if (listSavedSystemIDs.size() == 0){
+                    Log.w(LOG_TAG, "list is SIZE 0");
+                }
                 if (listSavedSystemIDs == null || listSavedSystemIDs.size() == 0) {
-                    // TODO ========== schoner afhandelen of? via custom tekst ofzo?
-                    showIPDialog(0, "[No saved systemIDs found]");
+
+                    // 05/09 OUD showIPDialog(0, "[No saved systemIDs found]");
+                    showIPDialogNoSavedSystemIDs(0);
                 } else {
+                    Log.w(LOG_TAG, "the first saved systemID is " + listSavedSystemIDs.get(0));
                     showIPDialog(0, listSavedSystemIDs.get(0));
                 }
 
@@ -737,6 +1049,8 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
         }
 
     }
+
+
 
     // TODO en nu moet gezorgd worden dat lijst links in GUI wordt geupdate. maar gebeurt als sowieso na een pairing en na restart vd app.
     // Maar kan dit direct nu al gebeuren?

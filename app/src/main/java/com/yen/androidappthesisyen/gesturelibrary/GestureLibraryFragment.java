@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.yen.androidappthesisyen.R;
-import com.yen.androidappthesisyen.advancedrecognizer.App;
+import com.yen.androidappthesisyen.advancedrecognizer.UsedConstants;
 
 /**
  * A fragment representing a list of Items.
@@ -24,7 +24,7 @@ public class GestureLibraryFragment extends ListFragment {
     private static final String LOG_TAG = GestureLibraryFragment.class.getName();
 
 
-    public com.yen.androidappthesisyen.advancedrecognizer.App.STATES stateChange = App.STATES.STATE_LIBRARY;
+    public UsedConstants.STATES stateChange = UsedConstants.STATES.STATE_LIBRARY;
 
     // TODO uitzetten of zelfs wissen?
     private boolean DEBUG = true;
@@ -54,7 +54,7 @@ public class GestureLibraryFragment extends ListFragment {
         // UIT WNT PRECIES NIET NODIG IN EEN FRAGMENT (WEL IN EEN ACTIVITY) getActivity().setContentView(R.layout.dbui);
 
 
-        stateChange = App.STATES.STATE_LIBRARY;
+        stateChange = UsedConstants.STATES.STATE_LIBRARY;
 
 
 
@@ -144,7 +144,7 @@ public class GestureLibraryFragment extends ListFragment {
         super.onStart();
 
         // TODO mag wrsl weg wnt niet echt relevant?
-        stateChange = App.STATES.STATE_LIBRARY;
+        stateChange = UsedConstants.STATES.STATE_LIBRARY;
     }
 
     @Override

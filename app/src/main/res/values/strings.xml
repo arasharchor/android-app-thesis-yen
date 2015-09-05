@@ -81,7 +81,6 @@
     <string name="title_advanced_recognizer">Gesture Recognizer for Pebble™</string>
 
 
-    <!-- voor THREE DOLLAR gesture detection -->
     <string name="hello">""</string>
     <string name="hold_to_record">Hold to record gesture</string>
 
@@ -114,8 +113,11 @@
     <string name="description_choose_gesture">Choose the gesture to train from the following list of gestures supported by the connected Action Devices.</string>
     <string name="no_connected_AD_supports">No currently connected Action Device supports this gesture\n</string>
 
-    <string name="tutorial_train">1) Choose gesture to train. \n2) Hold the record button while executing the gesture. \n3) Redo 2) for TODO hoeveel keer nodig. \n4) Train another gesture by starting from 1).</string>
-    <string name="tutorial_recognize"><![CDATA[The face detectors on the connected Action Devices allow for automatic enabling & disabling of the Pebble™ accelerometer data stream. Manual toggle:]]></string>
+    <string name="tutorial_train">1) Choose gesture to train. \n2) Hold the record button while executing the gesture. \n
+        3) Redo 2) for TODO hoeveel keer nodig. \n4) Train another gesture by starting from 1).</string>
+    <string name="tutorial_recognize"><![CDATA[The face detectors on the connected Action Devices
+    allow for automatic enabling & disabling of the Pebble™ accelerometer data stream. Manual toggle available on the right. \n\n1x
+    Vibration = A gesture was recognized and this gesture is supported by at least 1 currently connected Action Device. \n\n2x Vibration = No currently connected Action Device supports this gesture OR No network connection.]]></string>
     <string name="official_app">Official Pebble™ Companion App</string>
 
 

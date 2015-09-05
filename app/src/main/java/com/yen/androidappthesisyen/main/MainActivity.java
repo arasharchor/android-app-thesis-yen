@@ -422,7 +422,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
         } else {
 
-            firstButton.setTitle("Install official Pebble™ Companion App");
+            firstButton.setTitle("Install official Pebble™ Companion UsedConstants");
             firstButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
