@@ -451,6 +451,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
                 return true;
 
+            /*
             case R.id.action_set_1_opt_1:
                 item.setChecked(true);
                 return true;
@@ -474,7 +475,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
 
             case R.id.action_settings:
                 return true;
-
+            */
 
             default:
                 return super.onOptionsItemSelected(item);

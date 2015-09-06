@@ -204,6 +204,16 @@
         android:layout_marginLeft="87dp"
         android:layout_marginStart="87dp" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shutdown MQTT service (if running)"
+        android:id="@+id/buttonService"
+        android:layout_alignTop="@+id/toggle_BT"
+        android:layout_toRightOf="@+id/toggle_BT"
+        android:layout_toEndOf="@+id/toggle_BT"
+        android:layout_marginLeft="32dp"
+        android:layout_marginStart="32dp" />
 
 
 </RelativeLayout>

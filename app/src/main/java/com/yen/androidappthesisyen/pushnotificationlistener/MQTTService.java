@@ -1131,7 +1131,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         } catch (MqttException e) {
 
 
-            e.printStackTrace();
+            // e.printStackTrace();
 
 
             Log.w(LOG_TAG, "------------------------- CONNECTION FAILED for broker " + brokerName);

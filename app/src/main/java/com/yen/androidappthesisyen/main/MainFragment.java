@@ -155,6 +155,31 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
         setBTRelatedStates(returnedView);
 
+        Button serviceButton = (Button) returnedView.findViewById(R.id.buttonService);
+        serviceButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+
+                TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
+                textViewActionDevice.setText(getResources().getString(R.string.generic_not_connected));
+                bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
+
+                setToggleStates(getView(), false);
+                setEnableDisableStates(getView(), false);
+
+                Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
+                getActivity().stopService(svcOld);
+
+                // Clear the list
+                List<String> theList = getListSystemIDsToConnectTo(getActivity());
+                for (String systemIDToRemove : theList) {
+                    removeSystemIDFromListSystemIDsToConnectTo(getActivity(), systemIDToRemove);
+                }
+
+            }
+        });
+
         theView = returnedView;
 
         return returnedView;
@@ -257,30 +282,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                     }
                 });
 
-        builder.setNegativeButton("Cancel (and stop service if running)",
+        builder.setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
 
-
-                        TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
-                        textViewActionDevice.setText(getResources().getString(R.string.generic_not_connected));
-                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
-
-                        setToggleStates(getView(), false);
-                        setEnableDisableStates(getView(), false);
-
-
-                        Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
-                        getActivity().stopService(svcOld);
-
-                        // Clear the list
-                        List<String> theList = getListSystemIDsToConnectTo(getActivity());
-                        for (String systemIDToRemove : theList) {
-                            removeSystemIDFromListSystemIDsToConnectTo(getActivity(), systemIDToRemove);
-                        }
-
+                        // Do nothing.
                     }
                 });
 
@@ -298,7 +306,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Location of Face Detector and Gesture Handler");
         // OUD builder.setMessage("Insert the current IPv4 address for Action Device " + systemID + ". Use previous location (" + savedBrokerIP + ") by leaving the field blank.");
-        builder.setMessage("You have inserted the required information for all previously used systemIDs. If you want to add a new Action Device, insert the required information in the pattern 'systemID//IPaddress'. \nExample: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device Runtime application and push this information to confirm the association. Otherwise, this new systemID won't be saved here. \nIf you didn't want to register a new Action Device, leave the field blank and simply choose 'Done: start service'.");
+        builder.setMessage("If you want to add a new Action Device, insert the required information in the pattern 'systemID//IPaddress'. \nExample: first-laptop//192.168.1.2 \nMake sure to insert the same systemID in the particular Action Device Runtime application and to push it to the central hub to confirm the association. \nIf you didn't want to register a new Action Device, leave the field blank and choose 'Done: start service'.");
 
         final EditText input = new EditText(getActivity());
         // OUD InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER
@@ -411,33 +419,12 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                     }
                 });
 
-        builder.setNegativeButton("Cancel (and stop service if running)",
+        builder.setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
-
-
-                        TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
-                        textViewActionDevice.setText(getResources().getString(R.string.generic_not_connected));
-                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
-
-                        setToggleStates(getView(), false);
-                        setEnableDisableStates(getView(), false);
-
-
-                        // Stopping MQTT service
-                        // TODO OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
-                        Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
-                        getActivity().stopService(svcOld);
-
-                        // NIEUW
-                        // Clear the list
-                        List<String> theList = getListSystemIDsToConnectTo(getActivity());
-                        for (String systemIDToRemove : theList) {
-                            removeSystemIDFromListSystemIDsToConnectTo(getActivity(), systemIDToRemove);
-                        }
-
+                        // Do nothing.
                     }
                 });
 
@@ -529,33 +516,12 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                     }
                 });
 
-        builder.setNegativeButton("Cancel (and stop service if running)",
+        builder.setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int arg1) {
-
-
-                        TextView textViewActionDevice = (TextView) theView.findViewById(R.id.textView_action_device);
-                        textViewActionDevice.setText(getResources().getString(R.string.generic_not_connected));
-                        bundleLabelStates.putString("R.id.textView_generic", getResources().getString(R.string.generic_not_connected));
-
-                        setToggleStates(getView(), false);
-                        setEnableDisableStates(getView(), false);
-
-
-                        // Stopping MQTT service
-                        // TODO OF IS DIT NIET GEWENSTE BEHAVIOR en beter aparte button daarvoor ergens voorzien?
-                        Intent svcOld = new Intent(getActivity().getApplicationContext(), MQTTService.class);
-                        getActivity().stopService(svcOld);
-
-                        // NIEUW
-                        // Clear the list
-                        List<String> theList = getListSystemIDsToConnectTo(getActivity());
-                        for (String systemIDToRemove : theList) {
-                            removeSystemIDFromListSystemIDsToConnectTo(getActivity(), systemIDToRemove);
-                        }
-
+                        // Do nothing.
                     }
                 });
 

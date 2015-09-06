@@ -3,11 +3,11 @@
     tools:context=".MainActivity">
 
     <!-- Settings, should always be in the overflow -->
-    <item
+    <!--<item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
-        android:showAsAction="never" />
+        android:showAsAction="never" />-->
 
 
     <!--android:checkable="true"-->
@@ -28,7 +28,7 @@
 
 
     <!-- Navigation submenu -->
-    <item
+    <!--<item
         android:id="@+id/action_menu_setting_1"
         android:title="@string/action_label_setting_1">
 
@@ -57,11 +57,11 @@
         </menu>
 
 
-    </item>
+    </item>-->
 
 
     <!-- action bar background submenu -->
-    <item
+   <!-- <item
         android:id="@+id/action_menu_setting_2"
         android:title="@string/action_label_setting_2">
 
@@ -86,6 +86,6 @@
         </menu>
 
 
-    </item>
+    </item>-->
 
 </menu>

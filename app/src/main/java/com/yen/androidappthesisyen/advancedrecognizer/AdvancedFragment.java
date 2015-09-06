@@ -60,21 +60,10 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link AdvancedFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- */
-// 31-07 verwijderd: implements DialogInterface.OnClickListener
 public class AdvancedFragment extends Fragment {
 
 
-    //    private static final String LOG_TAG = AdvancedFragment.class.getName();
-    // was relatief lang dus nu:
-    private static final String LOG_TAG = "ADVANCED RECOGNIZER";
-
-//    private OnFragmentInteractionListener mListener;
+    private static final String LOG_TAG = "Advanced Fragment";
 
 
     private static final int NUM_SAMPLES = 15;
@@ -180,7 +169,7 @@ public class AdvancedFragment extends Fragment {
 
         Boolean caseEmpty = false;
         if(arraySupportedGestures.length == 1 && arraySupportedGestures[0].equalsIgnoreCase("")){
-            arraySupportedGestures[0] = "No options available: none of your Action Devices support any gesture at the moment.";
+            arraySupportedGestures[0] = "No options available: none of your Action Devices support any trainable gesture at the moment.";
             caseEmpty = true;
         }
 
@@ -414,14 +403,6 @@ public class AdvancedFragment extends Fragment {
 
 
         RECORD_GESTURE = false;
-        // Object[] gestureTrace = recordingGestureTrace.toArray();
-        /*int numItems = recordingGestureTrace.size();
-        // malloc LOL
-		float [][] traces = new float [numItems][3];
-		// "copy" gesture info to traces!!!*/
-        // traces = recordingGestureTrace.toArray(traces);
-
-
         doRemainingTasksAfterRecording();
 
 
@@ -829,7 +810,7 @@ public class AdvancedFragment extends Fragment {
 
         // threshold param was lange tijd 700
         // update nu 900 maar mag nog wat lager indien nuttig! nu is 850 - nu terug 900 MAAR IS 875 testen
-        theTiltGestureRecognizer = new TiltGestureRecognizer(this, 900, 1000, PebbleGestureModel.MODE_TILT);
+        theTiltGestureRecognizer = new TiltGestureRecognizer(this, 900, 200, PebbleGestureModel.MODE_TILT);
 
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -1166,7 +1147,16 @@ public class AdvancedFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        PebbleKit.startAppOnPebble(getActivity(), uuid);
+        // We use delay of 500 milliseonds before starting the Pebble app, because when switching between the Train and Recognize tab would
+        // otherwise sometimes have the effect that the Pebble app doesn't get started.
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                PebbleKit.startAppOnPebble(getActivity(), uuid);
+            }
+        }, 500);
+
 
         getToggleStatesAndEnableServices();
 
@@ -1216,22 +1206,22 @@ public class AdvancedFragment extends Fragment {
                     // Since there is no clear difference between different persons exercising these 4 gestures.
                     Boolean[] results = {false, false};
 
-                    // TODO 26/08 ====================== FF UIT.
-//                    if (state == UsedConstants.STATES.STATE_RECOGNIZE) {
-//
-//                        // TILT GESTURE DETECTION
-//                        // TODO is testen met float[] ipv int[]. want andere recognizer past float toe.
-//                        // UPDATE: maar hierboven is de data vanuit een int[] gehaald dusja.
-//                        int[] intArray = {latest_data[0], latest_data[1], latest_data[2]};
-//                        results = theTiltGestureRecognizer.update(intArray);
-//
-//                    } else {
-//                        // We are in the LEARN STATE or LIBRARY STATE
-//
-//                        results[0] = false;
-//                        results[1] = false;
-//                    }
-                    // 26/08 FF UIT.
+
+                    if (state == UsedConstants.STATES.STATE_RECOGNIZE) {
+
+                        // TILT GESTURE DETECTION
+                        // TODO is testen met float[] ipv int[]. want andere recognizer past float toe.
+                        // UPDATE: maar hierboven is de data vanuit een int[] gehaald dusja.
+                        int[] intArray = {latest_data[0], latest_data[1], latest_data[2]};
+                        results = theTiltGestureRecognizer.update(intArray);
+
+                    } else {
+                        // We are in the LEARN STATE or LIBRARY STATE
+
+                        results[0] = false;
+                        results[1] = false;
+                    }
+
 
 
                     // If NO tilt gesture was detected, we pass the accel data to the more advanced recognizer.
