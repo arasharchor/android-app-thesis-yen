@@ -59,6 +59,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.addNewAccelStreamState;
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.getEnabledAccelStreamDevices;
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.getMapSupportedGestures;
+
 
 public class AdvancedFragment extends Fragment {
 
@@ -81,6 +85,8 @@ public class AdvancedFragment extends Fragment {
             zView,
             rateView;
     private ToggleButton toggleAccelStream;
+    private Boolean isVibrationFeedbackEnabled = false;
+    private ToggleButton toggleVibrationFeedback;
     private CheckBox checkboxGestureSpotting;
 
 
@@ -135,7 +141,7 @@ public class AdvancedFragment extends Fragment {
 
         // Get a list of all the distinct gestures by checking which gestures all the Action Devices reported.
         // So if an Action Device adds/removes/renames a gesture, the list in the Android app will adapt.
-        Map<String, String> savedMap = getMapSupportedGestures();
+        Map<String, String> savedMap = getMapSupportedGestures(getActivity());
         Set setSupportedGestures = new TreeSet();
         if (savedMap != null) {
 
@@ -471,8 +477,7 @@ public class AdvancedFragment extends Fragment {
 
 
                             if (detected_gid.equalsIgnoreCase("unknown") || detected_gid.equalsIgnoreCase("unknown gesture")) {
-                                // Niet nodig. En hebben gemerkt dat de nu nog te krijgen "unknown gesture" berichten mogen genegeerd worden.
-                                // Het is precies niet meer het geval dat we een gesture uitvoeren en dat die niet wordt herkend.
+
                                 // doTwoShortPebbleVibrations();
                             } else {
 
@@ -515,7 +520,7 @@ public class AdvancedFragment extends Fragment {
 
 
         // Check for which action devices the accel stream is currently running.
-        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
+        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices(getActivity());
 
         if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
 
@@ -525,7 +530,7 @@ public class AdvancedFragment extends Fragment {
 
 
             // Get list of action devices which support the recognized gesture.
-            Map<String, String> savedMap = getMapSupportedGestures();
+            Map<String, String> savedMap = getMapSupportedGestures(getActivity());
             ArrayList<String> supportedSystems = new ArrayList<String>();
 
 
@@ -559,7 +564,10 @@ public class AdvancedFragment extends Fragment {
                 // Sending feedback to the user:
                 // If a gesture detected + supported by at least one of the currently used action devices: do 1x short vibration.
                 // This detected gesture can still be a false positive, though.
-                // TODO 05/09 FF UIT ============================================== doShortPebbleVibration();
+                if(isVibrationFeedbackEnabled){
+                    doShortPebbleVibration();
+                }
+
 
 
                 // ---- START EIGEN TOEVOEGING
@@ -608,7 +616,10 @@ public class AdvancedFragment extends Fragment {
                 } else {
 
                     // Arriving here if no network connection.
-                    // TODO 05/09 FF UIT ============================================== doTwoShortPebbleVibrations();
+                    if(isVibrationFeedbackEnabled){
+                        doTwoShortPebbleVibrations();
+                    }
+
 
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -629,7 +640,10 @@ public class AdvancedFragment extends Fragment {
 
             } else {
 
-                // TODO 05/09 FF UIT ============================================== doTwoShortPebbleVibrations();
+                if(isVibrationFeedbackEnabled){
+                    doTwoShortPebbleVibrations();
+                }
+
 
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -648,7 +662,10 @@ public class AdvancedFragment extends Fragment {
             // We should never arrive here anyway...
 
             // The accel stream isn't running. This means we don't need to do any processing.
-            // TODO 05/09 FF UIT ============================================== doTwoShortPebbleVibrations();
+            if(isVibrationFeedbackEnabled){
+                doTwoShortPebbleVibrations();
+            }
+
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -810,7 +827,7 @@ public class AdvancedFragment extends Fragment {
 
         // threshold param was lange tijd 700
         // update nu 900 maar mag nog wat lager indien nuttig! nu is 850 - nu terug 900 MAAR IS 875 testen
-        theTiltGestureRecognizer = new TiltGestureRecognizer(this, 900, 200, PebbleGestureModel.MODE_TILT);
+        theTiltGestureRecognizer = new TiltGestureRecognizer(this, 1000, 750, PebbleGestureModel.MODE_TILT);
 
 
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -842,6 +859,22 @@ public class AdvancedFragment extends Fragment {
                 } else {
                     Log.w(LOG_TAG, "CALLING disableAccelStream");
                     disableAccelStream("triggered-by-user");
+                }
+
+            }
+        });
+
+
+        toggleVibrationFeedback = (ToggleButton) returnedView.findViewById(R.id.toggle_vibration_feedback);
+        toggleVibrationFeedback.setChecked(false);
+        toggleVibrationFeedback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (toggleVibrationFeedback.isChecked()) {
+                    isVibrationFeedbackEnabled = true;
+                } else {
+                    isVibrationFeedbackEnabled = false;
                 }
 
             }
@@ -921,6 +954,9 @@ public class AdvancedFragment extends Fragment {
             tutorial.setText(getResources().getString(R.string.tutorial_recognize));
         } else if (state.equalsIgnoreCase("learn")) {
             toggleAccelStream.setVisibility(View.INVISIBLE);
+            TextView lblVibrationFeedback = (TextView) returnedView.findViewById(R.id.label_FeedbackVibration);
+            lblVibrationFeedback.setVisibility(View.INVISIBLE);
+            toggleVibrationFeedback.setVisibility(View.INVISIBLE);
             tutorial.setText(getResources().getString(R.string.tutorial_train));
         }
         // Don't need to show it anymore but still available if necessary.
@@ -962,10 +998,10 @@ public class AdvancedFragment extends Fragment {
     //  lock - just enough to keep the CPU running until we've finished
     private void enableAccelStream(String systemID) {
 
-        String previousList = getEnabledAccelStreamDevices();
+        String previousList = getEnabledAccelStreamDevices(getActivity());
         Log.w(LOG_TAG, "previousList " + previousList);
 
-        addNewAccelStreamState(systemID, "enable"); // List has now been updated.
+        addNewAccelStreamState(getActivity(), systemID, "enable"); // List has now been updated.
 
         if (systemID.equalsIgnoreCase("triggered-by-user") || previousList.equalsIgnoreCase("") || previousList.equalsIgnoreCase(";")) {
             // The previous list was empty. This means we deliberately need to send a signal to start the accel stream.
@@ -985,12 +1021,12 @@ public class AdvancedFragment extends Fragment {
     private void disableAccelStream(String systemID) {
 
 
-        String previousList = getEnabledAccelStreamDevices();
+        String previousList = getEnabledAccelStreamDevices(getActivity());
         Log.w(LOG_TAG, "previousList " + previousList);
 
-        addNewAccelStreamState(systemID, "disable"); // List has now been updated.
+        addNewAccelStreamState(getActivity(), systemID, "disable"); // List has now been updated.
 
-        String newList = getEnabledAccelStreamDevices();
+        String newList = getEnabledAccelStreamDevices(getActivity());
         Log.w(LOG_TAG, "newList " + newList);
 
         if (systemID.equalsIgnoreCase("triggered-by-user") || newList.equalsIgnoreCase("") || newList.equalsIgnoreCase(";")) {
@@ -1032,81 +1068,81 @@ public class AdvancedFragment extends Fragment {
 
 
     // STAAT OOK IN MQTTSERVICE.JAVA DUS DAAR OOK AANPASSEN
-    private String getEnabledAccelStreamDevices() {
-
-        SharedPreferences enumSetting = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
-        String enabledList = enumSetting.getString("enabledaccelstreamdevices", "");
-        return enabledList;
-    }
+//    private String getEnabledAccelStreamDevices() {
+//
+//        SharedPreferences enumSetting = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+//        String enabledList = enumSetting.getString("enabledaccelstreamdevices", "");
+//        return enabledList;
+//    }
 
     // STAAT OOK IN MQTTSERVICE.JAVA DUS DAAR OOK AANPASSEN
     // KEY = "accelstreamenabled" - VALUE = comma separated list of systemIDs where stream is currently enabled.
-    private void addNewAccelStreamState(String systemID, String stateRequest) {
-
-
-        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
-
-        String newConcatenatedString = "";
-
-
-        if (stateRequest.equalsIgnoreCase("enable")) {
-
-
-            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
-
-                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
-                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
-                // adding new action device systemID
-                setEnabledActionDevices.add(systemID);
-                // recreate concatenated string from new set
-                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
-
-                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-
-            } else {
-
-                newConcatenatedString = systemID;
-
-                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-            }
-
-
-        } else if (stateRequest.equalsIgnoreCase("disable")) {
-
-
-            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
-
-                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
-                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
-                // removing action device systemID
-                setEnabledActionDevices.remove(systemID);
-                // recreate concatenated string from new set
-                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
-
-                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-
-            } else {
-
-
-                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-            }
-
-
-        } else {
-            Log.w(LOG_TAG, "Wrong accel stream state request: not 'enable' or 'disable'");
-        }
-
-
-        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
-        if (pSharedPref != null) {
-            SharedPreferences.Editor editor = pSharedPref.edit();
-            editor.remove("enabledaccelstreamdevices").commit();
-            editor.putString("enabledaccelstreamdevices", newConcatenatedString);
-            editor.commit();
-        }
-
-
-    }
+//    private void addNewAccelStreamState(String systemID, String stateRequest) {
+//
+//
+//        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
+//
+//        String newConcatenatedString = "";
+//
+//
+//        if (stateRequest.equalsIgnoreCase("enable")) {
+//
+//
+//            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+//
+//                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+//                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+//                // adding new action device systemID
+//                setEnabledActionDevices.add(systemID);
+//                // recreate concatenated string from new set
+//                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+//
+//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+//
+//            } else {
+//
+//                newConcatenatedString = systemID;
+//
+//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+//            }
+//
+//
+//        } else if (stateRequest.equalsIgnoreCase("disable")) {
+//
+//
+//            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+//
+//                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+//                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+//                // removing action device systemID
+//                setEnabledActionDevices.remove(systemID);
+//                // recreate concatenated string from new set
+//                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+//
+//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+//
+//            } else {
+//
+//
+//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+//            }
+//
+//
+//        } else {
+//            Log.w(LOG_TAG, "Wrong accel stream state request: not 'enable' or 'disable'");
+//        }
+//
+//
+//        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+//        if (pSharedPref != null) {
+//            SharedPreferences.Editor editor = pSharedPref.edit();
+//            editor.remove("enabledaccelstreamdevices").commit();
+//            editor.putString("enabledaccelstreamdevices", newConcatenatedString);
+//            editor.commit();
+//        }
+//
+//
+//    }
 
 
     // TODO 05/09 May be removed.
@@ -1363,73 +1399,74 @@ public class AdvancedFragment extends Fragment {
     }
 
 
+    // 06/09 MAG WEG WANT NIET GEBRUIKT: wel in MQTT service maar daar is code al aangepast naar recentere versie!
     // key = system ID - value = comma separated list of supported gestures for the specific systemID
     // STAAT OOK IN MQTTService dus wijzingen BIJ ALLEBEI DOORVOEREN
-    private void addSupportedGesture(String systemID, String gestureToBeAdded) {
-
-        Map<String, String> savedMap = getMapSupportedGestures();
-
-        String concatenatedGestures = savedMap.get(systemID);
-
-        String newConcatenatedString = "";
-
-        if (concatenatedGestures != null) {
-
-            String[] arrayGestures = concatenatedGestures.split(";");
-            Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
-            // adding new gesture
-            setGestures.add(gestureToBeAdded);
-            // recreate concatenated string from new set
-            newConcatenatedString = TextUtils.join(";", setGestures);
-
-            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-
-        } else {
-
-            newConcatenatedString = gestureToBeAdded;
-
-            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-        }
-
-
-        savedMap.put(systemID, newConcatenatedString);
-
-
-        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
-        if (pSharedPref != null) {
-            JSONObject jsonObject = new JSONObject(savedMap);
-            String jsonString = jsonObject.toString();
-            SharedPreferences.Editor editor = pSharedPref.edit();
-            editor.remove("my_map").commit();
-            editor.putString("my_map", jsonString);
-            editor.commit();
-        }
-    }
+//    private void addSupportedGesture(String systemID, String gestureToBeAdded) {
+//
+//        Map<String, String> savedMap = getMapSupportedGestures();
+//
+//        String concatenatedGestures = savedMap.get(systemID);
+//
+//        String newConcatenatedString = "";
+//
+//        if (concatenatedGestures != null) {
+//
+//            String[] arrayGestures = concatenatedGestures.split(";");
+//            Set<String> setGestures = new HashSet<String>(Arrays.asList(arrayGestures));
+//            // adding new gesture
+//            setGestures.add(gestureToBeAdded);
+//            // recreate concatenated string from new set
+//            newConcatenatedString = TextUtils.join(";", setGestures);
+//
+//            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+//
+//        } else {
+//
+//            newConcatenatedString = gestureToBeAdded;
+//
+//            Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+//        }
+//
+//
+//        savedMap.put(systemID, newConcatenatedString);
+//
+//
+//        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
+//        if (pSharedPref != null) {
+//            JSONObject jsonObject = new JSONObject(savedMap);
+//            String jsonString = jsonObject.toString();
+//            SharedPreferences.Editor editor = pSharedPref.edit();
+//            editor.remove("my_map").commit();
+//            editor.putString("my_map", jsonString);
+//            editor.commit();
+//        }
+//    }
 
     // STAAT OOK IN MQTTService dus wijzingen BIJ ALLEBEI DOORVOEREN
-    private Map<String, String> getMapSupportedGestures() {
-
-        Map<String, String> outputMap = new HashMap<String, String>();
-
-        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
-
-        try {
-            if (pSharedPref != null) {
-                String jsonString = pSharedPref.getString("my_map", (new JSONObject()).toString());
-                JSONObject jsonObject = new JSONObject(jsonString);
-                Iterator<String> keysItr = jsonObject.keys();
-                while (keysItr.hasNext()) {
-                    String key = keysItr.next();
-                    String value = (String) jsonObject.get(key); // a value = comma separated list of supported gestures for the specific systemID
-                    outputMap.put(key, value);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return outputMap;
-    }
+//    private Map<String, String> getMapSupportedGestures() {
+//
+//        Map<String, String> outputMap = new HashMap<String, String>();
+//
+//        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
+//
+//        try {
+//            if (pSharedPref != null) {
+//                String jsonString = pSharedPref.getString("my_map", (new JSONObject()).toString());
+//                JSONObject jsonObject = new JSONObject(jsonString);
+//                Iterator<String> keysItr = jsonObject.keys();
+//                while (keysItr.hasNext()) {
+//                    String key = keysItr.next();
+//                    String value = (String) jsonObject.get(key); // a value = comma separated list of supported gestures for the specific systemID
+//                    outputMap.put(key, value);
+//                }
+//            }
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return outputMap;
+//    }
 
 
 }

@@ -159,7 +159,7 @@
         android:layout_toLeftOf="@+id/horizontalScrollView_main_fragment" />
 
 <!--android:background="@drawable/border_ui"-->
-    <ScrollView
+    <!--<ScrollView
         android:id="@+id/scrollView_output_window"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -179,7 +179,7 @@
             android:text="@string/output_window" />
 
 
-    </ScrollView>
+    </ScrollView>-->
 
 
     <ToggleButton

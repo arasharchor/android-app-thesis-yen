@@ -151,7 +151,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
 
         // We also place it here, since in case there is already text in the Output Window when arriving there, we immediately scroll.
-        ((ScrollView) returnedView.findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
+        // ((ScrollView) returnedView.findViewById(R.id.scrollView_output_window)).fullScroll(View.FOCUS_DOWN);
 
         setBTRelatedStates(returnedView);
 

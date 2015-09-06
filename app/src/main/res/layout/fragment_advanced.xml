@@ -51,8 +51,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="@string/start" />
-    <!-- TODO werkt deze tekst nog bij TOGGLE button? of mag nu weg? -->
+        />
+
 
 
     <!-- voor THREE DOLLAR gesture detection -->
@@ -94,6 +94,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/choose_gesture_to_train" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New ToggleButton"
+            android:id="@+id/toggle_vibration_feedback"
+            android:layout_weight="0.04" />
+
+        <TextView
+            android:layout_width="324dp"
+            android:layout_height="166dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Enable Vibration Feedback to get notified when a gesture got recognized or an error occured. \n IMPORTANT: This feature is experimental and will sometimes trigger additional unwanted gestures aside from the requested one."
+            android:id="@+id/label_FeedbackVibration" />
 
 
     </LinearLayout>

@@ -50,7 +50,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.addNewAccelStreamState;
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.getEnabledAccelStreamDevices;
 import static com.yen.androidappthesisyen.utilities.UtilityRepo.getListSystemIDsToConnectTo;
+import static com.yen.androidappthesisyen.utilities.UtilityRepo.getMapSupportedGestures;
 
 /*
  * An example of how to implement an MQTT client in Android, able to receive
@@ -69,7 +72,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
     private void addSupportedGesture(String systemID, String gestureToBeAdded) {
 
-        Map<String, String> savedMap = getMapSupportedGestures();
+        Map<String, String> savedMap = getMapSupportedGestures(getApplicationContext());
 
 
         String concatenatedGestures = savedMap.get(systemID);
@@ -119,37 +122,37 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     }
 
     // STAAT OOK IN 3Dgesturefragment dus wijzingen BIJ ALLEBEI DOORVOEREN
-    private Map<String, String> getMapSupportedGestures() {
-
-        Map<String, String> outputMap = new HashMap<String, String>();
-
-        SharedPreferences pSharedPref = getApplicationContext().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
-
-        try {
-            if (pSharedPref != null) {
-                String jsonString = pSharedPref.getString("my_map", (new JSONObject()).toString());
-                JSONObject jsonObject = new JSONObject(jsonString);
-                Iterator<String> keysItr = jsonObject.keys();
-                while (keysItr.hasNext()) {
-                    String key = keysItr.next();
-                    String value = (String) jsonObject.get(key); // a value = comma separated list of supported gestures for the specific systemID
-                    outputMap.put(key, value);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return outputMap;
-    }
+//    private Map<String, String> getMapSupportedGestures() {
+//
+//        Map<String, String> outputMap = new HashMap<String, String>();
+//
+//        SharedPreferences pSharedPref = getApplicationContext().getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
+//
+//        try {
+//            if (pSharedPref != null) {
+//                String jsonString = pSharedPref.getString("my_map", (new JSONObject()).toString());
+//                JSONObject jsonObject = new JSONObject(jsonString);
+//                Iterator<String> keysItr = jsonObject.keys();
+//                while (keysItr.hasNext()) {
+//                    String key = keysItr.next();
+//                    String value = (String) jsonObject.get(key); // a value = comma separated list of supported gestures for the specific systemID
+//                    outputMap.put(key, value);
+//                }
+//            }
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return outputMap;
+//    }
 
     // STAAT OOK IN ADVANCEDFRAGMENT.JAVA DUS DAAR OOK AANPASSEN
-    private String getEnabledAccelStreamDevices() {
-
-        SharedPreferences enumSetting = getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
-        String enabledList = enumSetting.getString("enabledaccelstreamdevices", "");
-        return enabledList;
-    }
+//    private String getEnabledAccelStreamDevices() {
+//
+//        SharedPreferences enumSetting = getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+//        String enabledList = enumSetting.getString("enabledaccelstreamdevices", "");
+//        return enabledList;
+//    }
 
 
     // DEFAULT:
@@ -609,72 +612,72 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
     // STAAT OOK IN ADVANCEDFRAGMENT.JAVA DUS DAAR OOK AANPASSEN
     // KEY = "accelstreamenabled" - VALUE = comma separated list of systemIDs where stream is currently enabled.
-    private void addNewAccelStreamState(String systemID, String stateRequest) {
-
-
-        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
-
-        String newConcatenatedString = "";
-
-
-        if (stateRequest.equalsIgnoreCase("enable")) {
-
-
-            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
-
-                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
-                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
-                // adding new action device systemID
-                setEnabledActionDevices.add(systemID);
-                // recreate concatenated string from new set
-                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
-
-                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-
-            } else {
-
-                newConcatenatedString = systemID;
-
-                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-            }
-
-
-        } else if (stateRequest.equalsIgnoreCase("disable")) {
-
-
-            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
-
-                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
-                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
-                // removing action device systemID
-                setEnabledActionDevices.remove(systemID);
-                // recreate concatenated string from new set
-                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
-
-                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-
-            } else {
-
-                // Do nothing!
-
-            }
-
-
-        } else {
-            Log.w(LOG_TAG, "Wrong accel stream state request: not 'enable' or 'disable'");
-        }
-
-
-        SharedPreferences pSharedPref = getApplicationContext().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
-        if (pSharedPref != null) {
-            SharedPreferences.Editor editor = pSharedPref.edit();
-            editor.remove("enabledaccelstreamdevices").commit();
-            editor.putString("enabledaccelstreamdevices", newConcatenatedString);
-            editor.commit();
-        }
-
-
-    }
+//    private void addNewAccelStreamState(String systemID, String stateRequest) {
+//
+//
+//        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
+//
+//        String newConcatenatedString = "";
+//
+//
+//        if (stateRequest.equalsIgnoreCase("enable")) {
+//
+//
+//            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+//
+//                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+//                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+//                // adding new action device systemID
+//                setEnabledActionDevices.add(systemID);
+//                // recreate concatenated string from new set
+//                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+//
+//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+//
+//            } else {
+//
+//                newConcatenatedString = systemID;
+//
+//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+//            }
+//
+//
+//        } else if (stateRequest.equalsIgnoreCase("disable")) {
+//
+//
+//            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+//
+//                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+//                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+//                // removing action device systemID
+//                setEnabledActionDevices.remove(systemID);
+//                // recreate concatenated string from new set
+//                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+//
+//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+//
+//            } else {
+//
+//                // Do nothing!
+//
+//            }
+//
+//
+//        } else {
+//            Log.w(LOG_TAG, "Wrong accel stream state request: not 'enable' or 'disable'");
+//        }
+//
+//
+//        SharedPreferences pSharedPref = getApplicationContext().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+//        if (pSharedPref != null) {
+//            SharedPreferences.Editor editor = pSharedPref.edit();
+//            editor.remove("enabledaccelstreamdevices").commit();
+//            editor.putString("enabledaccelstreamdevices", newConcatenatedString);
+//            editor.commit();
+//        }
+//
+//
+//    }
 
 
     // ----------- KOPIE OOK TE VINDEN IN ADVANCEDFRAGMENT.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
@@ -683,10 +686,10 @@ public class MQTTService extends Service implements MqttSimpleCallback {
     //  lock - just enough to keep the CPU running until we've finished
     private void enableAccelStream(String systemID) {
 
-        String previousList = getEnabledAccelStreamDevices();
+        String previousList = getEnabledAccelStreamDevices(getApplicationContext());
         Log.w(LOG_TAG, "previousList " + previousList);
 
-        addNewAccelStreamState(systemID, "enable"); // List has now been updated.
+        addNewAccelStreamState(getApplicationContext(), systemID, "enable"); // List has now been updated.
 
         if (previousList.equalsIgnoreCase("") || previousList.equalsIgnoreCase(";")) {
             // The previous list was empty. This means we deliberately need to send a signal to start the accel stream.
@@ -704,12 +707,12 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
     private void disableAccelStream(String systemID) {
 
-        String previousList = getEnabledAccelStreamDevices();
+        String previousList = getEnabledAccelStreamDevices(getApplicationContext());
         Log.w(LOG_TAG, "previousList " + previousList);
 
-        addNewAccelStreamState(systemID, "disable"); // List has now been updated.
+        addNewAccelStreamState(getApplicationContext(), systemID, "disable"); // List has now been updated.
 
-        String newList = getEnabledAccelStreamDevices();
+        String newList = getEnabledAccelStreamDevices(getApplicationContext());
         Log.w(LOG_TAG, "newList " + newList);
 
         if (newList.equalsIgnoreCase("") || newList.equalsIgnoreCase(";")) {

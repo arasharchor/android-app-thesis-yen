@@ -10,9 +10,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,6 +24,105 @@ public class UtilityRepo {
 
 
     private static final String LOG_TAG = UtilityRepo.class.getName();
+
+
+    public static Map<String, String> getMapSupportedGestures(Context theContext) {
+
+        Map<String, String> outputMap = new HashMap<String, String>();
+
+        SharedPreferences pSharedPref = theContext.getSharedPreferences("com.yen.androidappthesisyen.system_id_to_supported_gestures", Context.MODE_PRIVATE);
+
+        try {
+            if (pSharedPref != null) {
+                String jsonString = pSharedPref.getString("my_map", (new JSONObject()).toString());
+                JSONObject jsonObject = new JSONObject(jsonString);
+                Iterator<String> keysItr = jsonObject.keys();
+                while (keysItr.hasNext()) {
+                    String key = keysItr.next();
+                    String value = (String) jsonObject.get(key); // a value = comma separated list of supported gestures for the specific systemID
+                    outputMap.put(key, value);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return outputMap;
+    }
+
+    public static String getEnabledAccelStreamDevices(Context theContext) {
+        SharedPreferences enumSetting = theContext.getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+        String enabledList = enumSetting.getString("enabledaccelstreamdevices", "");
+        return enabledList;
+    }
+
+    // KEY = "accelstreamenabled" - VALUE = comma separated list of systemIDs where stream is currently enabled.
+    public static void addNewAccelStreamState(Context theContext, String systemID, String stateRequest) {
+
+
+        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices(theContext);
+
+        String newConcatenatedString = "";
+
+
+        if (stateRequest.equalsIgnoreCase("enable")) {
+
+
+            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+
+                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+                // adding new action device systemID
+                setEnabledActionDevices.add(systemID);
+                // recreate concatenated string from new set
+                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+
+            } else {
+
+                newConcatenatedString = systemID;
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+            }
+
+
+        } else if (stateRequest.equalsIgnoreCase("disable")) {
+
+
+            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
+
+                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
+                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
+                // removing action device systemID
+                setEnabledActionDevices.remove(systemID);
+                // recreate concatenated string from new set
+                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
+
+                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
+
+            } else {
+
+                // Do nothing!
+
+            }
+
+
+        } else {
+            Log.w(LOG_TAG, "Wrong accel stream state request: not 'enable' or 'disable'");
+        }
+
+
+        SharedPreferences pSharedPref = theContext.getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
+        if (pSharedPref != null) {
+            SharedPreferences.Editor editor = pSharedPref.edit();
+            editor.remove("enabledaccelstreamdevices").commit();
+            editor.putString("enabledaccelstreamdevices", newConcatenatedString);
+            editor.commit();
+        }
+
+
+    }
 
 
     public static List<String> getListSavedSystemIDs(Context context) {
