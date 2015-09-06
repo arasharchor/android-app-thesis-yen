@@ -45,6 +45,9 @@ This means the user does NOT have to reenter the IP Insertion dialog like the se
 
 
 Known issues:
+- As the message on the Recognize tab states: the Vibration Feedback function is experimental since with this feature enabled, sometimes additional gestures get triggered aside from the requested one. For example, when you exercised a circle, the recognizer will classify it as a circle. The Pebble will then vibrate 1 time to indicate a gesture was recognized. And this vibration will trigger an up, down, left or right gesture right after.
+Within the Pebble application, data samples that occured during vibrations already get discarded immediately and won't get sent over to the Android application at all. But seemingly, this is not enough.
+
 - It's important that your device's Auto-Rotate function is ON. (Otherwise some panels won't display properly.)
 
 - In very rare occasions, the application can crash while trying to record a gesture. When you then go to the Gesture Library section, the database won't be able to get loaded and you will encounter the message: "Error loading the gesture library. Clear the Application Data and retrain your gestures."
