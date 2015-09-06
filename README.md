@@ -9,6 +9,16 @@ The Android app has the following features:
 Workflow:
 - TODO
 
+Installation instructions:
+TODO
+
+Used:
+- 3D gesture recognition framework $3 Gesture Recognizer:
+https://code.google.com/p/three-dollar-gesture-recognizer/
+
+- MQTT client for Android:
+http://dalelane.co.uk/blog/?p=1599
+
 Remarks:
 - This application GUI has only been optimized for tablets. It will work on smartphones but won't look as expected.
 
