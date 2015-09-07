@@ -6,12 +6,13 @@ Made for my master's thesis at the University of Ghent, Belgium.
 
 
 The Android app has the following features:
-- TODO
+Check thesis book ( https://dl.dropboxusercontent.com/u/2648/Masterproef/Scriptie%20Yen%20Mertens.pdf ).
 
 
 
 Workflow:
-- TODO
+Check thesis book ( https://dl.dropboxusercontent.com/u/2648/Masterproef/Scriptie%20Yen%20Mertens.pdf ) at section 5.2: Gebruikersinterface en behind-the-scenes.
+
 
 
 
