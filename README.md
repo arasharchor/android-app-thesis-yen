@@ -3,14 +3,22 @@ Android companion app for Pebble™
 
 Made for my master's thesis at the University of Ghent, Belgium.
 
+
+
 The Android app has the following features:
 - TODO
+
+
 
 Workflow:
 - TODO
 
+
+
 Installation instructions:
 TODO
+
+
 
 Used:
 - 3D gesture recognition framework $3 Gesture Recognizer:
@@ -19,12 +27,18 @@ https://code.google.com/p/three-dollar-gesture-recognizer/
 - MQTT client for Android:
 http://dalelane.co.uk/blog/?p=1599
 
+
+
 Remarks:
 - This application GUI has only been optimized for tablets. It will work on smartphones but won't look as expected.
 
 - Don't look too much into the commit messages. Since this project has been implemented by a single person, GitHub was mostly used as a simple backup cloud service.
 
 - When exercising the up/down/left/right gesture, the start position is the position where the wearable display looks towards the sky and is horizontally aligned.
+
+- When training gestures, it's very important to choose gestures that don't have any slowdowns regarding acceleration occuring. Because, if one were to excersize this gesture in the Recognize phase, the slowdowns would make the Gesture Spotting mechanism think the gesture has been completed and hence, will stop the tracking too fast.
+For example: don't use a Z form but use an S form, because the latter doesn't have any slowdowns happening.
+Likewise, use a circle form instead of a square form.
 
 - The below section in the thesis book, under section 5.2.1 (page 38) is out-of-date:
 
@@ -47,6 +61,8 @@ This means the user does NOT have to reenter the IP Insertion dialog like the se
 - The Connect tab can be rotated to both portrait and landscape orientation.
 The code provided by the $3 Gesture Recognizer framework however, forces landscape mode by default. Since changing orientation destroys and recreates Android Fragments, this has probably been forced for a reason.
 We didn't test the implications of disabling this enforcement and switching orientations. This means the Train, Recognize and Gesture Library tabs will always run in landscape mode.
+
+
 
 Known issues:
 - As the message on the Recognize tab states: the Vibration Feedback function is experimental since with this feature enabled, sometimes additional gestures get triggered aside from the requested one. For example, when you exercised a circle, the recognizer will classify it as a circle. The Pebble will then vibrate 1 time to indicate a gesture was recognized. And this vibration will trigger an up, down, left or right gesture right after.
