@@ -27,6 +27,7 @@ Remarks:
 - When exercising the up/down/left/right gesture, the start position is the position where the wearable display looks towards the sky and is horizontally aligned.
 
 - The below section in the thesis book, under section 5.2.1 (page 38) is out-of-date:
+
 START QUOTE
 Wanneer de Application Data van de mobiele app werd gewist, heeft de mobiele app geen weet van 
 de systemID’s van elke Action Device. De gebruiker moet in dat geval een eerste verbinding leggen
@@ -43,6 +44,9 @@ Here they are briefly:
 3) The connection between systemID and IP address has now been confirmed and is immediately usable.
 This means the user does NOT have to reenter the IP Insertion dialog like the segment in the thesis states.
 
+- The Connect tab can be rotated to both portrait and landscape orientation.
+The code provided by the $3 Gesture Recognizer framework however, forces landscape mode by default. Since changing orientation destroys and recreates Android Fragments, this has probably been forced for a reason.
+We didn't test the implications of disabling this enforcement and switching orientations. This means the Train, Recognize and Gesture Library tabs will always run in landscape mode.
 
 Known issues:
 - As the message on the Recognize tab states: the Vibration Feedback function is experimental since with this feature enabled, sometimes additional gestures get triggered aside from the requested one. For example, when you exercised a circle, the recognizer will classify it as a circle. The Pebble will then vibrate 1 time to indicate a gesture was recognized. And this vibration will trigger an up, down, left or right gesture right after.
@@ -58,4 +62,4 @@ Same for when a completely new Pebble is getting paired through the 'Connect Peb
 
 - While pressing the Back button (bottom left corner) repeatedly, the currently selected tab doesn't get highlighted.
 
-- When touching the 'Clear all trained gestures' button, the list's view doesn't get cleared immediately but only when going to another GUI panel and back to the Gesture Library panel.
+- When touching the 'Clear all trained gestures' button, the list's view doesn't get cleared immediately but only when going to another GUI panel and back to the Gesture Library panel. (The underlying data does get immediately cleared though, as expected.)
