@@ -22,6 +22,8 @@ https://github.com/Asgaro/action-device-client-server-code
 https://github.com/Asgaro/mmlab-app-additions
 
 Overall architecture overview: https://dl.dropboxusercontent.com/u/2648/Masterproef/Overall%20architecture.png
+In this overview, the 'central hub' is a mobile device running the Android application provided in this repo.
+Note the Android GUI has only been optimized for tablets.
 
 A presentation in Dutch with accompanying script can be found at: https://dl.dropboxusercontent.com/u/2648/Masterproef/Presentatie%20Yen%20Mertens.pptx
 
