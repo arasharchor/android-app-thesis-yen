@@ -1,27 +1,31 @@
 # Android app
 Android companion app for Pebble™
 
-Made for my master's thesis at the University of Ghent, Belgium.
+Made for my master's thesis at the University of Ghent, Belgium. In cooperation with iMinds ( http://www.iminds.be/ ).
 
-
-
-The Android app has the following features:
-Check thesis book ( https://dl.dropboxusercontent.com/u/2648/Masterproef/Scriptie%20Yen%20Mertens.pdf ).
-
-
-
-Workflow:
-Check thesis book ( https://dl.dropboxusercontent.com/u/2648/Masterproef/Scriptie%20Yen%20Mertens.pdf ) at section 5.2: Gebruikersinterface en behind-the-scenes.
-
-
-
+Screenshots:
+- CONNECT tab: https://dl.dropboxusercontent.com/u/2648/Masterproef/CONNECT%20tab.png
+- TRAIN tab: https://dl.dropboxusercontent.com/u/2648/Masterproef/TRAIN%20tab.png
+- RECOGNIZE tab: https://dl.dropboxusercontent.com/u/2648/Masterproef/RECOGNIZE%20tab.png
+- Gesture Library: https://dl.dropboxusercontent.com/u/2648/Masterproef/Gesture%20library.png
 
 Installation instructions:
-TODO
+
+0) NOTE: his project also needs the following components to work:
+- Wearable side (Pebble) application
+https://github.com/Asgaro/pebble-app-thesis-yen
+- Central hub side (Android) application
+https://github.com/Asgaro/android-app-thesis-yen
+- Action Device side (Ubuntu) application
+https://github.com/Asgaro/action-device-client-server-code
+- 4K free-viewpoint application with additions
+https://github.com/Asgaro/mmlab-app-additions
+
+Overall architecture overview: https://dl.dropboxusercontent.com/u/2648/Masterproef/Overall%20architecture.png
+A presentation in Dutch with accompanying script can be found at: https://dl.dropboxusercontent.com/u/2648/Masterproef/Presentatie%20Yen%20Mertens.pptx
 
 
-
-Used:
+Used source code:
 - 3D gesture recognition framework $3 Gesture Recognizer:
 https://code.google.com/p/three-dollar-gesture-recognizer/
 
