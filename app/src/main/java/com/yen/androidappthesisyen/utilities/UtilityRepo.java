@@ -1,6 +1,5 @@
 package com.yen.androidappthesisyen.utilities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
@@ -25,6 +24,25 @@ public class UtilityRepo {
 
     private static final String LOG_TAG = UtilityRepo.class.getName();
 
+
+//    public static void enableAccelStream(Context theContext, String systemID) {
+//
+//        String previousList = getEnabledAccelStreamDevices(theContext);
+//        Log.w(LOG_TAG, "previousList " + previousList);
+//
+//        addNewAccelStreamState(theContext, systemID, "enable"); // List has now been updated.
+//
+//        if (systemID.equalsIgnoreCase("triggered-by-user") || previousList.equalsIgnoreCase("") || previousList.equalsIgnoreCase(";")) {
+//            // The previous list was empty. This means we deliberately need to send a signal to start the accel stream.
+//
+//            PebbleDictionary dict = new PebbleDictionary();
+//            dict.addInt32(1, 0); // key = 1 = TRUE = start stream, value = 0
+//            PebbleKit.sendDataToPebble(theContext, UUID.fromString("297c156a-ff89-4620-9d31-b00468e976d4"), dict);
+//
+//        } else {
+//            // The previous list was NOT empty. This means we don't need to send the signal to start the stream, since it's already running.
+//        }
+//    }
 
     public static Map<String, String> getMapSupportedGestures(Context theContext) {
 
@@ -153,8 +171,6 @@ public class UtilityRepo {
     }
 
 
-
-
     public static List<String> getListSystemIDsToConnectTo(Context context) {
 
         List<String> theList = new ArrayList<>();
@@ -168,7 +184,6 @@ public class UtilityRepo {
 
         return theList;
     }
-
 
 
     public static void addSystemIDToListSystemIDsToConnectTo(Context context, String systemID) {

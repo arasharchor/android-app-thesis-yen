@@ -49,15 +49,12 @@ public class GestureLibraryFragment extends ListFragment {
         stateChange = UsedConstants.STATES.STATE_LIBRARY;
 
 
-
         // see if we have a gesture library
-        // TODO eventueel deze if binnen de try/catch zetten indien nodig.
         if (GestureLibrary.GLibrarySingleInstance == null) {
 
             Log.w(LOG_TAG, "--------------------- NO GESTURE LIBRARY YET ---------------------");
 
 
-            // TODO je hebt hier TRY CATCH rond gezet want gaf error over SQL en close(): to fix.
             try {
                 this.glibrary_instance = new GestureLibrary("GESTURES", getActivity());
             } catch (Exception ex) {
@@ -106,10 +103,8 @@ public class GestureLibraryFragment extends ListFragment {
         });
 
 
-
         return returnedView;
     }
-
 
 
     public void initListView() {
@@ -132,7 +127,7 @@ public class GestureLibraryFragment extends ListFragment {
     public void onStart() {
         super.onStart();
 
-        // TODO mag wrsl weg wnt niet echt relevant?
+        // TODO mag wrsl weg wnt niet meer relevant?
         stateChange = UsedConstants.STATES.STATE_LIBRARY;
     }
 
@@ -142,10 +137,6 @@ public class GestureLibraryFragment extends ListFragment {
 
 
     }
-
-
-
-
 
 
 }

@@ -22,7 +22,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -43,9 +42,7 @@ import static com.yen.androidappthesisyen.utilities.UtilityRepo.getListSystemIDs
 import static com.yen.androidappthesisyen.utilities.UtilityRepo.removeSystemIDFromListSystemIDsToConnectTo;
 
 
-
 public class MainFragment extends Fragment implements View.OnClickListener {
-
 
 
     /*Use Static Final For Constants
@@ -111,8 +108,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         // get a list of paired devices by calling getBondedDevices()
         // List empty if BT is off.
         setPairedBTDevices = BTadapter.getBondedDevices();
-
-        // TODO of gaan we toch globaal landscape afdwingen? (als ja, doe dit via manifest)
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
     }
@@ -144,7 +139,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         setToggleStatesFromBundle(returnedView);
 
 
-
         registerButtonAndToggleListeners(returnedView);
 
         initListViewMain(returnedView);
@@ -156,7 +150,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         setBTRelatedStates(returnedView);
 
         Button serviceButton = (Button) returnedView.findViewById(R.id.buttonService);
-        serviceButton.setOnClickListener(new View.OnClickListener(){
+        serviceButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -232,13 +226,10 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                         saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
 
 
-
                         addSystemIDToListSystemIDsToConnectTo(getActivity(), systemIDandIPaddress[0]);
 
 
-
                         showIPDialogNoSavedSystemIDs(currentEnumInSystemIDList + 1);
-
 
 
                     }
@@ -329,18 +320,14 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                         Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
 
 
-
                         // For our use case, the IP of Face Detector and IP of Gesture Handler are always one and the same.
                         saveIPIfInserted(systemIDandIPaddress[0], systemIDandIPaddress[1]);
-
 
 
                         addSystemIDToListSystemIDsToConnectTo(getActivity(), systemIDandIPaddress[0]);
 
 
-
                         askNextAction(currentEnumInSystemIDList + 1);
-
 
 
                     }
@@ -357,12 +344,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                         String value = String.valueOf(input.getText());
 
 
-                        if(value.length() >= 1){
+                        if (value.length() >= 1) {
 
                             String[] systemIDandIPaddress = value.split("//");
 
                             Log.w(LOG_TAG, "================================ first " + systemIDandIPaddress[0] + " last " + systemIDandIPaddress[1]);
-
 
 
                             // For our use case, the IP of Face Detector and IP of Gesture Handler are always one and the same.
@@ -414,8 +400,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                         }
 
 
-
-
                     }
                 });
 
@@ -432,7 +416,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         dialog.show();
 
     }
-
 
 
     private void showIPDialog(final int currentEnumInSystemIDList, final String systemID) {
@@ -472,7 +455,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
                         List<String> listSavedSystemIDs = getListSavedSystemIDs(getActivity());
 
-                        if (listSavedSystemIDs.size() > currentEnumInSystemIDList + 1){
+                        if (listSavedSystemIDs.size() > currentEnumInSystemIDList + 1) {
                             showIPDialog(currentEnumInSystemIDList + 1, listSavedSystemIDs.get(currentEnumInSystemIDList + 1));
                         } else {
                             askNextAction(currentEnumInSystemIDList + 1);
@@ -530,7 +513,6 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
 
     }
-
 
 
     private void startOrRestartService(int enumerator) {
@@ -865,9 +847,6 @@ Extend the ArrayAdapter class and override the getView() method to modify the vi
     }
 
 
-
-    // TODO en nu moet gezorgd worden dat lijst links in GUI wordt geupdate. maar gebeurt al sowieso na een pairing en na restart vd app.
-    // Maar kan dit direct nu al gebeuren?
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {

@@ -18,10 +18,6 @@
     </style>
 
 
-
-
-
-
     <!-- File created by the Android Action Bar Style Generator
 
      Copyright (C) 2011 The Android Open Source Project
@@ -40,38 +36,46 @@
      limitations under the License.
 -->
     <style name="Theme.Lightdarkmixed" parent="@android:style/Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarItemBackground">@drawable/selectable_background_lightdarkmixed</item>
+        <item name="android:actionBarItemBackground">
+            @drawable/selectable_background_lightdarkmixed
+        </item>
         <item name="android:popupMenuStyle">@style/PopupMenu.Lightdarkmixed</item>
         <item name="android:dropDownListViewStyle">@style/DropDownListView.Lightdarkmixed</item>
         <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Lightdarkmixed</item>
         <item name="android:actionDropDownStyle">@style/DropDownNav.Lightdarkmixed</item>
         <item name="android:actionBarStyle">@style/ActionBar.Solid.Lightdarkmixed</item>
         <item name="android:actionModeBackground">@drawable/cab_background_top_lightdarkmixed</item>
-        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_lightdarkmixed</item>
-        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Lightdarkmixed</item>
+        <item name="android:actionModeSplitBackground">
+            @drawable/cab_background_bottom_lightdarkmixed
+        </item>
+        <item name="android:actionModeCloseButtonStyle">
+            @style/ActionButton.CloseMode.Lightdarkmixed
+        </item>
 
         <!-- Light.DarkActionBar specific -->
         <item name="android:actionBarWidgetTheme">@style/Theme.Lightdarkmixed.Widget</item>
-
-
-
-
-
 
 
         <!-- Generated with http://android-holo-colors.com -->
         <item name="android:editTextBackground">@drawable/extrabuttons_edit_text_holo_light</item>
 
         <item name="android:textColorHighlight">#9933b5e5</item>
-        <item name="android:textSelectHandleLeft">@drawable/extrabuttons_text_select_handle_left</item>
-        <item name="android:textSelectHandleRight">@drawable/extrabuttons_text_select_handle_right</item>
-        <item name="android:textSelectHandle">@drawable/extrabuttons_text_select_handle_middle</item>
+        <item name="android:textSelectHandleLeft">@drawable/extrabuttons_text_select_handle_left
+        </item>
+        <item name="android:textSelectHandleRight">@drawable/extrabuttons_text_select_handle_right
+        </item>
+        <item name="android:textSelectHandle">@drawable/extrabuttons_text_select_handle_middle
+        </item>
 
-        <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewExtraButtons</item>
+        <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewExtraButtons
+        </item>
 
-        <item name="android:listChoiceIndicatorMultiple">@drawable/extrabuttons_btn_check_holo_light</item>
+        <item name="android:listChoiceIndicatorMultiple">
+            @drawable/extrabuttons_btn_check_holo_light
+        </item>
 
-        <item name="android:listChoiceIndicatorSingle">@drawable/extrabuttons_btn_radio_holo_light</item>
+        <item name="android:listChoiceIndicatorSingle">@drawable/extrabuttons_btn_radio_holo_light
+        </item>
 
         <item name="android:buttonStyle">@style/ButtonExtraButtons</item>
 
@@ -91,11 +95,16 @@
 
         <item name="android:buttonStyleToggle">@style/ToggleExtraButtons</item>
 
-        <item name="android:listChoiceBackgroundIndicator">@drawable/extrabuttons_list_selector_holo_light</item>
+        <item name="android:listChoiceBackgroundIndicator">
+            @drawable/extrabuttons_list_selector_holo_light
+        </item>
 
-        <item name="android:activatedBackgroundIndicator">@drawable/extrabuttons_activated_background_holo_light</item>
+        <item name="android:activatedBackgroundIndicator">
+            @drawable/extrabuttons_activated_background_holo_light
+        </item>
 
-        <item name="android:fastScrollThumbDrawable">@drawable/extrabuttons_fastscroll_thumb_holo</item>
+        <item name="android:fastScrollThumbDrawable">@drawable/extrabuttons_fastscroll_thumb_holo
+        </item>
 
 
     </style>
@@ -145,14 +154,6 @@
     </style>
 
 
-
-
-
-
-
-
-
-
     <style name="AutoCompleteTextViewExtraButtons" parent="android:Widget.Holo.Light.AutoCompleteTextView">
         <item name="android:dropDownSelector">@drawable/extrabuttons_list_selector_holo_light</item>
         <item name="android:background">@drawable/extrabuttons_edit_text_holo_light</item>
@@ -192,29 +193,45 @@
     </style>
 
     <style name="ProgressBarExtraButtons" parent="android:Widget.Holo.Light.ProgressBar.Horizontal">
-        <item name="android:progressDrawable">@drawable/extrabuttons_progress_horizontal_holo_light</item>
-        <item name="android:indeterminateDrawable">@drawable/extrabuttons_progress_indeterminate_horizontal_holo_light</item>
+        <item name="android:progressDrawable">
+            @drawable/extrabuttons_progress_horizontal_holo_light
+        </item>
+        <item name="android:indeterminateDrawable">
+            @drawable/extrabuttons_progress_indeterminate_horizontal_holo_light
+        </item>
     </style>
 
     <style name="SeekBarExtraButtons" parent="android:Widget.Holo.Light.SeekBar">
-        <item name="android:progressDrawable">@drawable/extrabuttons_scrubber_progress_horizontal_holo_light</item>
-        <item name="android:indeterminateDrawable">@drawable/extrabuttons_scrubber_progress_horizontal_holo_light</item>
-        <item name="android:thumb">@drawable/extrabuttons_scrubber_control_selector_holo_light</item>
+        <item name="android:progressDrawable">
+            @drawable/extrabuttons_scrubber_progress_horizontal_holo_light
+        </item>
+        <item name="android:indeterminateDrawable">
+            @drawable/extrabuttons_scrubber_progress_horizontal_holo_light
+        </item>
+        <item name="android:thumb">@drawable/extrabuttons_scrubber_control_selector_holo_light
+        </item>
     </style>
 
     <style name="RatingBarExtraButtons" parent="android:Widget.Holo.Light.RatingBar">
-        <item name="android:progressDrawable">@drawable/extrabuttons_ratingbar_full_holo_light</item>
-        <item name="android:indeterminateDrawable">@drawable/extrabuttons_ratingbar_full_holo_light</item>
+        <item name="android:progressDrawable">@drawable/extrabuttons_ratingbar_full_holo_light
+        </item>
+        <item name="android:indeterminateDrawable">
+            @drawable/extrabuttons_ratingbar_full_holo_light
+        </item>
     </style>
 
     <style name="RatingBarBigExtraButtons" parent="android:Widget.Holo.Light.RatingBar.Indicator">
         <item name="android:progressDrawable">@drawable/extrabuttons_ratingbar_holo_light</item>
-        <item name="android:indeterminateDrawable">@drawable/extrabuttons_ratingbar_holo_light</item>
+        <item name="android:indeterminateDrawable">@drawable/extrabuttons_ratingbar_holo_light
+        </item>
     </style>
 
     <style name="RatingBarSmallExtraButtons" parent="android:Widget.Holo.Light.RatingBar.Small">
-        <item name="android:progressDrawable">@drawable/extrabuttons_ratingbar_small_holo_light</item>
-        <item name="android:indeterminateDrawable">@drawable/extrabuttons_ratingbar_small_holo_light</item>
+        <item name="android:progressDrawable">@drawable/extrabuttons_ratingbar_small_holo_light
+        </item>
+        <item name="android:indeterminateDrawable">
+            @drawable/extrabuttons_ratingbar_small_holo_light
+        </item>
     </style>
 
     <style name="ToggleExtraButtons" parent="android:Widget.Holo.Light.Button.Toggle">

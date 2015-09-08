@@ -42,8 +42,7 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
 
         // We first have to check whether a gesture different from up/down/left/right got recognized.
         // If yes, we don't recognize the gesture as up/down/left/right.
-        if(!theAdvancedFragment.isAdvancedRecording()){
-
+        if (!theAdvancedFragment.isAdvancedRecording()) {
 
 
             theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
@@ -64,7 +63,6 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
             Log.w(LOG_TAG, "wrist LEFT <--");
 
 
-
         }
 
 
@@ -75,7 +73,7 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
 
         // We first have to check whether a gesture different from up/down/left/right got recognized.
         // If yes, we don't recognize the gesture as up/down/left/right.
-        if(!theAdvancedFragment.isAdvancedRecording()) {
+        if (!theAdvancedFragment.isAdvancedRecording()) {
 
             theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -100,7 +98,7 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
 
         // We first have to check whether a gesture different from up/down/left/right got recognized.
         // If yes, we don't recognize the gesture as up/down/left/right.
-        if(!theAdvancedFragment.isAdvancedRecording()) {
+        if (!theAdvancedFragment.isAdvancedRecording()) {
 
             theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -125,7 +123,7 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
 
         // We first have to check whether a gesture different from up/down/left/right got recognized.
         // If yes, we don't recognize the gesture as up/down/left/right.
-        if(!theAdvancedFragment.isAdvancedRecording()) {
+        if (!theAdvancedFragment.isAdvancedRecording()) {
 
             theAdvancedFragment.getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -151,7 +149,6 @@ public class TiltGestureRecognizer extends PebbleGestureModel {
      */
     @Override
     public void onActionEnd() {
-        // TODO usen?
         Log.w(LOG_TAG, "onActionEnd()");
     }
 

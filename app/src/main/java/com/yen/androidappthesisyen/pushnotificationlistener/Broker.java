@@ -41,7 +41,6 @@ public class Broker {
     }
 
 
-
     public MQTTService.MQTTConnectionStatus getConnectionStatus() {
         return connectionStatus;
     }

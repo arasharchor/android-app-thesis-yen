@@ -15,12 +15,9 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yen.androidappthesisyen.R;
@@ -122,13 +119,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                     @Override
                     public void run() {
 
-                        // TODO labels don't update dynamically
-                        // Change Pebble™ connection label
-//                        MainFragment myFragment = (MainFragment)getFragmentManager().findFragmentByTag("main");
-//                        if (myFragment != null) {
-//                            myFragment.pebbleGotConnected();
-//                        }
-
                         Toast.makeText(context, R.string.pebble_connected_toast, Toast.LENGTH_LONG).show();
                     }
                 });
@@ -142,13 +132,6 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
-                        // TODO labels don't update dynamically
-                        // Change Pebble™ connection label
-//                        MainFragment myFragment = (MainFragment)getFragmentManager().findFragmentByTag("main");
-//                        if (myFragment != null) {
-//                            myFragment.pebbleGotDisconnected();
-//                        }
 
                         Toast.makeText(context, R.string.pebble_not_connected_toast, Toast.LENGTH_LONG).show();
                     }
@@ -251,7 +234,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
     }
 
 
-    // TODO ALS JE HIER IETS AANPAST, OOK IN ZELFDE METHODE IN ADVANCEDACTIVITY.JAVA
+    // IF YOU CHANGE SOMETHING HERE, ALSO CHANGE IT WITHIN THE SAME METHOD IN ADVANCEDACTIVITY.JAVA
     private void addNavigationTabs(ActionBar theActionBar) {
 
         // Only recently gotten deprecated: since Android 5.0

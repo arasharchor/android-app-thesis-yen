@@ -50,9 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        />
-
+        android:layout_centerHorizontal="true" />
 
 
     <!-- voor THREE DOLLAR gesture detection -->
@@ -95,6 +93,20 @@
             android:layout_height="wrap_content"
             android:text="@string/choose_gesture_to_train" />
 
+        <TextView
+            android:layout_width="499dp"
+            android:layout_height="54dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="If you don&apos;t want to use the Circle gesture to start the MMLab app, use the below manual method."
+            android:id="@+id/textView_MMLab_manually" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start MMLab app"
+            android:id="@+id/button_MMLab_manually"
+            android:layout_weight="0.04" />
+
         <ToggleButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -103,10 +115,10 @@
             android:layout_weight="0.04" />
 
         <TextView
-            android:layout_width="324dp"
-            android:layout_height="166dp"
+            android:layout_width="633dp"
+            android:layout_height="96dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Enable Vibration Feedback to get notified when a gesture got recognized or an error occured. \n IMPORTANT: This feature is experimental and will sometimes trigger additional unwanted gestures aside from the requested one."
+            android:text="Enable Vibration Feedback to get notified when a gesture got recognized or an error occured. IMPORTANT: This feature is experimental and will sometimes trigger additional unwanted gestures aside from the requested one."
             android:id="@+id/label_FeedbackVibration" />
 
 
@@ -129,13 +141,13 @@
         android:id="@+id/scrollView_gestures"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/relative_layout_three_dollar_gesture_detection"
         android:layout_below="@+id/rate_view"
         android:padding="16dp"
         android:layout_alignLeft="@+id/checkBoxGestureSpotting"
         android:layout_alignStart="@+id/checkBoxGestureSpotting"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true">
 
         <TextView
             android:id="@+id/textView_gestures"

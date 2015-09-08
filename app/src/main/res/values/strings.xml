@@ -68,13 +68,10 @@
     <string name="label_tab_4">Recognize</string>
 
 
-
-
     <!-- voor PEBBLE DATA STREAM -->
     <string name="x_axis_title">x-axis</string>
     <string name="y_axis_title">y-axis</string>
     <string name="z_axis_title">z-axis</string>
-
 
 
     <string name="title_activity_pebble_gesture_overview">Pebble™ Gesture Overview</string>
@@ -100,7 +97,6 @@
     <string name="hello_world">Hello world!</string>
 
 
-
     <!--  DeviceListActivity -->
     <string name="scanning">Scanning for Bluetooth devices...</string>
     <string name="select_device">Select a Bluetooth device to connect</string>
@@ -116,8 +112,8 @@
     <string name="tutorial_train">1) Choose gesture to train. \n2) Record the gesture by holding (not tapping) the record button. \n
         3) Make sure to have 8 or more trainings records for each gesture. The more, the better. \nEach training count can be found in the Gesture Library. \n4) Train another gesture by starting from 1).</string>
     <string name="tutorial_recognize"><![CDATA[The face detectors on the connected Action Devices
-    allow for automatic enabling & disabling of the Pebble™ accelerometer data stream. Manual toggle available on the right. \n\n1x
-    Vibration = A gesture was recognized and this gesture is supported by at least 1 currently connected Action Device. \n\n2x Vibration = No currently connected Action Device supports this gesture OR No network connection.]]></string>
+    allow for automatic enabling & disabling of the Pebble™ accelerometer data stream. Manual toggle available on the right. \n\n If Vibration Feedback is enabled below: \n1x
+    Vibration = A gesture was recognized and this gesture is supported by at least 1 currently connected Action Device. \n2x Vibration = No currently connected Action Device supports this gesture OR No network connection.]]></string>
     <string name="official_app">Official Pebble™ Companion App</string>
 
 

@@ -41,10 +41,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -681,9 +679,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
 
     // ----------- KOPIE OOK TE VINDEN IN ADVANCEDFRAGMENT.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
-    // we protect against the phone switching off while we're doing this
-    //  by requesting a wake lock - we request the minimum possible wake
-    //  lock - just enough to keep the CPU running until we've finished
     private void enableAccelStream(String systemID) {
 
         String previousList = getEnabledAccelStreamDevices(getApplicationContext());
@@ -701,7 +696,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
         } else {
             // The previous list was NOT empty. This means we don't need to send the signal to start the stream, since it's already running.
         }
-
 
     }
 
@@ -902,7 +896,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
      * ********************************************************************
      */
 
-    // TODO modify this code so only the disconnected broker gets modified, and not immediately ALL brokers we use.
+    // TODO Modify this code so only the disconnected broker gets modified, and not immediately ALL brokers we use.
     /*
      * callback - method called when we no longer have a connection to the
      *  message broker server
@@ -1165,7 +1159,6 @@ public class MQTTService extends Service implements MqttSimpleCallback {
             scheduleNextPing();
 
 
-
             return false;
 
 
@@ -1206,11 +1199,11 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                 subscribed = true;
 
             } catch (MqttNotConnectedException e) {
-                Log.e(LOG_TAG, "subscribe failed for broker " + brokerName +": MQTT not connected", e);
+                Log.e(LOG_TAG, "subscribe failed for broker " + brokerName + ": MQTT not connected", e);
             } catch (IllegalArgumentException e) {
-                Log.e(LOG_TAG, "subscribe failed for broker " + brokerName +": illegal argument", e);
+                Log.e(LOG_TAG, "subscribe failed for broker " + brokerName + ": illegal argument", e);
             } catch (MqttException e) {
-                Log.e(LOG_TAG, "subscribe failed for broker " + brokerName +": MQTT exception", e);
+                Log.e(LOG_TAG, "subscribe failed for broker " + brokerName + ": MQTT exception", e);
             }
         }
 
@@ -1329,7 +1322,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
                     Log.w(LOG_TAG, "wrong enum for broker " + brokerName);
                 }
 
-                // TODO HIER NOG DE 2DE REGEL OF TOTALE OMRINGENDE CODE COPYPASTEN.
+
                 handleStart(intent, 0);
 
             } else {
@@ -1565,6 +1558,7 @@ public class MQTTService extends Service implements MqttSimpleCallback {
 
     /************************************************************************/
     /*    METHODS - internal utility methods                                */
+
     /**
      * ********************************************************************
      */

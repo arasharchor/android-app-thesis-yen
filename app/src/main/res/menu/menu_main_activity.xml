@@ -23,8 +23,7 @@
     <item
         android:id="@+id/action_button_1"
         android:showAsAction="ifRoom|withText"
-        android:title="@string/action_label_button_1"
-        />
+        android:title="@string/action_label_button_1" />
 
 
     <!-- Navigation submenu -->
@@ -61,31 +60,31 @@
 
 
     <!-- action bar background submenu -->
-   <!-- <item
-        android:id="@+id/action_menu_setting_2"
-        android:title="@string/action_label_setting_2">
+    <!-- <item
+         android:id="@+id/action_menu_setting_2"
+         android:title="@string/action_label_setting_2">
 
 
-        <menu>
+         <menu>
 
-            <group
-                android:id="@+id/action_group_setting_2"
-                android:checkableBehavior="single">
+             <group
+                 android:id="@+id/action_group_setting_2"
+                 android:checkableBehavior="single">
 
-                <item
-                    android:id="@+id/action_set_2_opt_1"
-                    android:title="@string/action_label_set_2_opt_1"
-                    android:checked="true" />
+                 <item
+                     android:id="@+id/action_set_2_opt_1"
+                     android:title="@string/action_label_set_2_opt_1"
+                     android:checked="true" />
 
-                <item
-                    android:id="@+id/action_set_2_opt_2"
-                    android:title="@string/action_label_set_2_opt_2" />
+                 <item
+                     android:id="@+id/action_set_2_opt_2"
+                     android:title="@string/action_label_set_2_opt_2" />
 
-            </group>
+             </group>
 
-        </menu>
+         </menu>
 
 
-    </item>-->
+     </item>-->
 
 </menu>

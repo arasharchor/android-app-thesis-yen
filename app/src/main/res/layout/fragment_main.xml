@@ -10,7 +10,6 @@
     android:id="@+id/relative_layout_main_fragment">
 
 
-
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView_main_fragment"
         android:layout_width="wrap_content"
@@ -115,12 +114,10 @@
                 </TableRow>
 
 
-
                 <TableRow
                     android:id="@+id/tableRow_4_main"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    >
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:id="@+id/label_generic_sensor_streaming"
@@ -128,7 +125,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_mqtt_service_toggle"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
 
                     <ToggleButton
                         android:id="@+id/toggle_generic"
@@ -137,7 +134,7 @@
                         android:checked="false"
                         android:text="@string/generic_toggle"
                         android:enabled="false"
-                        android:visibility="invisible"/>
+                        android:visibility="invisible" />
 
                 </TableRow>
 
@@ -147,7 +144,7 @@
 
     </HorizontalScrollView>
 
-<!--android:background="@drawable/border_ui"-->
+    <!--android:background="@drawable/border_ui"-->
     <ListView
         android:id="@+id/listView_main"
         android:layout_width="wrap_content"
@@ -158,7 +155,7 @@
         android:layout_toStartOf="@+id/horizontalScrollView_main_fragment"
         android:layout_toLeftOf="@+id/horizontalScrollView_main_fragment" />
 
-<!--android:background="@drawable/border_ui"-->
+    <!--android:background="@drawable/border_ui"-->
     <!--<ScrollView
         android:id="@+id/scrollView_output_window"
         android:layout_width="wrap_content"

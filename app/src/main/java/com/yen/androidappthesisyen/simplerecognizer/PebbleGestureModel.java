@@ -23,7 +23,7 @@ public abstract class PebbleGestureModel {
      * Object that manages Pebble wrist movement gestures.
      * The user should extend their wrist with the fist pointing directly out from the chest as if to punch, with the watch's face pointing upwards
      *
-     * @param accelThreshold            Value from 0 to 4000 above which an action on an axis will be triggered
+     * @param accelThreshold       Value from 0 to 4000 above which an action on an axis will be triggered
      * @param durationMilliseconds Minimum time between gestures in milliseconds
      * @param modeConstant         Mode constant from this class for FLICK or TILT operation
      */
@@ -56,56 +56,56 @@ public abstract class PebbleGestureModel {
                 case MODE_TILT:
                 */
 
-                    // Check left
-                    if (!triggers[0] && accelData[1] > accelThreshold) {
-                        triggers[0] = true;
-                        onWristLeft();
-                        lastActionTime = now;
-                        actionYetToEnd = true;
-                        Boolean[] booleanArray = {true, false};
-                        return booleanArray;
-                    } else {
-                        triggers[0] = false;
-                    }
+            // Check left
+            if (!triggers[0] && accelData[1] > accelThreshold) {
+                triggers[0] = true;
+                onWristLeft();
+                lastActionTime = now;
+                actionYetToEnd = true;
+                Boolean[] booleanArray = {true, false};
+                return booleanArray;
+            } else {
+                triggers[0] = false;
+            }
 
 
-                    // Check right
-                    if (!triggers[1] && accelData[1] < (-1 * accelThreshold * REDUCTION_FACTOR)) {
-                        triggers[1] = true;
-                        onWristRight();
-                        lastActionTime = now;
-                        actionYetToEnd = true;
-                        Boolean[] booleanArray = {true, false};
-                        return booleanArray;
-                    } else {
-                        triggers[1] = false;
-                    }
+            // Check right
+            if (!triggers[1] && accelData[1] < (-1 * accelThreshold * REDUCTION_FACTOR)) {
+                triggers[1] = true;
+                onWristRight();
+                lastActionTime = now;
+                actionYetToEnd = true;
+                Boolean[] booleanArray = {true, false};
+                return booleanArray;
+            } else {
+                triggers[1] = false;
+            }
 
 
-                    // Check up
-                    if (!triggers[2] && accelData[0] < (-1 * accelThreshold * REDUCTION_FACTOR)) {
-                        triggers[2] = true;
-                        onWristUp();
-                        lastActionTime = now;
-                        actionYetToEnd = true;
-                        Boolean[] booleanArray = {true, false};
-                        return booleanArray;
-                    } else {
-                        triggers[2] = false;
-                    }
+            // Check up
+            if (!triggers[2] && accelData[0] < (-1 * accelThreshold * REDUCTION_FACTOR)) {
+                triggers[2] = true;
+                onWristUp();
+                lastActionTime = now;
+                actionYetToEnd = true;
+                Boolean[] booleanArray = {true, false};
+                return booleanArray;
+            } else {
+                triggers[2] = false;
+            }
 
 
-                    // Check down
-                    if (!triggers[3] && accelData[0] > accelThreshold * REDUCTION_FACTOR) {
-                        triggers[3] = true;
-                        onWristDown();
-                        lastActionTime = now;
-                        actionYetToEnd = true;
-                        Boolean[] booleanArray = {true, false};
-                        return booleanArray;
-                    } else {
-                        triggers[3] = false;
-                    }
+            // Check down
+            if (!triggers[3] && accelData[0] > accelThreshold * REDUCTION_FACTOR) {
+                triggers[3] = true;
+                onWristDown();
+                lastActionTime = now;
+                actionYetToEnd = true;
+                Boolean[] booleanArray = {true, false};
+                return booleanArray;
+            } else {
+                triggers[3] = false;
+            }
 
             /*
                     break;

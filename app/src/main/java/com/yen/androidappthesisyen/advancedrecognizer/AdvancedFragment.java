@@ -13,7 +13,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -50,9 +49,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -134,7 +131,21 @@ public class AdvancedFragment extends Fragment {
     private UsedConstants.STATES state = UsedConstants.STATES.STATE_LEARN;
 
 
-    // private MENUITEMS menuitems;
+    public enum RecordMode {
+        MOTION_DETECTION, PUSH_TO_GESTURE
+    }
+
+    RecordMode recordMode = RecordMode.MOTION_DETECTION;
+    boolean isAdvancedRecording = false;
+    ArrayList<float[]> gestureValues = new ArrayList<float[]>();
+
+    // Values related to gesture spotting.
+    float MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING = 1200;
+    float MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING = 1050;
+    int stepsSinceNoMovement; // TODO default op 0 zetten of niet?
+    final int MINIMUM_GESTURE_LENGTH = 5; // default 8
+    // If too high, the user has to stand still for a too long time with the Pebble:
+    final int MINIMUM_STEPS_SINCE_NO_MOVEMENT = 8; // default 10
 
 
     private void showChooseGestureDialog() {
@@ -153,7 +164,7 @@ public class AdvancedFragment extends Fragment {
                 List<String> newList = Arrays.asList(arrayGestures);
                 for (int i = 0; i < newList.size(); i++) {
                     // Remove up/down/left/right since those never need to be trained.
-                    if(newList.get(i).equalsIgnoreCase("up") || newList.get(i).equalsIgnoreCase("down") || newList.get(i).equalsIgnoreCase("left") || newList.get(i).equalsIgnoreCase("right")){
+                    if (newList.get(i).equalsIgnoreCase("up") || newList.get(i).equalsIgnoreCase("down") || newList.get(i).equalsIgnoreCase("left") || newList.get(i).equalsIgnoreCase("right")) {
                         newList.set(i, "");
                     } else {
                         newList.set(i, WordUtils.capitalize(newList.get(i)));
@@ -168,13 +179,12 @@ public class AdvancedFragment extends Fragment {
             setSupportedGestures = new TreeSet<>(listGestures);
 
 
-
         }
 
         final String[] arraySupportedGestures = (String[]) setSupportedGestures.toArray(new String[setSupportedGestures.size()]);
 
         Boolean caseEmpty = false;
-        if(arraySupportedGestures.length == 1 && arraySupportedGestures[0].equalsIgnoreCase("")){
+        if (arraySupportedGestures.length == 1 && arraySupportedGestures[0].equalsIgnoreCase("")) {
             arraySupportedGestures[0] = "No options available: none of your Action Devices support any trainable gesture at the moment.";
             caseEmpty = true;
         }
@@ -216,7 +226,6 @@ public class AdvancedFragment extends Fragment {
         dialog.show();
 
 
-
     }
 
 
@@ -232,9 +241,8 @@ public class AdvancedFragment extends Fragment {
         if (state.equalsIgnoreCase("recognize")) {
 
 
-                // Gesture spotting
-                findBoundariesGesture(values);
-
+            // Gesture spotting
+            findBoundariesGesture(values);
 
 
         } else if (state.equalsIgnoreCase("learn")) {
@@ -256,43 +264,12 @@ public class AdvancedFragment extends Fragment {
         }
 
 
-
     }
 
 
-    // TODO START BLOK mag naar boven
-    public enum RecordMode {
-        MOTION_DETECTION, PUSH_TO_GESTURE
-    }
-
-    RecordMode recordMode = RecordMode.MOTION_DETECTION;
-    boolean isAdvancedRecording = false;
-    ArrayList<float[]> gestureValues = new ArrayList<float[]>();
-
-    // Values related to gesture spotting.
-    // TODO ============ met MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING oppassen want 1300 was te hoog en dan werd CIRCLE nooit herkend en kwam er altijd UNKNOWN!
-    float MINIMUM_ACCELERATION_THRESHOLD_FOR_STARTING = 1200; // was lange tijd 1050.
-    float MINIMUM_ACCELERATION_THRESHOLD_WHILE_RECORDING = 1050;
-    int stepsSinceNoMovement; // TODO default op 0 zetten of niet?
-    final int MINIMUM_GESTURE_LENGTH = 5; // default 8
-    // als te hoog is moet de user te lang stilstaan met Pebble:
-    final int MINIMUM_STEPS_SINCE_NO_MOVEMENT = 8; // default 10
-    // TODO STOP BLOK mag naar boven
-
-    // TODO =========== zien welke van de 3 methodes hieronder best is om te accessen uit onWristLeft() etc.
-    // TOT NU TOE ENKEL DE 1STE METHODE GETEST (en w momenteel gebruikt) MAAR LIJKT OK.
     public Boolean isAdvancedRecording() {
         return isAdvancedRecording;
     }
-
-    public ArrayList<float[]> getGestureValues() {
-        return gestureValues;
-    }
-
-    public int getStepsSinceNoMovement() {
-        return stepsSinceNoMovement;
-    }
-    // einde 3 mogelijke methodes
 
 
     private void findBoundariesGesture(float[] values) {
@@ -339,7 +316,7 @@ public class AdvancedFragment extends Fragment {
             Log.w(LOG_TAG, "============================ Detection POSSIBLE gesture");
 
             int length = gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT;
-            if (length > MINIMUM_GESTURE_LENGTH) { // TODO ============================= MINIMUM_GESTURE_LENGTH wrsl verhogen?
+            if (length > MINIMUM_GESTURE_LENGTH) {
 //                         listener.onGestureRecorded(gestureValues.subList(0, gestureValues.size() - MINIMUM_STEPS_SINCE_NO_MOVEMENT));
                 // FYI ArrayList<float[]> gestureValues;
 
@@ -564,10 +541,9 @@ public class AdvancedFragment extends Fragment {
                 // Sending feedback to the user:
                 // If a gesture detected + supported by at least one of the currently used action devices: do 1x short vibration.
                 // This detected gesture can still be a false positive, though.
-                if(isVibrationFeedbackEnabled){
+                if (isVibrationFeedbackEnabled) {
                     doShortPebbleVibration();
                 }
-
 
 
                 // ---- START EIGEN TOEVOEGING
@@ -616,7 +592,7 @@ public class AdvancedFragment extends Fragment {
                 } else {
 
                     // Arriving here if no network connection.
-                    if(isVibrationFeedbackEnabled){
+                    if (isVibrationFeedbackEnabled) {
                         doTwoShortPebbleVibrations();
                     }
 
@@ -640,7 +616,7 @@ public class AdvancedFragment extends Fragment {
 
             } else {
 
-                if(isVibrationFeedbackEnabled){
+                if (isVibrationFeedbackEnabled) {
                     doTwoShortPebbleVibrations();
                 }
 
@@ -662,7 +638,7 @@ public class AdvancedFragment extends Fragment {
             // We should never arrive here anyway...
 
             // The accel stream isn't running. This means we don't need to do any processing.
-            if(isVibrationFeedbackEnabled){
+            if (isVibrationFeedbackEnabled) {
                 doTwoShortPebbleVibrations();
             }
 
@@ -941,6 +917,14 @@ public class AdvancedFragment extends Fragment {
                                             }
         );
 
+        final Button btnManualMMLab = (Button) returnedView.findViewById(R.id.button_MMLab_manually);
+        btnManualMMLab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                sendGestureIfMatchFound("circle");
+            }
+        });
 
         TextView tutorial = (TextView) returnedView.findViewById(R.id.tutorial);
 
@@ -958,10 +942,12 @@ public class AdvancedFragment extends Fragment {
             lblVibrationFeedback.setVisibility(View.INVISIBLE);
             toggleVibrationFeedback.setVisibility(View.INVISIBLE);
             tutorial.setText(getResources().getString(R.string.tutorial_train));
+            btnManualMMLab.setVisibility(View.INVISIBLE);
+            TextView lblMMLabManually = (TextView) returnedView.findViewById(R.id.textView_MMLab_manually);
+            lblMMLabManually.setVisibility(View.INVISIBLE);
         }
         // Don't need to show it anymore but still available if necessary.
         checkboxGestureSpotting.setVisibility(View.INVISIBLE);
-
 
         // We also place it here, since in case there is already text in the ScrollView when arriving there, we immediately scroll.
         ((ScrollView) returnedView.findViewById(R.id.scrollView_gestures)).fullScroll(View.FOCUS_DOWN);
@@ -987,15 +973,10 @@ public class AdvancedFragment extends Fragment {
 
         }
 
-        // TODO 05/09 OUD WNT NIET MEER RELEVANT WRSL stateChanged();
-
     }
 
 
     // ----------- KOPIE OOK TE VINDEN IN MQTTSERVICE.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
-    // we protect against the phone switching off while we're doing this
-    //  by requesting a wake lock - we request the minimum possible wake
-    //  lock - just enough to keep the CPU running until we've finished
     private void enableAccelStream(String systemID) {
 
         String previousList = getEnabledAccelStreamDevices(getActivity());
@@ -1012,9 +993,7 @@ public class AdvancedFragment extends Fragment {
 
         } else {
             // The previous list was NOT empty. This means we don't need to send the signal to start the stream, since it's already running.
-
         }
-
     }
 
     // ----------- KOPIE OOK TE VINDEN IN MQTTSERVICE.JAVA DUS VOER DAAR OOK WIJZIGINGEN DOOR.
@@ -1067,115 +1046,11 @@ public class AdvancedFragment extends Fragment {
     }
 
 
-    // STAAT OOK IN MQTTSERVICE.JAVA DUS DAAR OOK AANPASSEN
-//    private String getEnabledAccelStreamDevices() {
-//
-//        SharedPreferences enumSetting = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
-//        String enabledList = enumSetting.getString("enabledaccelstreamdevices", "");
-//        return enabledList;
-//    }
-
-    // STAAT OOK IN MQTTSERVICE.JAVA DUS DAAR OOK AANPASSEN
-    // KEY = "accelstreamenabled" - VALUE = comma separated list of systemIDs where stream is currently enabled.
-//    private void addNewAccelStreamState(String systemID, String stateRequest) {
-//
-//
-//        String concatenatedListEnabledActionDevices = getEnabledAccelStreamDevices();
-//
-//        String newConcatenatedString = "";
-//
-//
-//        if (stateRequest.equalsIgnoreCase("enable")) {
-//
-//
-//            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
-//
-//                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
-//                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
-//                // adding new action device systemID
-//                setEnabledActionDevices.add(systemID);
-//                // recreate concatenated string from new set
-//                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
-//
-//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-//
-//            } else {
-//
-//                newConcatenatedString = systemID;
-//
-//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-//            }
-//
-//
-//        } else if (stateRequest.equalsIgnoreCase("disable")) {
-//
-//
-//            if (concatenatedListEnabledActionDevices != null && !concatenatedListEnabledActionDevices.equalsIgnoreCase("") && !concatenatedListEnabledActionDevices.equalsIgnoreCase(";")) {
-//
-//                String[] arrayEnabledActionDevices = concatenatedListEnabledActionDevices.split(";");
-//                Set<String> setEnabledActionDevices = new HashSet<String>(Arrays.asList(arrayEnabledActionDevices));
-//                // removing action device systemID
-//                setEnabledActionDevices.remove(systemID);
-//                // recreate concatenated string from new set
-//                newConcatenatedString = TextUtils.join(";", setEnabledActionDevices);
-//
-//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-//
-//            } else {
-//
-//
-//                Log.w(LOG_TAG, "newConcatenatedString " + newConcatenatedString);
-//            }
-//
-//
-//        } else {
-//            Log.w(LOG_TAG, "Wrong accel stream state request: not 'enable' or 'disable'");
-//        }
-//
-//
-//        SharedPreferences pSharedPref = getActivity().getSharedPreferences("com.yen.androidappthesisyen.commands_receiver", Context.MODE_PRIVATE);
-//        if (pSharedPref != null) {
-//            SharedPreferences.Editor editor = pSharedPref.edit();
-//            editor.remove("enabledaccelstreamdevices").commit();
-//            editor.putString("enabledaccelstreamdevices", newConcatenatedString);
-//            editor.commit();
-//        }
-//
-//
-//    }
-
-
-    // TODO 05/09 May be removed.
-//    public void stateChanged() {
-//
-//
-//        switch (this.state) {
-//
-//            case STATE_LEARN:
-//
-//                break;
-//
-//            case STATE_RECOGNIZE:
-//                break;
-//
-//            case STATE_LIBRARY:
-//
-//                break;
-//
-//            default:
-//
-//                break;
-//        }
-//    }
-
-
-    // TODO Check if can be deleted.
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // change state and map to enum value
         this.state = UsedConstants.STATES.values()[resultCode];
         //update activity's state
 
-        // TODO 05/09 OUD WNT NIET MEER RELEVANT WRSL this.stateChanged();
     }
 
 
@@ -1246,8 +1121,6 @@ public class AdvancedFragment extends Fragment {
                     if (state == UsedConstants.STATES.STATE_RECOGNIZE) {
 
                         // TILT GESTURE DETECTION
-                        // TODO is testen met float[] ipv int[]. want andere recognizer past float toe.
-                        // UPDATE: maar hierboven is de data vanuit een int[] gehaald dusja.
                         int[] intArray = {latest_data[0], latest_data[1], latest_data[2]};
                         results = theTiltGestureRecognizer.update(intArray);
 
@@ -1259,7 +1132,6 @@ public class AdvancedFragment extends Fragment {
                     }
 
 
-
                     // If NO tilt gesture was detected, we pass the accel data to the more advanced recognizer.
                     if (results[0] == false && results[1] == false) {
 
@@ -1267,24 +1139,6 @@ public class AdvancedFragment extends Fragment {
                         sendAccelDataToFragment(floatArray);
 
                     }
-
-
-
-
-                    // TODO dit mag wrsl weg?
-                    /*// ------ TEST - voor MOEILIJKERE gesture detection
-
-                    // TODO we werken nu met INTs maar de gesture recognizer werkt eigenlijk met FLOATs
-                    // is het nuttig om met FLOATs te werken? to test...
-                    float[] floatArray = {latest_data[0], latest_data[1], latest_data[2]};
-
-                    try {
-                        // TODO ZIEN WANNEER recognitionService wordt aangemaakt/gecalled!
-                        recognitionService.giveNewAccelDataToService(floatArray);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                    // ------ TEST - voor MOEILIJKERE gesture detection*/
 
 
                     //Show
