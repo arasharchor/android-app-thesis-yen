@@ -11,14 +11,14 @@ Screenshots:
 
 Installation instructions:
 
-0) NOTE: his project also needs the following components to work:
+0) NOTE: This project needs all of the following components to work:
 - Wearable side (Pebble) application
 https://github.com/Asgaro/pebble-app-thesis-yen
 - Central hub side (Android) application
 https://github.com/Asgaro/android-app-thesis-yen
 - Action Device side (Ubuntu) application
 https://github.com/Asgaro/action-device-client-server-code
-- 4K free-viewpoint application with additions
+- 4K free-viewpoint application with additions (NOT AVAILABLE FOR PUBLIC USE)
 https://github.com/Asgaro/mmlab-app-additions
 
 Overall architecture overview: https://dl.dropboxusercontent.com/u/2648/Masterproef/Overall%20architecture.png
