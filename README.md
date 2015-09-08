@@ -22,6 +22,7 @@ https://github.com/Asgaro/action-device-client-server-code
 https://github.com/Asgaro/mmlab-app-additions
 
 Overall architecture overview: https://dl.dropboxusercontent.com/u/2648/Masterproef/Overall%20architecture.png
+
 A presentation in Dutch with accompanying script can be found at: https://dl.dropboxusercontent.com/u/2648/Masterproef/Presentatie%20Yen%20Mertens.pptx
 
 
