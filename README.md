@@ -40,8 +40,6 @@ http://dalelane.co.uk/blog/?p=1599
 Remarks:
 - This application GUI has only been optimized for tablets. It will work on smartphones but won't look as expected.
 
-- Don't look too much into the commit messages. Since this project has been implemented by a single person, GitHub was mostly used as a simple backup cloud service.
-
 - When exercising the up/down/left/right gesture, the start position is the position where the wearable display looks towards the sky and is horizontally aligned.
 
 - When training gestures, it's very important to choose gestures that don't have any slowdowns regarding acceleration occuring. Because, if one were to excersize this gesture in the Recognize phase, the slowdowns would make the Gesture Spotting mechanism think the gesture has been completed and hence, will stop the tracking too fast.
